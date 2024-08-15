@@ -1,0 +1,25 @@
+#+title: Todo for this project
+
+
+- [X] Figureout how to work with raylib
+- [X] Refactor project into a more modular system
+
+* Movement
+- [X] Add motion inertia to the objects, which basically allows for propper physics
+- [ ] Figure out a way to limit player acceleration by something like log(n), as he approaches the max speed
+  But make it be applied only when his absolute speed is rising and not falling.
+  Preferably do it in a way that will not involve logic and only math.
+
+* Physics
+- [ ] Make a more generelized physics handler that will apply to all objects.
+  Most likely just refactor the code to handle multiple objects with same rules as the player
+
+* Rendering
+- [ ] Look into using a 2D camera, so I don't have to limit player movement to the screen size.
+- [ ] Look into using sprites
+
+* Gameplay
+- [ ] Shooting
+  - [ ] Projectile physics and haldeing. Not sure how yet.
+
+- [ ] Asteroids
