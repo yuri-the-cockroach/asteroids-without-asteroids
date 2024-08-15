@@ -1,0 +1,10 @@
+#+title: Conventions
+#+description: This file will serve as a guide for the coding conventions I'm using in this project.
+
+* Error handling:
+- errno MUST be set to 0 on the program start
+- errno will be checked on any somewhat critical function
+and will result in the cancellation if errno is not 0.
+- errno should ALLWAYS be set to 0 when calling a function.
+- If a function needs to set errno for any reason,
+  it must be returned back to 0 after the error has been handled
