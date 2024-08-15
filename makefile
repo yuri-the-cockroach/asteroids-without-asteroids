@@ -26,6 +26,10 @@ build-syslogic:
 	clang -Wall -fPIC -lraylib -I headers/ -o object-files/syslogic.o -c syslogic.c
 	clang -shared -o shared/libsyslogic.so object-files/syslogic.o
 
+build-drawing:
+	clang -Wall -fPIC -lraylib -I headers/ -o object-files/drawing.o -c drawing.c
+	clang -shared -o shared/libdrawing.so object-files/drawing.o
+
 build-main:
 	clang -Wall -g -I headers -Lshared -lplayerlogic -lsyslogic -lgamelogic -lraylib -lGL -lm -lpthread -ldl -lrt -lglfw -o main main.c
 
