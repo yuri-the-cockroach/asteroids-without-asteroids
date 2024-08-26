@@ -5,20 +5,24 @@
 #include <signal.h>
 #include <err.h>
 #include <stdbool.h>
-#include <errno.h>
 
 // Local Headers
 #include "headers/syslogic.h"
 #include "headers/playerlogic.h"
 #include "headers/gamelogic.h"
-#include "headers/drawing.h"
+
+
+
+/* ----------------- General System Logic ----------------- */
+
+
+/* ----------------- Player Geometry Functions ----------------- */
 
 
 
 // Retuns prefilled PlayerStruct with default data
 
 int main() {
-    errno = 0;
     signal(SIGINT, SigIntHandler);
 
     const int screenWidth = 1280;
