@@ -21,11 +21,12 @@ struct player {
 } typedef       PlayerStruct;
 
 const PlayerShape PLAYER_BASE_SHAPE = (PlayerShape) { // Geometry of the player model
-    0.5,
+    0.5, {
     (Vector2){   0, -100 }, // Is always treated as the fronts-most point, used to get the heading
     (Vector2){  50,   50 },
     (Vector2){   0,    0 },
     (Vector2){ -50,   50 }
+    }
 };
 
 /*
@@ -36,7 +37,7 @@ const PlayerShape PLAYER_BASE_SHAPE = (PlayerShape) { // Geometry of the player 
 void UpdatePlayerPos(PlayerStruct *player);
 
 // Handles acceleration of the player
-void OnAccelerate(PlayerStruct *player, float speed);
+void OnPlayerAccelerate(PlayerStruct *player, float speed);
 
 // Determens and updates player.heading variable
 void UpdatePlayerHeading(PlayerStruct *player);
