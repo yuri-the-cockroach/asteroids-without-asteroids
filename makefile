@@ -17,7 +17,7 @@ define buildLib
 	@if [ -f object-files/$1.o ]; then rm object-files/$1.o; fi
 	@if [ -f shared/$1.so ]; then rm shared/$1.so; fi
 
-    clang $(WARNINGS) -g -fPIC -ferror-limit=0 -lraylib -I headers/ -o object-files/$1.o -c $1.c
+    clang $(WARNINGS) -g -fPIC -ferror-limit=0 -lraylib -I headers/ -o object-files/$1.o -c src/$1.c
     clang -g -fPIC -ferror-limit=0 -shared -o shared/lib$1.so object-files/$1.o
 endef
 
@@ -34,7 +34,7 @@ buildSysLogic:
 
 buildMain:
 	@if [ -f main.o ]; then rm main.o; fi
-	bear -- clang $(WARNINGS) -ferror-limit=0 -g -Og -I headers -Lshared -lobjectlogic -lsyslogic -lgamelogic -lraylib -lGL -lm -lpthread -ldl -lrt -lglfw -o main.o main.c
+	bear -- clang $(WARNINGS) -ferror-limit=0 -g -Og -I headers -Lshared -lobjectlogic -lsyslogic -lgamelogic -lraylib -lGL -lm -lpthread -ldl -lrt -lglfw -o build/main.o src/main.c
 
 run: main.o
 	./main.o

@@ -1,28 +1,21 @@
 /* #include "objectHandler.h" */
 #include <stdlib.h>
+#include "objectlogic.h"
 
 typedef struct tracker ObjTracker;
 typedef struct object Object;
+
 enum action {
     IGNORE = 1,
     UPDATE = 0,
     DELETE = -1
 };
 
-enum type {
-    GENERIC = 0,
-    PLAYER = 1,
-    ASTEROID = 2,
-    RESERVED = -1
-};
-
-struct object {
     enum action request;
     enum type objType;
     void *objPtr;
     void (*UpdateObj)(Object *self);
     void (*DeleteObj)(Object *self);
-};
 
 struct tracker {
     unsigned int objCount;
