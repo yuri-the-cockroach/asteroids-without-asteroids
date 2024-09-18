@@ -1,15 +1,12 @@
 #include "headers/gamelogic.h"
 
-void KeyboardHandler(PlayerStruct *player) {
+void KeyboardHandler(ObjectStruct *object) {
 
-    float adjMoveSpeed = player->moveSpeed * GetFrameTime();
-    float adjRotateSpeed = player->rotateSpeed * GetFrameTime();
-    float rotateBy = 0;
+    float adjMoveSpeed = object->moveSpeed * GetFrameTime();
+    float adjRotateSpeed = object->rotateSpeed * GetFrameTime();
 
-    if (IsKeyDown('W')) OnAccelerate(player, adjMoveSpeed);
-    if (IsKeyDown('S')) OnAccelerate(player, -adjMoveSpeed);
-    if (IsKeyDown('D')) rotateBy += adjRotateSpeed;
-    if (IsKeyDown('A')) rotateBy -= adjRotateSpeed;
-
-    MutTransformPlayerMatrix(player, rotateBy);
+    if (IsKeyDown('W')) OnObjectAccelerate(object, adjMoveSpeed);
+    if (IsKeyDown('S')) OnObjectAccelerate(object, -adjMoveSpeed);
+    if (IsKeyDown('D')) object->shape.TransformShapeMatrix(&object->shape, object->heading += adjRotateSpeed);
+    if (IsKeyDown('A')) object->shape.TransformShapeMatrix(&object->shape, object->heading -= adjRotateSpeed);
 }
