@@ -1,26 +1,10 @@
+#include "headers/main.h"
 
-#include <raylib.h>
-#include <rcamera.h>
-#include <raymath.h>
-#include <signal.h>
-#include <err.h>
-#include <stdbool.h>
-
-// Local Headers
-#include "headers/syslogic.h"
-#include "headers/playerlogic.h"
-#include "headers/gamelogic.h"
+const unsigned int BASE_ACCELL = 5;
+const unsigned int BASE_ROTATE = 5;
 
 
-
-/* ----------------- General System Logic ----------------- */
-
-
-/* ----------------- Player Geometry Functions ----------------- */
-
-
-
-// Retuns prefilled PlayerStruct with default data
+// Retuns prefilled ObjectStruct with default data
 
 int main() {
     signal(SIGINT, SigIntHandler);
@@ -30,8 +14,7 @@ int main() {
 
     int fpsTarget = 120;
 
-
-    InitWindow(screenWidth, screenHight, "Something something artillery");
+    InitWindow(screenWidth, screenHight, "asteroids without asteroids");
 
     SetWindowPosition(2560 + 900 - screenWidth, 0);
     SetWindowMinSize(10, 10);
@@ -39,17 +22,35 @@ int main() {
 
     SetTargetFPS(fpsTarget);
 
+    ShapeStruct PLAYER_SHAPE = InitShape(PLAYER_SHAPE_POINTS, sizeof(PLAYER_SHAPE_POINTS) / sizeof(Vector2), 0.5);
+    ShapeStruct ASTEROID_SHAPE = InitShape(ASTEROID_SHAPE_POINTS, sizeof(ASTEROID_SHAPE_POINTS) / sizeof(Vector2), 1);
 
-    /* --------------------- Player Init -------------------- */
 
-    PlayerStruct player = InitPlayer();
+/*  ---------------------<Object Init>--------------------  */
+
+
+    ObjectStruct asteroid = InitObject(ASTEROID_SHAPE);
+    asteroid.position = (Vector2){300, 300};
+
+    asteroid.speed = (Vector2){6, 9};
+
+    ObjectStruct player = InitObject(PLAYER_SHAPE);
     player.position = (Vector2){ 200, 200 };
+    player.moveSpeed = 5;
+    player.rotateSpeed = 5;
 
+    char * currentRotation = malloc(sizeof(char) * 64);
+
+    printf("player array length: %d\n", player.shape.arrayLength);
+    printf("sizeof(PLAYER_SHAPE): %ld\n", sizeof(PLAYER_SHAPE.arrayLength));
+    printf("sizeof(PLAYER_SHAPE): %ld\n", sizeof(Vector2));
     while (!WindowShouldClose()) {
          // Adjust moving speed for current frametime, so you don't get faster as fps goes up
         KeyboardHandler(&player); // All the keybindings and movement
 
-        UpdatePlayerPos(&player);
+        sprintf(currentRotation, "pos x: %f y: %f", player.position.x, player.position.y);
+        UpdateObjectPos(&asteroid);
+        UpdateObjectPos(&player);
 
         if (IsKeyPressed('9')) SetTargetFPS(fpsTarget = 75);
         if (IsKeyPressed('0')) SetTargetFPS(fpsTarget = 0);
@@ -60,9 +61,11 @@ int main() {
 
             ClearBackground(BLACK);
 
-            /* DrawRectangle(player.position.x, player.position.y, 100, 100, RED); */
-            DrawPlayer(&player);
+            /* DrawRectangle(object.position.x, object.position.y, 100, 100, RED); */
+            DrawObject(&asteroid);
+            DrawObject(&player);
             DrawFPS(400, 0);
+            DrawText(currentRotation, 10, 10, 24, RAYWHITE);
 
         EndDrawing();
     }
