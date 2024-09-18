@@ -7,32 +7,36 @@
 export PLATFORM=PLATFORM_DESKTOP
 export GLFW_LINUX_ENABLE_X11=FALSE
 export GLFW_LINUX_ENABLE_WAYLAND=TRUE
-export LD_LIBRARY_PATH=/home/cockroach/coding/c/raylib/asteroids/shared
+export LD_LIBRARY_PATH=/home/cockroach/coding/c/asteroids/shared
+export BUILDLIST=( $OBJECTLOGIC $GAMELOGIC $SYSLOGIC )
+export WARNINGS=-Wall -Wextra
+export RUN_MAIN=1
 
-run: build-full
-	./main
+define buildLib
+	@if [ -z $1 ]; then echo "No argument provided"; exit 1; fi
+	@if [ -f object-files/$1.o ]; then rm object-files/$1.o; fi
+	@if [ -f shared/$1.so ]; then rm shared/$1.so; fi
 
-build-full: clean-full build-syslogic build-gamelogic build-playerlogic build-main
+    clang $(WARNINGS) -g -fPIC -ferror-limit=0 -lraylib -I headers/ -o object-files/$1.o -c $1.c
+    clang -g -fPIC -ferror-limit=0 -shared -o shared/lib$1.so object-files/$1.o
+endef
 
-build-playerlogic:
-	clang -Wall -fPIC -lraylib -I headers/ -o object-files/playerlogic.o -c playerlogic.c
-	clang -shared -o shared/libplayerlogic.so object-files/playerlogic.o
+buildAll: buildObjectLogic buildGameLogic buildSysLogic buildMain
 
-build-gamelogic:
-	clang -Wall -fPIC -lraylib -I headers/ -o object-files/gamelogic.o -c gamelogic.c
-	clang -shared -o shared/libgamelogic.so object-files/gamelogic.o
+buildObjectLogic:
+	$(call buildLib,objectlogic)
 
-build-syslogic:
-	clang -Wall -fPIC -lraylib -I headers/ -o object-files/syslogic.o -c syslogic.c
-	clang -shared -o shared/libsyslogic.so object-files/syslogic.o
+buildGameLogic:
+	$(call buildLib,gamelogic)
 
-build-main:
-	clang -Wall -g -I headers -Lshared -lplayerlogic -lsyslogic -lgamelogic -lraylib -lGL -lm -lpthread -ldl -lrt -lglfw -o main main.c
+buildSysLogic:
+	$(call buildLib,syslogic)
 
-clean-full:
-	@if [ -f main ]; then\
-		rm main;\
-	fi
-	rm shared/* object-files/*
+buildMain:
+	@if [ -f main.o ]; then rm main.o; fi
+	bear -- clang $(WARNINGS) -ferror-limit=0 -g -Og -I headers -Lshared -lobjectlogic -lsyslogic -lgamelogic -lraylib -lGL -lm -lpthread -ldl -lrt -lglfw -o main.o main.c
+
+run: main.o
+	./main.o
 
 # end
