@@ -11,23 +11,8 @@
 #include <stdio.h>
 
 // Local Headers
-#include "syslogic.h"
-#include "objectlogic.h"
-#include "gamelogic.h"
-
-const Vector2 PLAYER_SHAPE_POINTS[] = {
-(Vector2){   0, -100 }, // Is always treated as the fronts-most point, used to get the heading
-(Vector2){  50,   50 },
-(Vector2){   0,    0 },
-(Vector2){ -50,   50 }
-};
-
-const Vector2 ASTEROID_SHAPE_POINTS[] = {
-(Vector2){-50,   50  },
-(Vector2){ 50,   50  },
-(Vector2){50,  -50  },        // Is always treated as the fronts-most point, used to get the heading
-(Vector2){ -50,  -50  }
-};
-
+#include "src/syslogic.h"
+#include "src/objectlogic.h"
+#include "src/gamelogic.h"
 
 #endif // MAIN_H_
