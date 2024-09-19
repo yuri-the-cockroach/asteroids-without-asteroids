@@ -10,8 +10,22 @@
 #include <raymath.h>
 #include <sys/types.h>
 
-typedef struct object ObjectStruct;
+typedef struct ObjectStruct ObjectStruct;
 typedef struct ShapeStruct ShapeStruct;
+
+const Vector2 PLAYER_SHAPE_POINTS[] = {
+(Vector2){   0, -100 }, // Is always treated as the fronts-most point, used to get the heading
+(Vector2){  50,   50 },
+(Vector2){   0,    0 },
+(Vector2){ -50,   50 }
+};
+
+const Vector2 ASTEROID_SHAPE_POINTS[] = {
+(Vector2){-50,   50  },
+(Vector2){ 50,   50  },
+(Vector2){50,  -50  },        // Is always treated as the fronts-most point, used to get the heading
+(Vector2){ -50,  -50  }
+};
 
 struct ShapeStruct {
     float   sizeMult;
@@ -22,22 +36,28 @@ struct ShapeStruct {
     /* Function references */
 
     void (*TransformShapeMatrix) (ShapeStruct *self, float angle);
+    void (*DeleteShapeStruct) (ShapeStruct *self);
 };
 
-struct object {
+struct ObjectStruct  {
     float       moveSpeed;
     float       rotateSpeed;
     float       heading;
     Vector2     position;
     Vector2     speed;
     ShapeStruct shape;
-} ;
+
+    /* Function references */
+
+    void (*DeleteObjectStruct) (ObjectStruct *self);
+
+};
 
 
 /*  ----------------------<Function definitions start here>----------------------  */
 
 
-//
+// Update the object position based on the speed, acceleration, rotation etc...
 void UpdateObjectPos(ObjectStruct *object);
 
 // Handles acceleration of the object
@@ -52,9 +72,16 @@ void DrawObject(ObjectStruct *object);
 // Adjusts scale of object geometry as requested
 Vector2* _ResizeVector2(const Vector2 *vector, float size, unsigned int arrayLength);
 
-//
+// Initialize ShapeStruct with default values
 ShapeStruct InitShape(const Vector2 *pointArray, unsigned int arrayLength, float sizeMult);
 
 // Returns ObjectStruct ready to use with default data initialized
-ObjectStruct InitObject(ShapeStruct shape);
+ObjectStruct InitObject(ShapeStruct shape, Vector2 initPosition, Vector2 initSpeed, unsigned int accelSpeed, unsigned int rotSpeed);
+
+// Free the ShapeStruct and cleanup
+void DeleteShapeStruct(ShapeStruct *self);
+
+// Free the ObjectStruct and cleanup
+void DeleteObjectStruct(ObjectStruct *self);
+
 #endif // OBJECTLOGIC_H_
