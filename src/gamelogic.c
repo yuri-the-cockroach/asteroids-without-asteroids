@@ -1,4 +1,4 @@
-#include "headers/gamelogic.h"
+#include "gamelogic.h"
 
 void KeyboardHandler(ObjectStruct *object) {
 
