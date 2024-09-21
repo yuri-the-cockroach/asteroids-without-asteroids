@@ -2,9 +2,6 @@
 #define SYSLOGIC_H
 
 #include <err.h>
-#include <signal.h>
-
-#include <stdlib.h>
 
 void SigIntHandler(int sig);
 

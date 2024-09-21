@@ -1,8 +1,10 @@
 #ifndef GAMELOGIC_H_
 #define GAMELOGIC_H_
-
+#include "structs.h"
 #include "objectlogic.h"
 
-void KeyboardHandler(ObjectStruct * player);
+void DebugingKeyHandler(ObjectTracker *tracker);
+void OnPlayerAccellerate(ObjectStruct *object, float speed);
+void KeyboardHandler(ObjectStruct * object);
 
 #endif // GAMELOGIC_H_

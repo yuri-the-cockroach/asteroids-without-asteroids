@@ -102,7 +102,7 @@ void AddWrapToList(ObjectTracker *self, ObjectWrap *wrap) {
 
 // Pass the default speed, default rotation speed, default position
 void CreatePlayer(ObjectTracker *self, Vector2 initPosition,
-                  unsigned int accelSpeed, unsigned int rotSpeed) {
+                  float size) {
     ObjectWrap *player = malloc(sizeof(ObjectWrap));
     player[0] = InitWrap();
 
@@ -111,37 +111,39 @@ void CreatePlayer(ObjectTracker *self, Vector2 initPosition,
     player->updatePosition = true;
     player->draw = true;
     player->collider = true;
-
+    player->isRotatableByGame = false;
     player->objPtr = malloc(sizeof(ObjectStruct));
     player->objPtr[0] =
         InitObject(InitShape(PLAYER_SHAPE_POINTS,
-                             sizeof(PLAYER_SHAPE_POINTS) / sizeof(Vector2),
-                             0.5),
+                            sizeof(PLAYER_SHAPE_POINTS) / sizeof(Vector2),
+                             size),
                    initPosition,
                    (Vector2){ 0, 0 },
-                   accelSpeed,
-                   rotSpeed);
+                   0,
+                   0,
+                   .8);
     AddWrapToList(self, player);
 }
 
 void CreateAsteroid(ObjectTracker *self, Vector2 initPosition,
-                    Vector2 initSpeed, int constRotationSpeed) {
+                    Vector2 initSpeed, float constRotationSpeed, float size) {
     ObjectWrap *asteroid = malloc(sizeof(ObjectWrap));
     asteroid[0] = InitWrap();
     asteroid->request = UPDATE;
     asteroid->updatePosition = true;
     asteroid->draw = true;
     asteroid->collider = true;
-    asteroid->cRotSpeed = constRotationSpeed;
+    asteroid->isRotatableByGame = true;
     asteroid->objPtr = malloc(sizeof(ObjectStruct));
     asteroid->objPtr[0] =
         InitObject(InitShape(ASTEROID_SHAPE_POINTS,
                              sizeof(ASTEROID_SHAPE_POINTS) / sizeof(Vector2),
-                             0.5),
+                             size),
                    initPosition,
                    initSpeed,
                    0,
-                   0);
+                   constRotationSpeed,
+                   1);
     AddWrapToList(self, asteroid);
 }
 
@@ -152,7 +154,7 @@ void DeleteObjWrap(ObjectWrap *self) {
 
 void DeleteTrackedObject(ObjectTracker *self, ObjectWrap *wrap) {
     unsigned long index = wrap->index;
-    wrap->WrapDestructor(wrap);
+    DeleteObjWrap(wrap);
 
     self->objListLen--;
     if (self->objListLen == index) {

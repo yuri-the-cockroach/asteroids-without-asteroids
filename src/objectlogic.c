@@ -1,73 +1,51 @@
 #include "objectlogic.h"
 #include <raylib.h>
-#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
+#define BOUNCEBACK 2
+
 void UpdateObjectPos(ObjectStruct *object) {
-    object->position.x =
-        fmod(object->position.x + object->speed.x * GetFrameTime(),
-             (float)GetScreenWidth());
-    if (object->position.x < 0)
-        object->position.x = (float)GetScreenWidth();
-    object->position.y =
-        fmod(object->position.y + object->speed.y * GetFrameTime(),
-             (float)GetScreenHeight());
-    if (object->position.y < 0)
-        object->position.y = (float)GetScreenHeight();
+    float frameTime = GetFrameTime();
+    Vector2 adjustedSpeed = { object->speed.x * frameTime,
+                              object->speed.y * frameTime };
+
+    if (object->position.x + adjustedSpeed.x < BORDER_OFFSET)
+        object->speed.x += BOUNCEBACK;
+    if (object->position.x + adjustedSpeed.x >
+        (float)GetScreenWidth() - BORDER_OFFSET)
+        object->speed.x -= BOUNCEBACK;
+
+    if (object->position.y + adjustedSpeed.y < BORDER_OFFSET)
+        object->speed.y += BOUNCEBACK;
+    if (object->position.y + adjustedSpeed.y >
+        (float)GetScreenHeight() - BORDER_OFFSET)
+        object->speed.y -= BOUNCEBACK;
+
+    adjustedSpeed =
+        (Vector2){ object->speed.x * frameTime, object->speed.y * frameTime };
+
+    object->position.x = object->position.x + adjustedSpeed.x;
+    object->position.y = object->position.y + adjustedSpeed.y;
 }
 
-void OnObjectAccelerate(ObjectStruct *object, float speed) {
-    object->speed.x = object->speed.x + object->shape.points[0].x * speed;
-    object->speed.y = object->speed.y + object->shape.points[0].y * speed;
-}
+void RotateObject(ObjectStruct *object, float rotateByDeg) {
 
-void TransformObjectMatrix(ShapeStruct *shape, float rotationAngle) {
-    for (unsigned int current = 0; current < shape->arrayLength; current++) {
-        shape->points[current].x =
-            (shape->refPoints[current].x * cos(rotationAngle)) -
-            (shape->refPoints[current].y * sin(rotationAngle));
-        shape->points[current].y =
-            (shape->refPoints[current].x * sin(rotationAngle)) +
-            (shape->refPoints[current].y * cos(rotationAngle));
+    object->heading += (rotateByDeg * GetFrameTime());
+    for (unsigned int current = 0; current < object->shape.arrayLength;
+         current++)
+    {
+        object->shape.points[current].x =
+            (object->shape.refPoints[current].x * cos(object->heading)) -
+            (object->shape.refPoints[current].y * sin(object->heading));
+        object->shape.points[current].y =
+            (object->shape.refPoints[current].x * sin(object->heading)) +
+            (object->shape.refPoints[current].y * cos(object->heading));
     }
 }
 
-void DrawObject(ObjectStruct *object) {
-    int prevPoint = 0;
-
-    for (unsigned int curPoint = 1; curPoint < object->shape.arrayLength;
-         curPoint++) {
-        DrawLineEx(
-            (Vector2){ // Draw from x/y
-                       object->shape.points[prevPoint].x + object->position.x,
-                       object->shape.points[prevPoint].y + object->position.y },
-            (Vector2){ // Draw to x/y
-                       object->shape.points[curPoint].x + object->position.x,
-                       object->shape.points[curPoint].y + object->position.y },
-            2.0,  // Thikness of the line
-            WHITE // Color of the line
-        );
-        prevPoint = curPoint;
-    }
-
-    // Draw the final line to finish the form. I'm too lazy to do this less
-    // janky
-    DrawLineEx(
-        (Vector2){ // Draw from x/y
-                   object->shape.points[0].x + object->position.x,
-                   object->shape.points[0].y + object->position.y },
-        (Vector2){ // Draw to x/y
-                   object->shape.points[object->shape.arrayLength - 1].x +
-                       object->position.x,
-                   object->shape.points[object->shape.arrayLength - 1].y +
-                       object->position.y },
-        1.0,  // Thikness of the line
-        WHITE // Color of the line
-    );
-}
-
-Vector2 *_ResizeVector2(const Vector2 *vector, float size,
-                        unsigned int arrayLength) {
+Vector2 *ResizeShape(const Vector2 *vector, float size,
+                     unsigned int arrayLength) {
     Vector2 *tempPShape = malloc(sizeof(Vector2) * arrayLength);
 
     for (unsigned int current = 0; current < arrayLength; current++) {
@@ -80,14 +58,11 @@ Vector2 *_ResizeVector2(const Vector2 *vector, float size,
 
 ShapeStruct InitShape(const Vector2 *pointArray, unsigned int arrayLength,
                       float sizeMult) {
-    ShapeStruct toReturn = {
-        sizeMult,
-        arrayLength,
-        calloc(arrayLength, sizeof(Vector2)),
-        (const Vector2 *)_ResizeVector2(pointArray, sizeMult, arrayLength),
-        *TransformObjectMatrix,
-        *DeleteShapeStruct
-    };
+    ShapeStruct toReturn = { sizeMult,
+                             arrayLength,
+                             calloc(arrayLength, sizeof(Vector2)),
+                             (const Vector2 *)ResizeShape(
+                                 pointArray, sizeMult, arrayLength) };
 
     memcpy((void *)toReturn.points,
            (void *)toReturn.refPoints,
@@ -121,6 +96,7 @@ void DeleteShapeStruct(ShapeStruct *self) {
 }
 
 void DeleteObjectStruct(ObjectStruct *self) {
-    self->shape.DeleteShapeStruct(&self->shape);
+    free((void *)self->shape.points);
+    free((void *)self->shape.refPoints);
     free(self);
 }
