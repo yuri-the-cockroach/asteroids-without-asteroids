@@ -9,7 +9,7 @@ export GLFW_LINUX_ENABLE_X11=FALSE
 export GLFW_LINUX_ENABLE_WAYLAND=TRUE
 export LD_LIBRARY_PATH=/home/cockroach/coding/c/asteroids/build
 export BUILDLIST=( $OBJECTLOGIC $GAMELOGIC $SYSLOGIC )
-export WARNINGS=-Wall -Wextra
+export WARNINGS=-Wall -Wextra -pedantic
 export RUN_MAIN=1
 
 define buildLib
