@@ -17,27 +17,38 @@ define buildLib
 	@if [ -f object-files/$1.o ]; then rm object-files/$1.o; fi
 	@if [ -f build/$1.so ]; then rm build/$1.so; fi
 
-    clang $(WARNINGS) -g -fPIC -ferror-limit=0 -lraylib -I src/ -o object-files/$1.o -c src/$1.c
-    clang -g -fPIC -ferror-limit=0 -shared -o build/lib$1.so object-files/$1.o
+    clang $(WARNINGS) -g -fPIC -ferror-limit=0 -I src/ -o object-files/$1.o -c src/$1.c
+    clang $(WARNINGS) -g -fPIC -ferror-limit=0 -shared -o build/lib$1.so object-files/$1.o
 endef
 
-buildAll:buildObjectHandler buildObjectLogic buildGameLogic buildSysLogic buildMain
+buildall:
+	mold -run make -j tracker objectlogic gamelogic syslogic utils render
+	mold -run make main
 
-buildObjectLogic:
+render:
+	$(call buildLib,render)
+
+utils:
+	$(call buildLib,utils)
+
+objectlogic:
 	$(call buildLib,objectlogic)
 
-buildGameLogic:
+gamelogic:
 	$(call buildLib,gamelogic)
 
-buildSysLogic:
+syslogic:
 	$(call buildLib,syslogic)
 
-buildObjectHandler:
+tracker:
 	$(call buildLib,objecthandler)
 
-buildMain:
+collider:
+	$(call buildLib,collider)
+
+main:
 	@if [ -f main.o ]; then rm main.o; fi
-	bear -- clang $(WARNINGS) -ferror-limit=0 -g -Og -Isrc -Lbuild -lobjectlogic -lsyslogic -lgamelogic -lraylib -lobjecthandler -lGL -lm -lpthread -ldl -lrt -lglfw -o build/main.o main.c
+	bear -- clang $(WARNINGS) -ferror-limit=0 -g -Og -Isrc -Lbuild -lutils -lrender -lobjectlogic -lsyslogic -lgamelogic -lraylib -lobjecthandler -lGL -lm -lpthread -ldl -lrt -lglfw -o build/main.o main.c
 
 run: main.o
 	./build/main.o

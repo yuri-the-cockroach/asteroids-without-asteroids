@@ -95,7 +95,9 @@ ShapeStruct InitShape(const Vector2 *pointArray, unsigned int arrayLength,
     return toReturn;
 }
 
-ObjectStruct InitObject(ShapeStruct shape, Vector2 initPosition, Vector2 initSpeed, unsigned int accelSpeed, unsigned int rotSpeed) {
+ObjectStruct InitObject(ShapeStruct shape, Vector2 initPosition,
+                        Vector2 initSpeed, unsigned int accelSpeed,
+                        float rotSpeed, float colliderMult) {
     return (ObjectStruct){
         accelSpeed, // acceleration speed
         rotSpeed, // Rotation speed
@@ -103,7 +105,12 @@ ObjectStruct InitObject(ShapeStruct shape, Vector2 initPosition, Vector2 initSpe
         initPosition, // Starting position of the object
         initSpeed, // Starting speed of the object
         shape,
-        *DeleteObjectStruct
+        (Rectangle){ -50 * shape.sizeMult * colliderMult,
+                    -50 * shape.sizeMult * colliderMult,
+                    100 * shape.sizeMult * colliderMult,
+                    100 * shape.sizeMult * colliderMult },
+        0.9,
+        shape.sizeMult * shape.sizeMult
     };
 }
 
