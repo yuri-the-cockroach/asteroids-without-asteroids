@@ -27,7 +27,7 @@ ShapeStruct InitShape(const Vector2 *pointArray, unsigned int arrayLength,
 
 // Returns ObjectStruct ready to use with default data initialized
 ObjectStruct InitObject(ShapeStruct shape, Vector2 initPosition,
-                        Vector2 initSpeed, unsigned int accelSpeed,
+                        Vector2 initSpeed,
                         float rotSpeed, float colliderMult);
 
 // Free the ShapeStruct and cleanup

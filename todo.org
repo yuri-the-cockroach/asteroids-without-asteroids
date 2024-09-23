@@ -1,0 +1,48 @@
+#+title: Todo
+
+- [ ] Menues
+  - [ ] Start Screen
+  - [ ] Pause
+  - [ ] End screen
+
+- [ ] Game Logic
+  - [ ] Seperate camera and game space
+  - [ ] Make game world bigger
+
+- [-] Collisions
+  - [X] Base system implementation
+  - [ ] Rewrite to use multithreading
+  - [ ] Rewrite to use multiple collision zones
+  - [ ] Better rotations on impact
+
+- [-] Player
+  - [-] Shooting
+    - [X] Base systems
+    - [ ] Make them more suitable for a game
+
+- [ ] Asteroids
+  - [ ] Dynamic spawn system
+  - [ ] Procedural shape generator
+  - [ ] Separation on getting shot
+
+- [X] Memory handelling (hopefully)
+
+- [ ] Stress testing and self-reporting
+
+- [-] Logging
+  - [X] Base logging system
+  - [ ] Rewrite the program to use logger system
+    - [ ] main
+    - [ ] objectHandler
+    - [ ] objectLogic
+    - [ ] renderer
+    - [ ] utils
+    - [ ] gamelogic
+    - [ ] syslogic
+    - [ ] logger(?)
+
+- [ ] String formatting into return
+
+- [ ] Optional
+  - [ ] Maybe make them combine on impact if it is powerfull enough
+  - [ ] Maybe basic nutonian gravity implementation

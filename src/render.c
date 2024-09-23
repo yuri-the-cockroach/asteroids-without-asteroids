@@ -1,47 +1,49 @@
-#include "render.h"
-#include "structs.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <raylib.h>
 
+#include "render.h"
+#include "structs.h"
+#include "logger.h"
 
-void AddToDrawList(ObjectTracker *self, ObjectStruct *obj) {
-    if (self->drawListLen >= MAX_OBJECT_COUNT) {
-        fprintf(stderr,
-                "Error in AddToDrawList, too many objects in "
-                "self->drawList\nself->drawListLen is at %ld\n",
-                self->drawListLen);
-        /* exit(ECHRNG); */
+void AddToDrawList(ObjectTracker *tracker, ObjectStruct *obj) {
+    if (tracker->drawListLen >= MAX_OBJECT_COUNT) {
+        char errmsg[67] = "";
+        sprintf(errmsg, "Too many objects in tracker->drawList\ntracker->drawListLen is at %ld", tracker->drawListLen);
+        LOG(ERROR, "%s", errmsg);
         return;
     }
-    self->drawList[self->drawListLen] = obj;
-    self->drawListLen++;
+    tracker->drawList[tracker->drawListLen] = obj;
+    tracker->drawListLen++;
 }
 
-void DrawAllFromDrawList(ObjectTracker *self) {
-    if (self->drawListLen == 0) {
-        printf("Warning: Draw list is empty, not drawing anything\n");
+void DrawAllFromDrawList(ObjectTracker *tracker) {
+    if (tracker->drawListLen == 0) {
+        LOG(DEBUG, "%s", "Drawing list is empty");
         return;
     }
 
-    for (unsigned int i = 0; i < self->drawListLen; i++) {
-        DrawObject(self->drawList[i]);
-        self->drawList[i] = NULL;
+    for (unsigned int i = 0; i < tracker->drawListLen; i++) {
+        DrawObject(tracker->drawList[i]);
+        tracker->drawList[i] = NULL;
     }
-    self->drawListLen = 0;
+    tracker->drawListLen = 0;
 }
 
 void DrawObject(ObjectStruct *object) {
-    int prevPoint = 0;
-
-    if (DEBUG) {
-        DrawRectangleLines(object->collider.x + object->position.x,
-                      object->collider.y + object->position.y,
-                      object->collider.width,
-                      object->collider.height,
+    if (CURRENT_LOG_LEVEL >= DEBUG) {
+        DrawRectangleLines((int)(object->collider.x + object->position.x),
+                      (int)(object->collider.y + object->position.y),
+                      (int)(object->collider.width),
+                      (int)(object->collider.height),
                       RED);
     }
 
+    if ( object->shape.arrayLength == 0 ) {
+        LOG(WARNING, "%s", "Attempting to draw an empty shape");
+    }
+
+    unsigned int prevPoint = 0;
     for (unsigned int curPoint = 1; curPoint < object->shape.arrayLength;
          curPoint++)
     {

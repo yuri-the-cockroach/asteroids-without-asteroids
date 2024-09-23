@@ -1,75 +1,66 @@
 #include "objecthandler.h"
 
+#include <err.h>
+#include <errno.h>
+#include <math.h>
 #include <raylib.h>
 #include <stdbool.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "gamelogic.h"
 #include "objectlogic.h"
 #include "render.h"
+#include "structs.h"
 #include "utils.h"
 
 // Returns a list of objects that need to be drawn
-void RunActionList(ObjectTracker *self) {
+void RunActionList(ObjectTracker *tracker) {
 
     // Run through all the tracked objects
-    for (unsigned long i = 0; i < self->objListLen; i++) {
-        ObjectWrap *current = self->objList[i];
+    for (unsigned long i = 0; i < tracker->objListLen; i++) {
 
         // Check if current object is NULLed (it really shouldn't be)
-        if (current == NULL) {
+        if (tracker->objList[i] == 0) continue;
             // If it is somehow NULL, then cleanup:
-            // Check if there's any elements ahead at all. If not just decrement the length of the list.
-            if (i > self->objListLen - 2) {
-                self->objListLen--;
-                break;
-            }
+            // Check if there's any elements ahead at all. If not just decrement
+            // the length of the list.
 
-            self->objList[i] = self->objList[self->objListLen - 1]; // Set current to the last known element of the list
-            self->objList[self->objListLen] = 0; // NULL the last one
-            self->objListLen--; // Decrement the length
-            current = self->objList[i]; // Set current to the newly assinged element
-        }
-
+        ObjectWrap *current = tracker->objList[i];
         switch (current->request) {
         case IGNORE:
             continue; // next for cycle
 
         case DELETE: // Delete element from the list
-            DeleteTrackedObject(self, current);
+            DeleteTrackedObject(tracker, i);
             continue;
 
         case UPDATE: // Call the updater function of the element
-            UpdateObj(self, current);
+            UpdateObj(tracker, current);
             break;
         }
     }
+
+    CleanupMemory(tracker);
 }
 
 void UpdateObj(ObjectTracker *tracker, ObjectWrap *wrap) {
-    if (wrap->player)
+    if (wrap->objectType == PLAYER)
         KeyboardHandler(wrap->objPtr);
 
     if (wrap->collider)
         CheckCollisions(tracker, wrap);
 
-    if (wrap->updatePosition) {
-        if (!wrap->ignoreNext) {
-            UpdateObjectPos(wrap->objPtr);
-        } else
-            wrap->ignoreNext = false;
-    }
-
     if (wrap->isRotatableByGame) {
         RotateObject(wrap->objPtr, (wrap->objPtr->rotateSpeed));
     }
 
+    if (wrap->updatePosition)
+        UpdateObjectPos(wrap->objPtr);
+
     if (wrap->draw)
         AddToDrawList(tracker, wrap->objPtr);
 }
-
-
 
 ObjectTracker InitTracker(void) {
     return (ObjectTracker){
@@ -83,59 +74,64 @@ ObjectTracker InitTracker(void) {
 
 ObjectWrap InitWrap(void) {
     return (
-        ObjectWrap){ 0, IGNORE, false, false, false, false, 0, NULL, false, NULL};
+        ObjectWrap){ NOTYPE, IGNORE, false, false, false, false, NULL, NULL };
 }
 
-void AddWrapToList(ObjectTracker *self, ObjectWrap *wrap) {
-    if (self->objListLen >= MAX_OBJECT_COUNT) {
+int AddWrapToList(ObjectTracker *tracker, ObjectWrap *wrap) {
+    if (tracker->objListLen >= MAX_OBJECT_COUNT) {
         fprintf(stderr,
                 "Error in AddWrapToList, too many objects in "
-                "self->objList\nself->objListLen is at %ld\n",
-                self->objListLen);
-        /* exit(ECHRNG); */
-        return;
+                "tracker->objList\ntracker->objListLen is at %ld\n",
+                tracker->objListLen);
+        errno = ECHRNG;
+        return -1;
     }
-    wrap->index = self->objListLen;
-    self->objList[self->objListLen] = wrap;
-    self->objListLen++;
+    tracker->objList[tracker->objListLen] = wrap;
+    tracker->objListLen++;
+    return 0;
 }
 
 // Pass the default speed, default rotation speed, default position
-void CreatePlayer(ObjectTracker *self, Vector2 initPosition,
-                  float size) {
+void CreatePlayer(ObjectTracker *tracker, Vector2 initPosition, float size) {
+
     ObjectWrap *player = malloc(sizeof(ObjectWrap));
     player[0] = InitWrap();
 
-    player->request = UPDATE;
-    player->player = true;
-    player->updatePosition = true;
-    player->draw = true;
-    player->collider = true;
-    player->isRotatableByGame = false;
-    player->objPtr = malloc(sizeof(ObjectStruct));
-    player->objPtr[0] =
+    if (AddWrapToList(tracker, player)) {
+        free(player); // TODO: Make a propper logger and call it when
+                      // something goes wrong
+        return;
+    }
+
+    ObjectStruct *objPtr = malloc(sizeof(ObjectStruct));
+    objPtr[0] =
         InitObject(InitShape(PLAYER_SHAPE_POINTS,
-                            sizeof(PLAYER_SHAPE_POINTS) / sizeof(Vector2),
+                             sizeof(PLAYER_SHAPE_POINTS) / sizeof(Vector2),
                              size),
                    initPosition,
                    (Vector2){ 0, 0 },
                    0,
                    0,
                    .8);
-    AddWrapToList(self, player);
+
+    player[0] = (ObjectWrap){ PLAYER, UPDATE, true,   true,
+                              true,   false, objPtr, *Bounce };
 }
 
-void CreateAsteroid(ObjectTracker *self, Vector2 initPosition,
+void CreateAsteroid(ObjectTracker *tracker, Vector2 initPosition,
                     Vector2 initSpeed, float constRotationSpeed, float size) {
+
     ObjectWrap *asteroid = malloc(sizeof(ObjectWrap));
     asteroid[0] = InitWrap();
-    asteroid->request = UPDATE;
-    asteroid->updatePosition = true;
-    asteroid->draw = true;
-    asteroid->collider = true;
-    asteroid->isRotatableByGame = true;
-    asteroid->objPtr = malloc(sizeof(ObjectStruct));
-    asteroid->objPtr[0] =
+    if (AddWrapToList(tracker, asteroid)) {
+        errno = 0;
+        free(asteroid); // TODO: Make a propper logger and call it when
+                        // something goes wrong
+        return;
+    }
+
+    ObjectStruct *objPtr = malloc(sizeof(ObjectStruct));
+    objPtr[0] =
         InitObject(InitShape(ASTEROID_SHAPE_POINTS,
                              sizeof(ASTEROID_SHAPE_POINTS) / sizeof(Vector2),
                              size),
@@ -144,35 +140,63 @@ void CreateAsteroid(ObjectTracker *self, Vector2 initPosition,
                    0,
                    constRotationSpeed,
                    1);
-    AddWrapToList(self, asteroid);
+
+    asteroid[0] = (ObjectWrap){ ASTEROID, UPDATE, true,   true,
+                                true,     true,   objPtr, *Bounce };
 }
 
-void DeleteObjWrap(ObjectWrap *self) {
-    DeleteObjectStruct(self->objPtr);
-    free(self);
-}
+void CreateProjectile(ObjectTracker *tracker, ObjectWrap *parent) {
 
-void DeleteTrackedObject(ObjectTracker *self, ObjectWrap *wrap) {
-    unsigned long index = wrap->index;
-    DeleteObjWrap(wrap);
-
-    self->objListLen--;
-    if (self->objListLen == index) {
-        self->objList[index] = 0;
+    ObjectWrap *projectile = malloc(sizeof(ObjectWrap));
+    projectile[0] = InitWrap();
+    if (AddWrapToList(tracker, projectile)) {
+        errno = 0;
+        free(projectile); // TODO: Make a propper logger and call it
+                          // when something goes wrong
         return;
     }
 
-    self->objList[index] = self->objList[self->objListLen];
-    self->objList[self->objListLen] = 0;
+    ObjectStruct *objPtr = malloc(sizeof(ObjectStruct));
+    objPtr[0] = InitObject(
+        InitShape(PROJECTILE_SHAPE_POINTS,
+                  sizeof(PROJECTILE_SHAPE_POINTS) / sizeof(Vector2),
+                  PROJECTILE_SIZE),
+        (Vector2){ parent->objPtr->position.x +
+                       (parent->objPtr->shape.points[0].x * 1.5),
+                   parent->objPtr->position.y +
+                       (parent->objPtr->shape.points[0].y * 1.5) },
+        (Vector2){ parent->objPtr->shape.points[0].x * PROJECTILE_SPEED +
+                       parent->objPtr->speed.x,
+                   parent->objPtr->shape.points[0].y * PROJECTILE_SPEED +
+                       parent->objPtr->speed.y },
+        5,
+        (float)0.8);
+
+    projectile[0] = InitWrap();
+    projectile[0] = (ObjectWrap){ PROJECTILE, UPDATE, true,     true,
+                                  true,       true,   objPtr, *GetShoot };
+}
+
+void DeleteObjWrap(ObjectWrap *wrap) {
+    DeleteObjectStruct(wrap->objPtr);
+    free(wrap);
+}
+
+void DeleteTrackedObject(ObjectTracker *tracker, unsigned long index) {
+    DeleteObjWrap(tracker->objList[index]);
+    tracker->objList[index] = 0;
 }
 
 void CheckCollisions(ObjectTracker *tracker, ObjectWrap *first) {
     if (tracker->objListLen < 2)
         return;
 
-    for (unsigned int j = 0; j < tracker->objListLen; j++) {
+    if (!first) return;
 
+    for (unsigned int j = 0; j < tracker->objListLen; j++) {
         ObjectWrap *second = tracker->objList[j];
+        if (tracker->objList[j] == NULL)
+            continue;
 
         if (first == second)
             continue;
@@ -206,7 +230,10 @@ void CheckCollisions(ObjectTracker *tracker, ObjectWrap *first) {
              firstEnd.x > secondStart.x) &&
             (firstStart.y < secondEnd.y && firstEnd.y > secondStart.y))
         {
-            Bounce(first, second);
+            if (first->objectType > second->objectType)
+                first->ActionOnCollision(first, second);
+            else
+                second->ActionOnCollision(first, second);
         }
     }
 }
@@ -230,10 +257,10 @@ void Bounce(ObjectWrap *first, ObjectWrap *second) {
     {
         first->objPtr->speed.x -=
             relativeSpeed.x *
-            clamp(second->objPtr->mass / first->objPtr->mass, 0, 1);
+            clampFloat(second->objPtr->mass / first->objPtr->mass, 0, 1);
         second->objPtr->speed.x +=
             (relativeSpeed.x *
-             clamp(first->objPtr->mass / second->objPtr->mass, 0, 1));
+             clampFloat(first->objPtr->mass / second->objPtr->mass, 0, 1));
 
         ObjectWrap *left, *right;
 
@@ -249,10 +276,10 @@ void Bounce(ObjectWrap *first, ObjectWrap *second) {
             left->objPtr->position.x -= 1;
             right->objPtr->position.x += 1;
         }
-        if (left->isRotatableByGame){
+        if (left->isRotatableByGame) {
             ApplyMassBasedRandRotation(left);
         }
-        if (right->isRotatableByGame){
+        if (right->isRotatableByGame) {
             ApplyMassBasedRandRotation(right);
         }
     }
@@ -262,10 +289,10 @@ void Bounce(ObjectWrap *first, ObjectWrap *second) {
     {
         first->objPtr->speed.y -=
             (relativeSpeed.y *
-             clamp(second->objPtr->mass / first->objPtr->mass, 0, 1));
+             clampFloat(second->objPtr->mass / first->objPtr->mass, 0, 1));
         second->objPtr->speed.y +=
             (relativeSpeed.y *
-             clamp(first->objPtr->mass / second->objPtr->mass, 0, 1));
+             clampFloat(first->objPtr->mass / second->objPtr->mass, 0, 1));
 
         ObjectWrap *above, *below;
 
@@ -277,9 +304,31 @@ void Bounce(ObjectWrap *first, ObjectWrap *second) {
             below = first;
         }
 
-        if (first->objPtr->position.y != second->objPtr->position.y) {
+        if (roundf(first->objPtr->position.y) != roundf(second->objPtr->position.y)) {
             below->objPtr->position.y += 1;
             above->objPtr->position.y -= 1;
         }
+    }
+}
+
+void GetShoot(ObjectWrap *projectile, ObjectWrap *victim) {
+    projectile->request = DELETE;
+    victim->request = DELETE;
+}
+
+void CleanupMemory(ObjectTracker *tracker) {
+    for (unsigned long i = 0; i < tracker->objListLen; i++) {
+        if (tracker->objList[i] != 0)
+            continue;
+
+        if (tracker->objList[tracker->objListLen - 1] == 0) {
+            tracker->objListLen--;
+            i = 0;
+            continue;
+        }
+
+        tracker->objList[i] = tracker->objList[tracker->objListLen - 1];
+        tracker->objList[tracker->objListLen - 1] = 0;
+        tracker->objListLen--;
     }
 }

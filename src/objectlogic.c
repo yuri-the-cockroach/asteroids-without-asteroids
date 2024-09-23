@@ -1,9 +1,11 @@
 #include "objectlogic.h"
+#include <math.h>
 #include <raylib.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define BOUNCEBACK 2
+#define BOUNCEBACK_MAX_FORCE 20
+#define BOUNCEBACK_STEP_FORCE 50 // This will be adjusted by frametime, so it can be more than BOUNCEBACK_MAX_FORCE
 
 void UpdateObjectPos(ObjectStruct *object) {
     float frameTime = GetFrameTime();
@@ -11,16 +13,28 @@ void UpdateObjectPos(ObjectStruct *object) {
                               object->speed.y * frameTime };
 
     if (object->position.x + adjustedSpeed.x < BORDER_OFFSET)
-        object->speed.x += BOUNCEBACK;
+        object->speed.x =
+            object->speed.x < BOUNCEBACK_MAX_FORCE
+                ? object->speed.x + BOUNCEBACK_STEP_FORCE * frameTime
+                : BOUNCEBACK_MAX_FORCE;
     if (object->position.x + adjustedSpeed.x >
-        (float)GetScreenWidth() - BORDER_OFFSET)
-        object->speed.x -= BOUNCEBACK;
+        (float)(GetScreenWidth()) - BORDER_OFFSET)
+        object->speed.x =
+            object->speed.x > -BOUNCEBACK_MAX_FORCE
+                ? object->speed.x - BOUNCEBACK_STEP_FORCE * frameTime
+                : -BOUNCEBACK_MAX_FORCE;
 
     if (object->position.y + adjustedSpeed.y < BORDER_OFFSET)
-        object->speed.y += BOUNCEBACK;
+        object->speed.y =
+            object->speed.y < BOUNCEBACK_MAX_FORCE
+                ? object->speed.y + BOUNCEBACK_STEP_FORCE * frameTime
+                : BOUNCEBACK_MAX_FORCE;
     if (object->position.y + adjustedSpeed.y >
-        (float)GetScreenHeight() - BORDER_OFFSET)
-        object->speed.y -= BOUNCEBACK;
+        (float)(GetScreenHeight()) - BORDER_OFFSET)
+        object->speed.y =
+            object->speed.y > -BOUNCEBACK_MAX_FORCE
+                ? object->speed.y - BOUNCEBACK_STEP_FORCE * frameTime
+                : -BOUNCEBACK_MAX_FORCE;
 
     adjustedSpeed =
         (Vector2){ object->speed.x * frameTime, object->speed.y * frameTime };
@@ -36,11 +50,11 @@ void RotateObject(ObjectStruct *object, float rotateByDeg) {
          current++)
     {
         object->shape.points[current].x =
-            (object->shape.refPoints[current].x * cos(object->heading)) -
-            (object->shape.refPoints[current].y * sin(object->heading));
+            (float)((object->shape.refPoints[current].x * cosf(object->heading)) -
+            (object->shape.refPoints[current].y * sinf(object->heading)));
         object->shape.points[current].y =
-            (object->shape.refPoints[current].x * sin(object->heading)) +
-            (object->shape.refPoints[current].y * cos(object->heading));
+            (object->shape.refPoints[current].x * sinf(object->heading)) +
+            (object->shape.refPoints[current].y * cosf(object->heading));
     }
 }
 
@@ -49,8 +63,8 @@ Vector2 *ResizeShape(const Vector2 *vector, float size,
     Vector2 *tempPShape = malloc(sizeof(Vector2) * arrayLength);
 
     for (unsigned int current = 0; current < arrayLength; current++) {
-        tempPShape[current].x = round(vector[current].x * size);
-        tempPShape[current].y = round(vector[current].y * size);
+        tempPShape[current].x = roundf(vector[current].x * size);
+        tempPShape[current].y = roundf(vector[current].y * size);
     }
 
     return tempPShape;
@@ -71,10 +85,9 @@ ShapeStruct InitShape(const Vector2 *pointArray, unsigned int arrayLength,
 }
 
 ObjectStruct InitObject(ShapeStruct shape, Vector2 initPosition,
-                        Vector2 initSpeed, unsigned int accelSpeed,
+                        Vector2 initSpeed,
                         float rotSpeed, float colliderMult) {
     return (ObjectStruct){
-        accelSpeed, // acceleration speed
         rotSpeed, // Rotation speed
         0, // Starter heading
         initPosition, // Starting position of the object
