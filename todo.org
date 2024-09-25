@@ -44,5 +44,5 @@
 - [ ] String formatting into return
 
 - [ ] Optional
-  - [ ] Maybe make them combine on impact if it is powerfull enough
+  - [ ] Maybe make asteroids combine on impact if it is powerfull enough
   - [ ] Maybe basic nutonian gravity implementation
