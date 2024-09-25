@@ -5,9 +5,9 @@
   - [ ] Pause
   - [ ] End screen
 
-- [ ] Game Logic
-  - [ ] Seperate camera and game space
-  - [ ] Make game world bigger
+- [X] Game Logic
+  - [X] Seperate camera and game space
+  - [X] Make game world bigger
 
 - [-] Collisions
   - [X] Base system implementation
@@ -41,7 +41,7 @@
     - [ ] syslogic
     - [ ] logger(?)
 
-- [ ] String formatting into return
+- [X] String formatting into return
 
 - [ ] Optional
   - [ ] Maybe make asteroids combine on impact if it is powerfull enough
