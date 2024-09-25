@@ -1,19 +1,21 @@
-#include <stdlib.h>
-#include <stdio.h>
 #include <raylib.h>
+#include <stdio.h>
+#include <stdlib.h>
 
+#include "logger.h"
 #include "render.h"
 #include "structs.h"
-#include "logger.h"
+#include "visdebugger.h"
 
-void AddToDrawList(ObjectTracker *tracker, ObjectStruct *obj) {
+void AddToDrawList(ObjectTracker *tracker, ObjectWrap *wrap) {
     if (tracker->drawListLen >= MAX_OBJECT_COUNT) {
-        char errmsg[67] = "";
-        sprintf(errmsg, "Too many objects in tracker->drawList\ntracker->drawListLen is at %ld", tracker->drawListLen);
-        LOG(ERROR, "%s", errmsg);
+        LOG(ERROR,
+            "%s",
+            "Too many objects in tracker->drawList\ntracker->drawListLen"
+            "is at %ld");
         return;
     }
-    tracker->drawList[tracker->drawListLen] = obj;
+    tracker->drawList[tracker->drawListLen] = wrap;
     tracker->drawListLen++;
 }
 
@@ -30,30 +32,39 @@ void DrawAllFromDrawList(ObjectTracker *tracker) {
     tracker->drawListLen = 0;
 }
 
-void DrawObject(ObjectStruct *object) {
-    if (CURRENT_LOG_LEVEL >= DEBUG) {
-        DrawRectangleLines((int)(object->collider.x + object->position.x),
-                      (int)(object->collider.y + object->position.y),
-                      (int)(object->collider.width),
-                      (int)(object->collider.height),
-                      RED);
-    }
+void DrawObject(ObjectWrap *wrap) {
+    if (VISUAL_DEBUG)
+        DrawRectangleLines(
+            (int)(wrap->collider.collider.x + wrap->objPtr->position.x),
+            (int)(wrap->collider.collider.y + wrap->objPtr->position.y),
+            (int)(wrap->collider.collider.width),
+            (int)(wrap->collider.collider.height),
+            RED);
 
-    if ( object->shape.arrayLength == 0 ) {
+    DebugDisplayText((Vector2){ wrap->objPtr->position.x, wrap->objPtr->position.y + 50},
+                     "Speed.x: %f\nSpeed.y: %f",
+                     (double)wrap->objPtr->speed.x,
+                     (double)wrap->objPtr->speed.y);
+
+    if (wrap->objPtr->shape.arrayLength == 0) {
         LOG(WARNING, "%s", "Attempting to draw an empty shape");
     }
 
     unsigned int prevPoint = 0;
-    for (unsigned int curPoint = 1; curPoint < object->shape.arrayLength;
+    for (unsigned int curPoint = 1; curPoint < wrap->objPtr->shape.arrayLength;
          curPoint++)
     {
         DrawLineEx(
             (Vector2){ // Draw from x/y
-                       object->shape.points[prevPoint].x + object->position.x,
-                       object->shape.points[prevPoint].y + object->position.y },
+                       wrap->objPtr->shape.points[prevPoint].x +
+                           wrap->objPtr->position.x,
+                       wrap->objPtr->shape.points[prevPoint].y +
+                           wrap->objPtr->position.y },
             (Vector2){ // Draw to x/y
-                       object->shape.points[curPoint].x + object->position.x,
-                       object->shape.points[curPoint].y + object->position.y },
+                       wrap->objPtr->shape.points[curPoint].x +
+                           wrap->objPtr->position.x,
+                       wrap->objPtr->shape.points[curPoint].y +
+                           wrap->objPtr->position.y },
             2.0,  // Thikness of the line
             WHITE // Color of the line
         );
@@ -64,14 +75,59 @@ void DrawObject(ObjectStruct *object) {
     // janky
     DrawLineEx(
         (Vector2){ // Draw from x/y
-                   object->shape.points[0].x + object->position.x,
-                   object->shape.points[0].y + object->position.y },
-        (Vector2){ // Draw to x/y
-                   object->shape.points[object->shape.arrayLength - 1].x +
-                       object->position.x,
-                   object->shape.points[object->shape.arrayLength - 1].y +
-                       object->position.y },
+                   wrap->objPtr->shape.points[0].x + wrap->objPtr->position.x,
+                   wrap->objPtr->shape.points[0].y + wrap->objPtr->position.y },
+        (Vector2){
+            // Draw to x/y
+            wrap->objPtr->shape.points[wrap->objPtr->shape.arrayLength - 1].x +
+                wrap->objPtr->position.x,
+            wrap->objPtr->shape.points[wrap->objPtr->shape.arrayLength - 1].y +
+                wrap->objPtr->position.y },
         1.0,  // Thikness of the line
         WHITE // Color of the line
     );
+}
+
+void DrawGrid2D(int dist, Color color) {
+
+    int shiftedCoord = abs(WORLD_POS_MIN_X) + abs(WORLD_POS_MAX_X);
+
+    dist = shiftedCoord % dist != 0 ? dist + (shiftedCoord % dist) : dist;
+
+    for (int current = 0; current < shiftedCoord; current += dist) {
+        DrawLine(WORLD_POS_MIN_X + current,
+                 WORLD_POS_MIN_Y,
+                 WORLD_POS_MIN_X + current,
+                 WORLD_POS_MAX_Y,
+                 color);
+        DrawLine(WORLD_POS_MIN_X,
+                 WORLD_POS_MIN_Y + current,
+                 WORLD_POS_MAX_X,
+                 WORLD_POS_MIN_Y + current,
+                 color);
+    }
+
+    DrawLine(WORLD_POS_MIN_X,
+             WORLD_POS_MIN_Y,
+             WORLD_POS_MIN_X,
+             WORLD_POS_MAX_Y,
+             WHITE);
+
+    DrawLine(WORLD_POS_MIN_X,
+             WORLD_POS_MAX_Y,
+             WORLD_POS_MAX_X,
+             WORLD_POS_MAX_Y,
+             WHITE);
+
+    DrawLine(WORLD_POS_MAX_X,
+             WORLD_POS_MAX_Y,
+             WORLD_POS_MAX_X,
+             WORLD_POS_MIN_Y,
+             WHITE);
+
+    DrawLine(WORLD_POS_MAX_X,
+             WORLD_POS_MIN_Y,
+             WORLD_POS_MIN_X,
+             WORLD_POS_MIN_Y,
+             WHITE);
 }

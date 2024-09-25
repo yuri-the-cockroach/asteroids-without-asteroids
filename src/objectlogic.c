@@ -1,46 +1,35 @@
 #include "objectlogic.h"
+#include "structs.h"
 #include <math.h>
 #include <raylib.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define BOUNCEBACK_MAX_FORCE 20
-#define BOUNCEBACK_STEP_FORCE 50 // This will be adjusted by frametime, so it can be more than BOUNCEBACK_MAX_FORCE
+// This will be adjusted by frametime, so it can be more than
+// BOUNCEBACK_MAX_FORCE
 
-void UpdateObjectPos(ObjectStruct *object) {
+void UpdateObjectPos(ObjectWrap *wrap) {
     float frameTime = GetFrameTime();
-    Vector2 adjustedSpeed = { object->speed.x * frameTime,
-                              object->speed.y * frameTime };
+    Vector2 adjustedSpeed = { wrap->objPtr->speed.x * frameTime,
+                              wrap->objPtr->speed.y * frameTime };
 
-    if (object->position.x + adjustedSpeed.x < BORDER_OFFSET)
-        object->speed.x =
-            object->speed.x < BOUNCEBACK_MAX_FORCE
-                ? object->speed.x + BOUNCEBACK_STEP_FORCE * frameTime
-                : BOUNCEBACK_MAX_FORCE;
-    if (object->position.x + adjustedSpeed.x >
-        (float)(GetScreenWidth()) - BORDER_OFFSET)
-        object->speed.x =
-            object->speed.x > -BOUNCEBACK_MAX_FORCE
-                ? object->speed.x - BOUNCEBACK_STEP_FORCE * frameTime
-                : -BOUNCEBACK_MAX_FORCE;
+    if (wrap->objPtr->position.x + wrap->collider.collider.x < WORLD_POS_MIN_X && wrap->objPtr->speed.x < 0)
+        wrap->objPtr->speed.x *= -1;
 
-    if (object->position.y + adjustedSpeed.y < BORDER_OFFSET)
-        object->speed.y =
-            object->speed.y < BOUNCEBACK_MAX_FORCE
-                ? object->speed.y + BOUNCEBACK_STEP_FORCE * frameTime
-                : BOUNCEBACK_MAX_FORCE;
-    if (object->position.y + adjustedSpeed.y >
-        (float)(GetScreenHeight()) - BORDER_OFFSET)
-        object->speed.y =
-            object->speed.y > -BOUNCEBACK_MAX_FORCE
-                ? object->speed.y - BOUNCEBACK_STEP_FORCE * frameTime
-                : -BOUNCEBACK_MAX_FORCE;
+    if (wrap->objPtr->position.y + wrap->collider.collider.y < WORLD_POS_MIN_Y && wrap->objPtr->speed.y < 0)
+        wrap->objPtr->speed.y *= -1;
+
+    if (wrap->objPtr->position.x > WORLD_POS_MAX_X - (wrap->collider.collider.x + wrap->collider.collider.height) && wrap->objPtr->speed.x > 0)
+        wrap->objPtr->speed.x *= -1;
+
+    if (wrap->objPtr->position.y > WORLD_POS_MAX_Y - (wrap->collider.collider.y + wrap->collider.collider.height) && wrap->objPtr->speed.y > 0)
+        wrap->objPtr->speed.y *= -1;
 
     adjustedSpeed =
-        (Vector2){ object->speed.x * frameTime, object->speed.y * frameTime };
+        (Vector2){ wrap->objPtr->speed.x * frameTime, wrap->objPtr->speed.y * frameTime };
 
-    object->position.x = object->position.x + adjustedSpeed.x;
-    object->position.y = object->position.y + adjustedSpeed.y;
+    wrap->objPtr->position.x = wrap->objPtr->position.x + adjustedSpeed.x;
+    wrap->objPtr->position.y = wrap->objPtr->position.y + adjustedSpeed.y;
 }
 
 void RotateObject(ObjectStruct *object, float rotateByDeg) {
@@ -50,8 +39,10 @@ void RotateObject(ObjectStruct *object, float rotateByDeg) {
          current++)
     {
         object->shape.points[current].x =
-            (float)((object->shape.refPoints[current].x * cosf(object->heading)) -
-            (object->shape.refPoints[current].y * sinf(object->heading)));
+            (float)((object->shape.refPoints[current].x *
+                     cosf(object->heading)) -
+                    (object->shape.refPoints[current].y *
+                     sinf(object->heading)));
         object->shape.points[current].y =
             (object->shape.refPoints[current].x * sinf(object->heading)) +
             (object->shape.refPoints[current].y * cosf(object->heading));
@@ -75,8 +66,7 @@ ShapeStruct InitShape(const Vector2 *pointArray, unsigned int arrayLength,
     ShapeStruct toReturn = { sizeMult,
                              arrayLength,
                              calloc(arrayLength, sizeof(Vector2)),
-                             (const Vector2 *)ResizeShape(
-                                 pointArray, sizeMult, arrayLength) };
+                             ResizeShape(pointArray, sizeMult, arrayLength) };
 
     memcpy((void *)toReturn.points,
            (void *)toReturn.refPoints,
@@ -85,20 +75,13 @@ ShapeStruct InitShape(const Vector2 *pointArray, unsigned int arrayLength,
 }
 
 ObjectStruct InitObject(ShapeStruct shape, Vector2 initPosition,
-                        Vector2 initSpeed,
-                        float rotSpeed, float colliderMult) {
+                        Vector2 initSpeed, float rotSpeed) {
     return (ObjectStruct){
         rotSpeed, // Rotation speed
         0, // Starter heading
         initPosition, // Starting position of the object
         initSpeed, // Starting speed of the object
         shape,
-        (Rectangle){ -50 * shape.sizeMult * colliderMult,
-                    -50 * shape.sizeMult * colliderMult,
-                    100 * shape.sizeMult * colliderMult,
-                    100 * shape.sizeMult * colliderMult },
-        0.9,
-        shape.sizeMult * shape.sizeMult
     };
 }
 
@@ -112,4 +95,5 @@ void DeleteObjectStruct(ObjectStruct *self) {
     free((void *)self->shape.points);
     free((void *)self->shape.refPoints);
     free(self);
+
 }

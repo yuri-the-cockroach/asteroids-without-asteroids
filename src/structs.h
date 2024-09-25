@@ -19,13 +19,13 @@ enum loglevel {
 
 static const char *loglvlToString[9] = {
     "NOLOG",
-    "\033[1;31mFATAL\033[0m",
-    "\033[0;31mERROR\033[0m",
-    "\033[1;33mWARNING\033[0m",
-    "\033[0;32mINFO\033[0m",
-    "\033[0;34mFIXME\033[0m",
-    "\033[1;35mDEBUG\033[0m",
-    "\033[0;35mTRACE\033[0m",
+    "\033[1;31mFATAL\033[0;37m",
+    "\033[0;31mERROR\033[0;37m",
+    "\033[1;33mWARNING\033[0;37m",
+    "\033[0;32mINFO\033[0;37m",
+    "\033[0;34mFIXME\033[0;37m",
+    "\033[1;35mDEBUG\033[0;37m",
+    "\033[0;35mTRACE\033[0;37m",
     "ALL"
 };
 
@@ -38,12 +38,23 @@ typedef struct tracker ObjectTracker;
 typedef struct ObjectWrap ObjectWrap;
 typedef struct ObjectStruct ObjectStruct;
 typedef struct ShapeStruct ShapeStruct;
-
+typedef struct Collider Collider;
 /* -------------------- constants --------------------  */
 
-static const int RATE_OF_FIRE = 20;
+
+/* -------------------- Physics constants --------------------  */
+
+static const float ELASTICITY_FACTOR = 0.5; // How much energy object recives back on bouce
+
+static const int WORLD_POS_MIN_X = -5000;
+static const int WORLD_POS_MAX_X = 5000;
+
+static const int WORLD_POS_MIN_Y = -5000;
+static const int WORLD_POS_MAX_Y = 5000;
+
+static const int RATE_OF_FIRE = 5;
 static const int PROJECTILE_SPEED = 20;
-static const double PROJECTILE_SIZE = 0.1;
+static const float PROJECTILE_SIZE = 0.1f;
 static const int MAX_OBJECT_COUNT = 1024;
 static const int PLAYER_ROTATION_SPEED = 5;
 static const int PLAYER_MOVE_SPEED = 5;
@@ -54,11 +65,20 @@ static const int BASE_ROTATE = 5;
 static const int BORDER_OFFSET = 40;
 static const enum loglevel DEFAULT_LOG_LEVEL = WARNING;
 
+
+/* Externally defined dynamic global variables */
+
+extern bool VISUAL_DEBUG;
 extern enum loglevel CURRENT_LOG_LEVEL;
 extern long lastShot;
 extern int SCREEN_WIDTH;
 extern int SCREEN_HEIGHT;
 extern int FPS_TARGET;
+extern Camera2D camera;
+extern bool CAMERA_FOLLOW;
+extern bool PAUSE_GAME;
+
+extern bool GDB_STOP;
 
 static const Vector2 PLAYER_SHAPE_POINTS[] = {
     (Vector2){ 0,   -50 }, // Is always treated as the fronts-most point, used to
@@ -100,9 +120,18 @@ struct ObjectStruct {
     Vector2 position;
     Vector2 speed;
     ShapeStruct shape;
+};
+
+
+struct Collider {
+    bool isCollidable;          // True if object's collision is enabled
     Rectangle collider;
-    float friction;
     float mass;
+
+    void (*ActionOnCollision)(ObjectWrap *first, ObjectWrap *second);
+    int collidedListLen;
+    ObjectWrap **collidedList;
+
 };
 
 struct ObjectWrap {
@@ -111,22 +140,19 @@ struct ObjectWrap {
                             // will be called on it
     bool updatePosition;    // True if object's position needs to be updated
     bool draw;              // True if object needs to be drawn
-    bool collider;          // True if object's collision is enabled
     bool isRotatableByGame; // Constant rotation speed, if needed. Ignored if 0
     ObjectStruct *objPtr;   // Pointer to the actuall object that is governed
 
-    void (*ActionOnCollision)(ObjectWrap *first, ObjectWrap *second);
+    Collider collider;
 };
 
 struct tracker {
     bool hasPlayer;
     ObjectWrap **objList;
     unsigned long objListLen;
-    ObjectStruct **drawList; // List of objects that need to be drawn
+    ObjectWrap **drawList; // List of objects that need to be drawn
     unsigned long drawListLen;
 };
-
-void InitGlobals(void);
 
 /* -------------------- end --------------------  */
 #endif // STRUCTS_H_

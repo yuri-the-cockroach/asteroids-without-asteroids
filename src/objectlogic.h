@@ -11,7 +11,7 @@
  * here>----------------------  */
 
 // Update the object position based on the speed, acceleration, rotation etc...
-void UpdateObjectPos(ObjectStruct *object);
+void UpdateObjectPos(ObjectWrap *wrap);
 
 // Rotates provided object by *object.shape.rotate* degree !!Mutating object
 // inplace!!
@@ -28,7 +28,7 @@ ShapeStruct InitShape(const Vector2 *pointArray, unsigned int arrayLength,
 // Returns ObjectStruct ready to use with default data initialized
 ObjectStruct InitObject(ShapeStruct shape, Vector2 initPosition,
                         Vector2 initSpeed,
-                        float rotSpeed, float colliderMult);
+                        float rotSpeed);
 
 // Free the ShapeStruct and cleanup
 void DeleteShapeStruct(ShapeStruct *self);

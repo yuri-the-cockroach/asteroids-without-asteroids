@@ -43,14 +43,5 @@ void DeleteObjWrap(ObjectWrap *wrap);
 void DeleteTrackedObject(ObjectTracker *tracker, unsigned long index);
 
 
-void CleanupMemory(ObjectTracker *tracker);
-
-/* Collision checking */
-void CheckCollisions(ObjectTracker *tracker, ObjectWrap *wrap);
-
-/* Collision response function */
-void Bounce(ObjectWrap *first, ObjectWrap *second);
-
-void GetShoot(ObjectWrap *first, ObjectWrap *second);
 
 #endif // OBJECTHANDLER_H_
