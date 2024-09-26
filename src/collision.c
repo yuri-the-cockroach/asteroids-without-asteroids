@@ -1,13 +1,8 @@
-#include <raylib.h>
-#include <stdlib.h>
-#include <err.h>
-#include <errno.h>
+#include "collision.h"
+
 
 #pragma GCC diagnostic ignored "-Wdouble-promotion"
 
-#include "structs.h"
-#include "collision.h"
-#include "logger.h"
 
 void FindCollisions(ObjectTracker *tracker, ObjectWrap *first) {
     if (tracker->objListLen < 2)
@@ -78,9 +73,9 @@ void Bounce(ObjectWrap *first, ObjectWrap *second) {
         first->objPtr->speed.x = Sa + ( Sb - Sa ) / ma;
         second->objPtr->speed.x = Sb + ( Sa - Sb ) / mb;
 
-        LOG(DEBUG, "MASSES:\n A == %f\n B == %f", ma, mb);
-        LOG(DEBUG, "SPEEDS BEFORE:\n First == %f\n Second == %f", Sa, Sb);
-        LOG(DEBUG, "SPEEDS AFTER:\n First == %f\n Second == %f", first->objPtr->speed.x, second->objPtr->speed.x);
+        LOG(TRACE, "MASSES:\n A == %f\n B == %f", ma, mb);
+        LOG(TRACE, "SPEEDS BEFORE:\n First == %f\n Second == %f", Sa, Sb);
+        LOG(TRACE, "SPEEDS AFTER:\n First == %f\n Second == %f", first->objPtr->speed.x, second->objPtr->speed.x);
 
         left->objPtr->position.x -= BOUCE_CONSTANT * frameTime;
         right->objPtr->position.x += BOUCE_CONSTANT * frameTime;
@@ -97,9 +92,9 @@ void Bounce(ObjectWrap *first, ObjectWrap *second) {
         first->objPtr->speed.y = Sa + ( Sb - Sa ) / ma;
         second->objPtr->speed.y = Sb + ( Sa - Sb ) / mb;
 
-        LOG(DEBUG, "MASSES:\n A == %f\n B == %f", ma, mb);
-        LOG(DEBUG, "SPEEDS BEFORE:\n First == %f\n Second == %f", Sa, Sb);
-        LOG(DEBUG, "SPEEDS AFTER:\n First == %f\n Second == %f", first->objPtr->speed.y, second->objPtr->speed.y);
+        LOG(TRACE, "MASSES:\n A == %f\n B == %f", ma, mb);
+        LOG(TRACE, "SPEEDS BEFORE:\n First == %f\n Second == %f", Sa, Sb);
+        LOG(TRACE, "SPEEDS AFTER:\n First == %f\n Second == %f", first->objPtr->speed.y, second->objPtr->speed.y);
 
         above->objPtr->position.y -= BOUCE_CONSTANT * frameTime;
         below->objPtr->position.y += BOUCE_CONSTANT * frameTime;

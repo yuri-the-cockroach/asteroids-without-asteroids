@@ -2,6 +2,7 @@
 #define COLLISION_H_
 
 #include "structs.h"
+#include "logger.h"
 
 #define BOUCE_CONSTANT 100
 
