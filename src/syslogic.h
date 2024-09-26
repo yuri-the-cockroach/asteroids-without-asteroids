@@ -1,7 +1,7 @@
 #ifndef SYSLOGIC_H
 #define SYSLOGIC_H
 
-#include <err.h>
+#include "structs.h"
 
 void SigIntHandler(int sig);
 
