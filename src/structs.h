@@ -2,6 +2,26 @@
 #define STRUCTS_H_
 
 #include <raylib.h>
+#include <raymath.h>
+#include <rcamera.h>
+
+
+// Sys stuff
+#include <sys/time.h>
+#include <signal.h>
+
+// Include
+#include <err.h>
+#include <errno.h>
+
+// StdThingings
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Local Headers
 
 /* -------------------- enums --------------------  */
 
@@ -15,6 +35,16 @@ enum loglevel {
     DEBUG = 6,
     TRACE = 7,
     ALL = 8
+};
+
+enum game_state {
+    INIT = 0,
+    MAIN_MENU = 1,
+    START_NEW = 2,
+    GAME_OVER = 3,
+    RUNNING = 4,
+    PAUSE = 5,
+    EXIT = -1,
 };
 
 static const char *loglvlToString[9] = {
@@ -39,6 +69,7 @@ typedef struct ObjectWrap ObjectWrap;
 typedef struct ObjectStruct ObjectStruct;
 typedef struct ShapeStruct ShapeStruct;
 typedef struct Collider Collider;
+
 /* -------------------- constants --------------------  */
 
 
@@ -65,20 +96,26 @@ static const int BASE_ROTATE = 5;
 static const int BORDER_OFFSET = 40;
 static const enum loglevel DEFAULT_LOG_LEVEL = WARNING;
 
+static const int MAX_MENU_STACK_SIZE = 32;
+
 
 /* Externally defined dynamic global variables */
 
+/* Debugging vars */
+extern bool DEBUGGING;
+extern bool DEBUG_PAUSE;
 extern bool VISUAL_DEBUG;
 extern enum loglevel CURRENT_LOG_LEVEL;
+extern bool GDB_BREAK;
+
+/* Game flow related */
+extern enum game_state GAME_STATE;
 extern long lastShot;
 extern int SCREEN_WIDTH;
 extern int SCREEN_HEIGHT;
 extern int FPS_TARGET;
-extern Camera2D camera;
 extern bool CAMERA_FOLLOW;
-extern bool PAUSE_GAME;
 
-extern bool GDB_STOP;
 
 static const Vector2 PLAYER_SHAPE_POINTS[] = {
     (Vector2){ 0,   -50 }, // Is always treated as the fronts-most point, used to
@@ -147,11 +184,26 @@ struct ObjectWrap {
 };
 
 struct tracker {
-    bool hasPlayer;
+    ObjectWrap *playerPtr;
+    Camera2D playerCamera;
     ObjectWrap **objList;
     unsigned long objListLen;
-    ObjectWrap **drawList; // List of objects that need to be drawn
-    unsigned long drawListLen;
+};
+
+struct menuOption {
+    char *name;
+    void (*MenuAction) (void);
+};
+
+struct menuParent {
+    int selected;
+    int optionListLen;
+    struct menuOption *optionList;
+};
+
+struct menuStack {
+    int stackSize;
+    struct menuParent *optionList;
 };
 
 /* -------------------- end --------------------  */
