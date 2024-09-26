@@ -1,9 +1,12 @@
 #ifndef LOGGER_H_
 #define LOGGER_H_
+#include "structs.h"
+
+#pragma GCC diagnostic ignored "-Wvarargs"
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
 
 #define LOG(logLevel, format, ...) Logger(__FILE__, __FUNCTION__, __LINE__, logLevel, format, __VA_ARGS__)
 
-#include "structs.h"
 
 void Logger(const char *restrict inFile, const char *restrict inFunc,
             const int onLine, const enum loglevel loglevel,
