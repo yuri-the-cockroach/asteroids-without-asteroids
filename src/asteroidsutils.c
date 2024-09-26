@@ -1,6 +1,4 @@
 #include "asteroidsutils.h"
-#include <raylib.h>
-#include <sys/time.h>
 
 float GetRandomFloat(float min, float max) {
     return (float)(GetRandomValue((int)(min * 1000), (int)(max * 1000))) / 1000;
