@@ -1,9 +1,13 @@
 #ifndef OBJECTHANDLER_H_
 #define OBJECTHANDLER_H_
 
-#include <raylib.h>
-#include <stdbool.h>
 #include "structs.h"
+
+#include "asteroidsutils.h"
+#include "collision.h"
+#include "gamelogic.h"
+#include "objectlogic.h"
+#include "render.h"
 
 /* Go through the list of tracked objects and call UpdateObj function on them */
 void RunActionList(ObjectTracker *tracker);
@@ -15,7 +19,7 @@ void UpdateObj(ObjectTracker *tracker, ObjectWrap *wrap);
 void DeleteObjWrap(ObjectWrap *wrap);
 
 /* Initializes the tracker and returns it */
-ObjectTracker InitTracker(void);
+ObjectTracker *InitTracker(void);
 
 /* Initialize an object wrapper that stores general data */
 ObjectWrap InitWrap(void);
@@ -42,6 +46,8 @@ void DeleteObjWrap(ObjectWrap *wrap);
 /* Wrapper for ObjectWrapper destructor that hanldes cleanup from the tracking list  */
 void DeleteTrackedObject(ObjectTracker *tracker, unsigned long index);
 
+/* Deinit tracker and everything in it */
+void DeleteTracker(ObjectTracker *tracker);
 
 
 #endif // OBJECTHANDLER_H_

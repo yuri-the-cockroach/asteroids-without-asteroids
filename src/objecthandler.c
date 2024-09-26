@@ -1,17 +1,4 @@
 #include "objecthandler.h"
-
-#include <err.h>
-#include <errno.h>
-#include <raylib.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "asteroidsutils.h"
-#include "collision.h"
-#include "gamelogic.h"
-#include "objectlogic.h"
-#include "render.h"
 #include "structs.h"
 
 // Returns a list of objects that need to be drawn
@@ -46,13 +33,6 @@ void RunActionList(ObjectTracker *tracker) {
 }
 
 void UpdateObj(ObjectTracker *tracker, ObjectWrap *wrap) {
-    if (wrap->draw)
-        AddToDrawList(tracker, wrap);
-
-    if (PAUSE_GAME) return;
-
-    if (wrap->objectType == PLAYER)
-        ShipControlls(wrap->objPtr);
 
     if ( wrap->collider.isCollidable)
         FindCollisions(tracker, wrap);
@@ -66,14 +46,15 @@ void UpdateObj(ObjectTracker *tracker, ObjectWrap *wrap) {
 
 }
 
-ObjectTracker InitTracker(void) {
-    return (ObjectTracker){
-        false,
+ObjectTracker *InitTracker(void) {
+    ObjectTracker *tracker = calloc(1, sizeof(ObjectTracker));
+    tracker[0] = (ObjectTracker){
+        NULL,
+        { 0 },
         (ObjectWrap **)calloc(MAX_OBJECT_COUNT, sizeof(ObjectWrap *)),
-        0,
-        (ObjectWrap **)calloc(MAX_OBJECT_COUNT, sizeof(ObjectStruct *)),
-        0,
+        0
     };
+    return tracker;
 }
 
 ObjectWrap InitWrap(void) {
@@ -90,19 +71,35 @@ ObjectWrap InitWrap(void) {
         0,
         NULL,
         0,
-          NULL }
+        NULL }
     };
 }
 
 int AddWrapToList(ObjectTracker *tracker, ObjectWrap *wrap) {
-    if (tracker->objListLen >= MAX_OBJECT_COUNT) {
-        fprintf(stderr,
-                "Error in AddWrapToList, too many objects in "
-                "tracker->objList\ntracker->objListLen is at %ld\n",
-                tracker->objListLen);
-        errno = ECHRNG;
-        return -1;
+
+    if (!wrap) {
+        errno = EFAULT;
+        LOG(ERROR, "Got null pointer instead of wrap. errno: %d", tracker->objListLen, errno);
+        return errno;
     }
+
+    if (tracker->objListLen >= MAX_OBJECT_COUNT) {
+        errno = ECHRNG;
+        LOG(ERROR, "Too many objects in tracker->objListLen is at %ld. errno: %d", tracker->objListLen, errno);
+        return errno;
+    }
+
+
+    if ( wrap->objectType == PLAYER  ) {
+        if ( tracker->playerPtr ) {
+            errno = EADDRINUSE;
+            LOG(ERROR, "Player is already present in the list. errno: %d", errno);
+            return errno;
+        }
+        tracker->playerPtr = wrap;
+    }
+
+
     tracker->objList[tracker->objListLen] = wrap;
     tracker->objListLen++;
     return 0;
@@ -113,10 +110,10 @@ void CreatePlayer(ObjectTracker *tracker, Vector2 initPosition, float size) {
 
     ObjectWrap *player = malloc(sizeof(ObjectWrap));
     player[0] = InitWrap();
+    player->objectType = PLAYER;
 
     if (AddWrapToList(tracker, player)) {
-        free(player); // TODO: Make a propper logger and call it when
-                      // something goes wrong
+        free(player);
         return;
     }
 
@@ -129,7 +126,6 @@ void CreatePlayer(ObjectTracker *tracker, Vector2 initPosition, float size) {
                    (Vector2){ 0, 0 },
                    0);
 
-    player->objectType = PLAYER;
     player->request = UPDATE;
     player->isRotatableByGame = false;
     player->updatePosition = true;
@@ -138,6 +134,17 @@ void CreatePlayer(ObjectTracker *tracker, Vector2 initPosition, float size) {
 
     player->collider = InitCollider(player->objPtr->shape.sizeMult, *Bounce);
     player->collider.mass = 1;
+
+    // Camera stuff
+    tracker->playerCamera.target = (Vector2){ tracker->objList[0]->objPtr->position.x + 20.0f,
+                               tracker->objList[0]->objPtr->position.y + 20.0f };
+    tracker->playerCamera.offset =
+        (Vector2){ (float)SCREEN_WIDTH / 2.0f, (float)SCREEN_HEIGHT / 2.0f };
+
+    tracker->playerCamera.rotation = 0.0f;
+    tracker->playerCamera.zoom = 1.0f;
+
+
 }
 
 void CreateAsteroid(ObjectTracker *tracker, Vector2 initPosition,
@@ -217,4 +224,12 @@ void DeleteObjWrap(ObjectWrap *wrap) {
 void DeleteTrackedObject(ObjectTracker *tracker, unsigned long index) {
     DeleteObjWrap(tracker->objList[index]);
     tracker->objList[index] = 0;
+}
+
+void DeleteTracker(ObjectTracker *tracker) {
+    for ( unsigned long i = 0; i < tracker->objListLen; i++ ) {
+        if ( tracker->objList[i] ) DeleteTrackedObject(tracker, i);
+    }
+    free(tracker->objList);
+    free(tracker);
 }
