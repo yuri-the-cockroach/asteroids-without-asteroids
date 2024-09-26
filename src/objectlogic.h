@@ -2,10 +2,6 @@
 #define OBJECTLOGIC_H_
 
 #include "structs.h"
-#include <raylib.h>
-#include <raymath.h>
-#include <stdint.h>
-#include <sys/types.h>
 
 /*  ----------------------<Function definitions start
  * here>----------------------  */

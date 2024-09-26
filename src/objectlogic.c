@@ -1,9 +1,4 @@
 #include "objectlogic.h"
-#include "structs.h"
-#include <math.h>
-#include <raylib.h>
-#include <stdlib.h>
-#include <string.h>
 
 // This will be adjusted by frametime, so it can be more than
 // BOUNCEBACK_MAX_FORCE
