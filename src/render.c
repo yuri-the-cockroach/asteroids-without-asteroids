@@ -1,36 +1,7 @@
-#include <raylib.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "logger.h"
 #include "render.h"
 #include "structs.h"
-#include "visdebugger.h"
-
-void AddToDrawList(ObjectTracker *tracker, ObjectWrap *wrap) {
-    if (tracker->drawListLen >= MAX_OBJECT_COUNT) {
-        LOG(ERROR,
-            "%s",
-            "Too many objects in tracker->drawList\ntracker->drawListLen"
-            "is at %ld");
-        return;
-    }
-    tracker->drawList[tracker->drawListLen] = wrap;
-    tracker->drawListLen++;
-}
-
-void DrawAllFromDrawList(ObjectTracker *tracker) {
-    if (tracker->drawListLen == 0) {
-        LOG(DEBUG, "%s", "Drawing list is empty");
-        return;
-    }
-
-    for (unsigned int i = 0; i < tracker->drawListLen; i++) {
-        DrawObject(tracker->drawList[i]);
-        tracker->drawList[i] = NULL;
-    }
-    tracker->drawListLen = 0;
-}
+#include <raylib.h>
+#include <string.h>
 
 void DrawObject(ObjectWrap *wrap) {
     if (VISUAL_DEBUG)
@@ -41,10 +12,13 @@ void DrawObject(ObjectWrap *wrap) {
             (int)(wrap->collider.collider.height),
             RED);
 
-    DebugDisplayText((Vector2){ wrap->objPtr->position.x, wrap->objPtr->position.y + 50},
-                     "Speed.x: %f\nSpeed.y: %f",
-                     (double)wrap->objPtr->speed.x,
-                     (double)wrap->objPtr->speed.y);
+    DebugDisplayText(
+        (Vector2){ wrap->objPtr->position.x, wrap->objPtr->position.y + 50 },
+        18,
+        WHITE,
+        "Speed.x: %f\nSpeed.y: %f",
+        (double)wrap->objPtr->speed.x,
+        (double)wrap->objPtr->speed.y);
 
     if (wrap->objPtr->shape.arrayLength == 0) {
         LOG(WARNING, "%s", "Attempting to draw an empty shape");
@@ -130,4 +104,86 @@ void DrawGrid2D(int dist, Color color) {
              WORLD_POS_MIN_X,
              WORLD_POS_MIN_Y,
              WHITE);
+}
+
+void RunWorldRender(ObjectTracker *tracker) {
+    BeginMode2D(tracker->playerCamera);
+
+    DrawRectangle(WORLD_POS_MIN_X,
+                  WORLD_POS_MIN_Y,
+                  abs(WORLD_POS_MIN_X) + abs(WORLD_POS_MAX_X),
+                  abs(WORLD_POS_MIN_Y) + abs(WORLD_POS_MAX_Y),
+                  (Color){ 18, 18, 18, 255 });
+    DrawGrid2D(200, (Color){ 38, 38, 38, 255 });
+
+    if (tracker->objListLen == 0) {
+        LOG(TRACE, "%s", "Object list is empty. Not rendering anything");
+        return;
+    }
+
+    for (unsigned int i = 0; i < tracker->objListLen; i++) {
+        if (tracker->objList[i]->draw)
+            DrawObject(tracker->objList[i]);
+    }
+
+    EndMode2D();
+}
+
+void RunScreenRender(ObjectTracker *tracker) {
+
+    SCREEN_WIDTH = GetScreenWidth();
+    SCREEN_HEIGHT = GetScreenHeight();
+    tracker->playerCamera.offset.x = (float)SCREEN_WIDTH / 2;
+    tracker->playerCamera.offset.y = (float)SCREEN_HEIGHT / 2;
+
+    DebugDisplayText((Vector2){ 20, 20 },
+                     18,
+                     WHITE,
+                     "Length of the list: %lu",
+                     tracker->objListLen);
+
+    DrawFPS(0, 0);
+}
+
+void RunMenuRender(struct menuParent *menu, const char *restrict title) {
+    const int titleFontSize = 42;
+    const int fontSize = 32;
+    int start = SCREEN_HEIGHT / 2 - menu->optionListLen * fontSize / 2;
+    SCREEN_WIDTH = GetScreenWidth();
+    SCREEN_HEIGHT = GetScreenHeight();
+
+    DrawRectangle(SCREEN_WIDTH / 3,
+                  start / 2,
+                  SCREEN_WIDTH / 3,
+                  SCREEN_HEIGHT / 2,
+                  (Color){ 38, 38, 38, 190 });
+
+
+
+    DrawText(title,
+             (SCREEN_WIDTH - MeasureText(title, titleFontSize)) / 2,
+             100,
+             titleFontSize,
+             WHITE);
+
+    for (int i = 0; i < menu->optionListLen; i++) {
+        if (i == menu->selected) {
+            DrawText(menu->optionList[i].name,
+                     (SCREEN_WIDTH -
+                      MeasureText(menu->optionList[i].name, fontSize)) /
+                         2,
+                     start + fontSize * i,
+                     fontSize,
+                     RED);
+            continue;
+        }
+
+        DrawText(
+            menu->optionList[i].name,
+            (SCREEN_WIDTH - MeasureText(menu->optionList[i].name, fontSize)) /
+                2,
+            start + fontSize * i,
+            fontSize,
+            WHITE);
+    }
 }

@@ -2,10 +2,8 @@
 #define RENDER_H_
 
 #include "structs.h"
-
-/* Adds an object to the list for drawing on the next frame. List gets emptied
- * after the frame is drawn */
-void AddToDrawList(ObjectTracker *tracker, ObjectWrap *wrap);
+#include "visdebugger.h"
+#include"logger.h"
 
 /* Calls DrawObject on each object in tracker->drawList
  * nulls it's position in the list after the object is draw
@@ -17,4 +15,9 @@ void DrawAllFromDrawList(ObjectTracker *tracker);
 void DrawObject(ObjectWrap *wrap);
 
 void DrawGrid2D( int dist, Color color);
+
+void RunScreenRender(ObjectTracker *tracker);
+void RunWorldRender(ObjectTracker *tracker);
+void RunMenuRender(struct menuParent *menu, const char *restrict title);
+
 #endif // RENDER_H_
