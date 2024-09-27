@@ -1,0 +1,19 @@
+#ifndef ASTEROID_H_
+#define ASTEROID_H_
+#include "structs.h"
+#include "asteroidsutils.h"
+#include "objectlogic.h"
+#include "objecthandler.h"
+
+/* Will spawn asteroid in such a way, that it won't collide with anything */
+void AsteroidSafeSpawn(ObjectTracker *tracker);
+
+ /* Generates a surface for an asteroid */
+Vector2 *GenerateAsteroidShape(void);
+
+/* A wrapper funciton for AddWrapToList, to create an asteroid */
+ObjectWrap *CreateAsteroid(ObjectTracker *tracker, Vector2 initPosition,
+                    Vector2 initSpeed, float constRotationSpeed, float size);
+
+
+#endif // ASTEROID_H_

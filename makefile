@@ -31,6 +31,7 @@ export LIBS+= -lcollision
 export LIBS+= -lvisdebugger
 export LIBS+= -lstatemachine
 export LIBS+= -lmenulogic
+export LIBS+= -lasteroid
 
 define buildLib
 	@if [ -z $1 ]; then echo "No argument provided"; exit 1; fi
@@ -42,7 +43,7 @@ define buildLib
 endef
 
 buildall:
-	mold -run make -j asteroidsutils tracker objectlogic gamelogic syslogic render logger collision visdebugger statemachine menulogic
+	mold -run make -j asteroidsutils tracker objectlogic gamelogic syslogic render logger collision visdebugger statemachine menulogic asteroid
 	mold -run make main
 
 menulogic:
@@ -81,11 +82,14 @@ visdebugger:
 statemachine:
 	$(call buildLib,statemachine)
 
+asteroid:
+	$(call buildLib,asteroid)
+
 main:
 	@if [ -f main.o ]; then rm main.o; fi
 	bear -- clang $(WARNINGS) -std=gnu17 -ferror-limit=0 -rpath $(OPTIMIZE) -Isrc -Lbuild $(LIBS) -o build/main.o main.c
 
 run: main.o
-	./build/main.o -l 4 -d
+	./build/main.o -l 7 -d -v
 
 # end
