@@ -1,4 +1,5 @@
 #include "objecthandler.h"
+#include "objectlogic.h"
 #include "structs.h"
 
 // Returns a list of objects that need to be drawn
@@ -147,35 +148,6 @@ void CreatePlayer(ObjectTracker *tracker, Vector2 initPosition, float size) {
 
 }
 
-void CreateAsteroid(ObjectTracker *tracker, Vector2 initPosition,
-                    Vector2 initSpeed, float constRotationSpeed, float size) {
-
-    ObjectWrap *asteroid = malloc(sizeof(ObjectWrap));
-    asteroid[0] = InitWrap();
-    if (AddWrapToList(tracker, asteroid)) {
-        errno = 0;
-        free(asteroid); // TODO: Make a propper logger and call it when
-                        // something goes wrong
-        return;
-    }
-
-    ObjectStruct *objPtr = malloc(sizeof(ObjectStruct));
-    objPtr[0] =
-        InitObject(InitShape(ASTEROID_SHAPE_POINTS,
-                             sizeof(ASTEROID_SHAPE_POINTS) / sizeof(Vector2),
-                             size),
-                   initPosition,
-                   initSpeed,
-                   constRotationSpeed);
-
-    asteroid->objectType = ASTEROID;
-    asteroid->request = UPDATE;
-    asteroid->updatePosition = true;
-    asteroid->draw = true;
-    asteroid->isRotatableByGame = true;
-    asteroid->objPtr = objPtr;
-    asteroid->collider = InitCollider(asteroid->objPtr->shape.sizeMult, *Bounce);
-}
 
 void CreateProjectile(ObjectTracker *tracker, ObjectWrap *parent) {
 

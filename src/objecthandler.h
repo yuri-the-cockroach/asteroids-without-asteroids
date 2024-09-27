@@ -33,10 +33,6 @@ int AddWrapToList(ObjectTracker *tracker, ObjectWrap *wrap);
 void CreatePlayer(ObjectTracker *tracker, Vector2 initPosition,
                   float size);
 
-/* A wrapper funciton for AddWrapToList, to create an asteroid */
-void CreateAsteroid(ObjectTracker *tracker, Vector2 initPosition,
-                    Vector2 initSpeed, float constRotationSpeed, float size);
-
 /* Creates a projectile that inherits from it's parent */
 void CreateProjectile(ObjectTracker *tracker, ObjectWrap *parent);
 
