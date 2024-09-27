@@ -6,6 +6,10 @@
 
 #define BOUCE_CONSTANT 100
 
+/* Check anything collides with this object
+ Return either TRUE or FALSE */
+bool FindAnyCollision(ObjectTracker *tracker, ObjectWrap *first);
+
 /* Collision checking */
 void FindCollisions(ObjectTracker *tracker, ObjectWrap *wrap);
 

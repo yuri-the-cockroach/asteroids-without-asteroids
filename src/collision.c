@@ -1,8 +1,29 @@
 #include "collision.h"
-
-
+#include "asteroidsutils.h"
 #pragma GCC diagnostic ignored "-Wdouble-promotion"
 
+bool FindAnyCollision(ObjectTracker *tracker, ObjectWrap *first) {
+    if (tracker->objListLen < 2)
+        return false;
+
+    if (!first)
+        return false;
+
+    for (unsigned int j = 0; j < tracker->objListLen; j++) {
+        ObjectWrap *second = tracker->objList[j];
+        if (tracker->objList[j] == NULL)
+            continue;
+
+        if (first == second)
+            continue;
+
+        if (!second->collider.isCollidable)
+            continue;
+
+        if (CheckIfCollide(first, second)) return true;
+    }
+    return false;
+}
 
 void FindCollisions(ObjectTracker *tracker, ObjectWrap *first) {
     if (tracker->objListLen < 2)
@@ -67,11 +88,11 @@ void Bounce(ObjectWrap *first, ObjectWrap *second) {
         float Sa = first->objPtr->speed.x;
         float Sb = second->objPtr->speed.x;
 
-        float ma = first->collider.mass;
-        float mb = second->collider.mass;
+        float ma = ClampFloat(first->collider.mass, 1, 1024);
+        float mb = ClampFloat(second->collider.mass, 1, 1024);
 
-        first->objPtr->speed.x = Sa + ( Sb - Sa ) / ma;
-        second->objPtr->speed.x = Sb + ( Sa - Sb ) / mb;
+        first->objPtr->speed.x = Sa + (( Sb - Sa ) / ma) * 0.5f;
+        second->objPtr->speed.x = Sb + (( Sa - Sb ) / mb) * 0.5f;
 
         LOG(TRACE, "MASSES:\n A == %f\n B == %f", ma, mb);
         LOG(TRACE, "SPEEDS BEFORE:\n First == %f\n Second == %f", Sa, Sb);
@@ -82,15 +103,17 @@ void Bounce(ObjectWrap *first, ObjectWrap *second) {
     }
 
     {
-
         float Sa = first->objPtr->speed.y;
         float Sb = second->objPtr->speed.y;
 
-        float ma = first->collider.mass;
-        float mb = second->collider.mass;
+        float ma = ClampFloat(first->collider.mass, 1, 1024);
+        float mb = ClampFloat(second->collider.mass, 1, 1024);
 
         first->objPtr->speed.y = Sa + ( Sb - Sa ) / ma;
         second->objPtr->speed.y = Sb + ( Sa - Sb ) / mb;
+
+        first->objPtr->speed.y *= 0.9f;
+        second->objPtr->speed.y *= 0.9f;
 
         LOG(TRACE, "MASSES:\n A == %f\n B == %f", ma, mb);
         LOG(TRACE, "SPEEDS BEFORE:\n First == %f\n Second == %f", Sa, Sb);
