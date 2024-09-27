@@ -1,6 +1,7 @@
 #include "gamelogic.h"
+#include "asteroidsutils.h"
 #include "structs.h"
-#include <raylib.h>
+#include "asteroid.h"
 
 void OnPlayerAccellerate(ObjectStruct *object, float speed) {
     object->speed.x += object->shape.points[0].x * (speed * GetFrameTime());
@@ -94,15 +95,16 @@ void DebugingKeyHandler(ObjectTracker *tracker) {
 
         if (IsKeyPressed('9')) {
             for (unsigned int i = 0; i < MAX_OBJECT_COUNT - 1; i++) {
-                CreateAsteroid(
-                    tracker,
-                    (Vector2){ GetRandomFloat(0, (float)SCREEN_WIDTH),
-                               GetRandomFloat(0, (float)SCREEN_HEIGHT) },
+                AsteroidSafeSpawn(tracker);
+                /* CreateAsteroid( */
+                /*     tracker, */
+                /*     (Vector2){ GetRandomFloat(0, (float)SCREEN_WIDTH), */
+                /*                GetRandomFloat(0, (float)SCREEN_HEIGHT) }, */
 
-                    (Vector2){ GetRandomFloat(-100, 100),
-                               GetRandomFloat(-100, 100) },
-                    GetRandomFloat(-5, 5),
-                    1);
+                /*     (Vector2){ GetRandomFloat(-100, 100), */
+                /*                GetRandomFloat(-100, 100) }, */
+                /*     GetRandomFloat(-5, 5), */
+                /*     1); */
             }
         }
 
@@ -116,18 +118,19 @@ void DebugingKeyHandler(ObjectTracker *tracker) {
         }
 
         if (IsKeyPressed('='))
-            CreateAsteroid(
-                tracker,
-                (Vector2){ GetRandomFloat(
-                               tracker->objList[0]->objPtr->position.x - 500,
-                               tracker->objList[0]->objPtr->position.x + 500),
-                           GetRandomFloat(
-                               tracker->objList[0]->objPtr->position.y - 500,
-                               tracker->objList[0]->objPtr->position.y + 500) },
-                (Vector2){ GetRandomFloat(-100, 100),
-                           GetRandomFloat(-100, 100) },
-                GetRandomFloat(-5, 5),
-                GetRandomFloat(0.5, 2));
+            AsteroidSafeSpawn(tracker);
+            /* CreateAsteroid( */
+            /*     tracker, */
+            /*     (Vector2){ GetRandomFloat( */
+            /*                    tracker->objList[0]->objPtr->position.x - 500, */
+            /*                    tracker->objList[0]->objPtr->position.x + 500), */
+            /*                GetRandomFloat( */
+            /*                    tracker->objList[0]->objPtr->position.y - 500, */
+            /*                    tracker->objList[0]->objPtr->position.y + 500) }, */
+            /*     (Vector2){ GetRandomFloat(-100, 100), */
+            /*                GetRandomFloat(-100, 100) }, */
+            /*     GetRandomFloat(-5, 5), */
+            /*     GetRandomFloat(0.5, 2)); */
 
         if (IsKeyPressed('-')) {
             if (tracker->objListLen > 1)
@@ -156,12 +159,12 @@ void ShipControlls(ObjectTracker *tracker) {
 
 void MenuControlls(struct menuParent *menu) {
     if (IsKeyPressed('W')) {
-        menu->selected = abs((menu->selected - 1) % menu->optionListLen);
+        menu->selected = RollOverInt((menu->selected - 1), 0, menu->optionListLen - 1);
         LOG(DEBUG, "Menu->selected == %d", menu->selected);
     }
 
     if (IsKeyPressed('S')) {
-        menu->selected = abs((menu->selected + 1) % menu->optionListLen);
+        menu->selected = RollOverInt((menu->selected + 1), 0, menu->optionListLen - 1);
         LOG(DEBUG, "Menu->selected == %d", menu->selected);
     }
 
