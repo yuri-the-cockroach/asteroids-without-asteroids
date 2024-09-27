@@ -16,7 +16,8 @@ void DrawObject(ObjectWrap *wrap) {
         (Vector2){ wrap->objPtr->position.x, wrap->objPtr->position.y + 50 },
         18,
         WHITE,
-        "Speed.x: %f\nSpeed.y: %f",
+        "Heading: %f\nSpeed.x: %f\nSpeed.y: %f",
+        (double)wrap->objPtr->heading,
         (double)wrap->objPtr->speed.x,
         (double)wrap->objPtr->speed.y);
 
