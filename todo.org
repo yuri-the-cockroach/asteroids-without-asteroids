@@ -1,9 +1,9 @@
 #+title: Todo
 
-- [ ] Menues
-  - [ ] Start Screen
-  - [ ] Pause
-  - [ ] End screen
+- [-] Menues
+  - [X] Start Screen
+  - [X] Pause
+  - [ ] Game-over screen
 
 - [X] Game Logic
   - [X] Seperate camera and game space
@@ -20,9 +20,9 @@
     - [X] Base systems
     - [ ] Make them more suitable for a game
 
-- [ ] Asteroids
+- [-] Asteroids
   - [ ] Dynamic spawn system
-  - [ ] Procedural shape generator
+  - [X] Procedural shape generator
   - [ ] Separation on getting shot
 
 - [X] Memory handelling (hopefully)
