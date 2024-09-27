@@ -97,6 +97,8 @@ static const int BORDER_OFFSET = 40;
 static const enum loglevel DEFAULT_LOG_LEVEL = WARNING;
 
 static const int MAX_MENU_STACK_SIZE = 32;
+static const unsigned long ASTEROID_CORNERS_COUNT = 20;
+static const float ASTEROID_HEIGHT_VARIATION = 10;
 
 
 /* Externally defined dynamic global variables */
