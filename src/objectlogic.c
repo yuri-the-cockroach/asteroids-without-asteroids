@@ -1,4 +1,8 @@
 #include "objectlogic.h"
+#include "asteroidsutils.h"
+#include "structs.h"
+#include <math.h>
+#include <raylib.h>
 
 // This will be adjusted by frametime, so it can be more than
 // BOUNCEBACK_MAX_FORCE
@@ -30,6 +34,7 @@ void UpdateObjectPos(ObjectWrap *wrap) {
 void RotateObject(ObjectStruct *object, float rotateByDeg) {
 
     object->heading += (rotateByDeg * GetFrameTime());
+    object->heading = RollOverFloat(object->heading, 0.0f, PI * 2.0f);
     for (unsigned int current = 0; current < object->shape.arrayLength;
          current++)
     {
@@ -69,6 +74,7 @@ ShapeStruct InitShape(const Vector2 *pointArray, unsigned int arrayLength,
     return toReturn;
 }
 
+
 ObjectStruct InitObject(ShapeStruct shape, Vector2 initPosition,
                         Vector2 initSpeed, float rotSpeed) {
     return (ObjectStruct){
@@ -90,5 +96,4 @@ void DeleteObjectStruct(ObjectStruct *self) {
     free((void *)self->shape.points);
     free((void *)self->shape.refPoints);
     free(self);
-
 }
