@@ -1,4 +1,6 @@
 #include "objecthandler.h"
+#include "asteroid.h"
+#include "collision.h"
 #include "objectlogic.h"
 #include "structs.h"
 
@@ -17,16 +19,22 @@ void RunActionList(ObjectTracker *tracker) {
 
         ObjectWrap *current = tracker->objList[i];
         switch (current->request) {
-        case DELETE: // Delete element from the list
-            DeleteTrackedObject(tracker, i);
-            continue;
 
-        case UPDATE: // Call the updater function of the element
-            UpdateObj(tracker, current);
-            break;
+            case DELETE: // Delete element from the list
+                DeleteTrackedObject(tracker, i);
+                continue;
 
-        case IGNORE:
-            continue;
+            case SEPARATE:
+                Separate(tracker, tracker->objList[i]);
+                i--;
+                break;
+
+            case UPDATE: // Call the updater function of the element
+                UpdateObj(tracker, current);
+                break;
+
+            case IGNORE:
+                continue;
         }
     }
     CleanupMemory(tracker);
@@ -39,7 +47,7 @@ void UpdateObj(ObjectTracker *tracker, ObjectWrap *wrap) {
         FindCollisions(tracker, wrap);
 
     if (wrap->isRotatableByGame) {
-        RotateObject(wrap->objPtr, (wrap->objPtr->rotateSpeed));
+        RotateObject(wrap, (wrap->objPtr->rotateSpeed));
     }
 
     if (wrap->updatePosition)
@@ -72,7 +80,8 @@ ObjectWrap InitWrap(void) {
         0,
         NULL,
         0,
-        NULL }
+        NULL},
+        0
     };
 }
 
@@ -133,8 +142,9 @@ void CreatePlayer(ObjectTracker *tracker, Vector2 initPosition, float size) {
     player->draw = true;
     player->objPtr = objPtr;
 
-    player->collider = InitCollider(player->objPtr->shape.sizeMult, *Bounce);
+    player->collider = InitCollider(player->objPtr->shape.sizeMult, *PlayerCollision);
     player->collider.mass = 1;
+    player->livesLeft = 2;
 
     // Camera stuff
     tracker->playerCamera.target = (Vector2){ tracker->objList[0]->objPtr->position.x + 20.0f,

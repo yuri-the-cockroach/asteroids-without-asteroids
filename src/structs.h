@@ -59,8 +59,8 @@ static const char *loglvlToString[9] = {
     "ALL"
 };
 
-enum request { UPDATE = 1, IGNORE = 0,  DELETE = -1 };
-enum type { NOTYPE = 0, ASTEROID = 1, PLAYER = 2, PROJECTILE = 3 };
+enum request { IGNORE = 0, UPDATE = 1, SEPARATE = 2, DELETE = -1 };
+enum type { NOTYPE = 0, ASTEROID = 1, PROJECTILE = 2, PLAYER = 3 };
 
 /* -------------------- typedefs --------------------  */
 
@@ -167,7 +167,7 @@ struct Collider {
     Rectangle collider;
     float mass;
 
-    void (*ActionOnCollision)(ObjectWrap *first, ObjectWrap *second);
+    void (*ActionOnCollision)(ObjectTracker *tracker, ObjectWrap *first, ObjectWrap *second);
     int collidedListLen;
     ObjectWrap **collidedList;
 
@@ -183,6 +183,7 @@ struct ObjectWrap {
     ObjectStruct *objPtr;   // Pointer to the actuall object that is governed
 
     Collider collider;
+    int livesLeft;
 };
 
 struct tracker {
