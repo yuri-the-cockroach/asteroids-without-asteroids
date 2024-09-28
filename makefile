@@ -90,6 +90,6 @@ main:
 	bear -- clang $(WARNINGS) -std=gnu17 -ferror-limit=0 -rpath $(OPTIMIZE) -Isrc -Lbuild $(LIBS) -o build/main.o main.c
 
 run: main.o
-	./build/main.o -l 7 -d -v
+	./build/main.o -l 6 -d -v
 
 # end
