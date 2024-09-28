@@ -11,7 +11,7 @@ void UpdateObjectPos(ObjectWrap *wrap);
 
 // Rotates provided object by *object.shape.rotate* degree
 // !!Mutating object inplace!!
-void RotateObject(ObjectStruct *object, float rotateByDeg);
+void RotateObject(ObjectWrap *wrap, float rotateByDeg);
 
 // Adjusts scale of object geometry as requested
 Vector2 *ResizeShape(const Vector2 *vector, float size,

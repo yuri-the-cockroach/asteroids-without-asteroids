@@ -1,5 +1,6 @@
 #include "objectlogic.h"
 #include "asteroidsutils.h"
+#include "collision.h"
 #include "structs.h"
 #include <math.h>
 #include <raylib.h>
@@ -31,22 +32,24 @@ void UpdateObjectPos(ObjectWrap *wrap) {
     wrap->objPtr->position.y = wrap->objPtr->position.y + adjustedSpeed.y;
 }
 
-void RotateObject(ObjectStruct *object, float rotateByDeg) {
+void RotateObject(ObjectWrap *wrap, float rotateByDeg) {
 
-    object->heading += (rotateByDeg * GetFrameTime());
-    object->heading = RollOverFloat(object->heading, 0.0f, PI * 2.0f);
-    for (unsigned int current = 0; current < object->shape.arrayLength;
+    wrap->objPtr->heading += (rotateByDeg * GetFrameTime());
+    wrap->objPtr->heading = RollOverFloat(wrap->objPtr->heading, 0.0f, PI * 2.0f);
+    for (unsigned int current = 0; current < wrap->objPtr->shape.arrayLength;
          current++)
     {
-        object->shape.points[current].x =
-            (float)((object->shape.refPoints[current].x *
-                     cosf(object->heading)) -
-                    (object->shape.refPoints[current].y *
-                     sinf(object->heading)));
-        object->shape.points[current].y =
-            (object->shape.refPoints[current].x * sinf(object->heading)) +
-            (object->shape.refPoints[current].y * cosf(object->heading));
+        wrap->objPtr->shape.points[current].x =
+            (float)((wrap->objPtr->shape.refPoints[current].x *
+                     cosf(wrap->objPtr->heading)) -
+                    (wrap->objPtr->shape.refPoints[current].y *
+                     sinf(wrap->objPtr->heading)));
+        wrap->objPtr->shape.points[current].y =
+            (wrap->objPtr->shape.refPoints[current].x * sinf(wrap->objPtr->heading)) +
+            (wrap->objPtr->shape.refPoints[current].y * cosf(wrap->objPtr->heading));
     }
+
+    if ( wrap->collider.isCollidable ) UpdateCollider(wrap);
 }
 
 Vector2 *ResizeShape(const Vector2 *vector, float size,
