@@ -2,6 +2,7 @@
 #include "asteroidsutils.h"
 #include "structs.h"
 #include "asteroid.h"
+#include <raylib.h>
 
 void OnPlayerAccellerate(ObjectStruct *object, float speed) {
     object->speed.x += object->shape.points[0].x * (speed * GetFrameTime());
@@ -14,6 +15,11 @@ void DebugingKeyHandler(ObjectTracker *tracker) {
     if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_C)) {
         LOG(DEBUG, "%s", "CTRL and C is pressed");
         GAME_STATE = EXIT;
+    }
+
+    if (IsKeyPressed('L')) {
+        FPS_TARGET = FPS_TARGET ? 0 : 75;
+        SetTargetFPS(FPS_TARGET);
     }
 
     if (IsKeyPressed('T')) {
@@ -32,20 +38,22 @@ void DebugingKeyHandler(ObjectTracker *tracker) {
     if (GAME_STATE == RUNNING) {
         if (IsKeyPressed('P')) DEBUG_PAUSE = !DEBUG_PAUSE;
         if (IsKeyPressed('1')) {
-            CreateAsteroid(
-                tracker, (Vector2){ 300, 600 }, (Vector2){ 0, 0 }, 0, 1);
-            CreateAsteroid(
-                tracker, (Vector2){ 500, 600 }, (Vector2){ -90, 0 }, 0, 1);
 
-            CreateAsteroid(
-                tracker, (Vector2){ 300, 900 }, (Vector2){ 90, 0 }, 0, 1);
-            CreateAsteroid(
-                tracker, (Vector2){ 500, 900 }, (Vector2){ 0, 0 }, 0, 1);
+            CreateAsteroid(tracker, (Vector2){ 0, -200 }, (Vector2){ 0, 0 }, 1, 1);
+            /* CreateAsteroid( */
+            /*     tracker, (Vector2){ 300, 600 }, (Vector2){ 0, 0 }, 0, 1); */
+            /* CreateAsteroid( */
+            /*     tracker, (Vector2){ 500, 600 }, (Vector2){ -90, 0 }, 0, 1); */
 
-            CreateAsteroid(
-                tracker, (Vector2){ 300, 300 }, (Vector2){ 90, 0 }, 0, 1);
-            CreateAsteroid(
-                tracker, (Vector2){ 500, 300 }, (Vector2){ -90, 0 }, 0, 1);
+            /* CreateAsteroid( */
+            /*     tracker, (Vector2){ 300, 900 }, (Vector2){ 90, 0 }, 0, 1); */
+            /* CreateAsteroid( */
+            /*     tracker, (Vector2){ 500, 900 }, (Vector2){ 0, 0 }, 0, 1); */
+
+            /* CreateAsteroid( */
+            /*     tracker, (Vector2){ 300, 300 }, (Vector2){ 90, 0 }, 0, 1); */
+            /* CreateAsteroid( */
+            /*     tracker, (Vector2){ 500, 300 }, (Vector2){ -90, 0 }, 0, 1); */
         }
 
         if (IsKeyPressed('2')) {
@@ -145,9 +153,9 @@ void ShipControlls(ObjectTracker *tracker) {
     if (IsKeyDown('S'))
         OnPlayerAccellerate(tracker->playerPtr->objPtr, -PLAYER_MOVE_SPEED);
     if (IsKeyDown('D'))
-        RotateObject(tracker->playerPtr->objPtr, PLAYER_ROTATION_SPEED);
+        RotateObject(tracker->playerPtr, PLAYER_ROTATION_SPEED);
     if (IsKeyDown('A'))
-        RotateObject(tracker->playerPtr->objPtr, -PLAYER_ROTATION_SPEED);
+        RotateObject(tracker->playerPtr, -PLAYER_ROTATION_SPEED);
 
     if (IsKeyDown(KEY_SPACE)) {
         if (GetTimeMS() - lastShot > (long)1e6 / RATE_OF_FIRE) {
