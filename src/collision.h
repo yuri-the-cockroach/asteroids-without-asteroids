@@ -20,12 +20,12 @@ void ApplyMassBasedRandRotation(ObjectWrap *wrap);
 bool CheckIfCollide(ObjectWrap *first, ObjectWrap *second);
 
 /* Collision response function */
-void Bounce(ObjectWrap *first, ObjectWrap *second);
+void Bounce(ObjectTracker *tracker, ObjectWrap *first, ObjectWrap *second);
 
 /* If object callided with a projectile */
-void GetShot(ObjectWrap *first, ObjectWrap *second);
+void GetShot(ObjectTracker *tracker, ObjectWrap *first, ObjectWrap *second);
 
-Collider InitCollider(float sizeMult, void (*ActionOnCollision)(ObjectWrap *first, ObjectWrap *second));
+Collider InitCollider(float sizeMult, void (*ActionOnCollision)(ObjectTracker *tracker, ObjectWrap *first, ObjectWrap *second));
 
 // Push to the end of list
 // Return value can be -1 unable to push
@@ -44,4 +44,9 @@ int ClearList(Collider *parent);
 
 // Clean all the lists
 int CleanupLists(ObjectTracker *tracker);
+
+int UpdateCollider(ObjectWrap *wrap);
+
+void PlayerCollision(ObjectTracker *tracker, ObjectWrap *player, ObjectWrap *offender);
+
 #endif // COLLISION_H_

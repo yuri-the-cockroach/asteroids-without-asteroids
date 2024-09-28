@@ -1,5 +1,8 @@
 #include "collision.h"
+#include "asteroid.h"
 #include "asteroidsutils.h"
+#include "structs.h"
+#include <signal.h>
 #pragma GCC diagnostic ignored "-Wdouble-promotion"
 
 bool FindAnyCollision(ObjectTracker *tracker, ObjectWrap *first) {
@@ -32,14 +35,12 @@ void FindCollisions(ObjectTracker *tracker, ObjectWrap *first) {
     if (!first)
         return;
 
+    if (first->request == DELETE) return;
+
     for (unsigned int j = 0; j < tracker->objListLen; j++) {
         ObjectWrap *second = tracker->objList[j];
-        if (tracker->objList[j] == NULL)
-            continue;
 
-        if (first == second)
-            continue;
-        if (!second->collider.isCollidable)
+        if (tracker->objList[j] == NULL || first == second || second->request == DELETE || !second->collider.isCollidable)
             continue;
 
         if (FindInList(&first->collider, second) != -1) continue;
@@ -51,12 +52,10 @@ void FindCollisions(ObjectTracker *tracker, ObjectWrap *first) {
         Push(&second->collider, first);
 
         if (first->objectType > second->objectType) {
-            first->collider.ActionOnCollision(first, second);
+            first->collider.ActionOnCollision(tracker, first, second);
             continue;
         }
-        second->collider.ActionOnCollision(first, second);
-
-
+        second->collider.ActionOnCollision(tracker, second, first);
     }
 }
 
@@ -68,7 +67,9 @@ void ApplyMassBasedRandRotation(ObjectWrap *wrap) {
     wrap->objPtr->rotateSpeed = 2 * randomMod * massMod;
 }
 
-void Bounce(ObjectWrap *first, ObjectWrap *second) {
+void Bounce(ObjectTracker *tracker, ObjectWrap *first, ObjectWrap *second) {
+
+    UNUSED(tracker);
 
     ObjectWrap *left, *right;
     ObjectWrap *above, *below;
@@ -91,8 +92,8 @@ void Bounce(ObjectWrap *first, ObjectWrap *second) {
         float ma = ClampFloat(first->collider.mass, 1, 1024);
         float mb = ClampFloat(second->collider.mass, 1, 1024);
 
-        first->objPtr->speed.x = Sa + (( Sb - Sa ) / ma) * 0.5f;
-        second->objPtr->speed.x = Sb + (( Sa - Sb ) / mb) * 0.5f;
+        first->objPtr->speed.x = Sa + ( Sb - Sa ) / ma;
+        second->objPtr->speed.x = Sb + ( Sa - Sb ) / mb;
 
         LOG(TRACE, "MASSES:\n A == %f\n B == %f", ma, mb);
         LOG(TRACE, "SPEEDS BEFORE:\n First == %f\n Second == %f", Sa, Sb);
@@ -111,9 +112,6 @@ void Bounce(ObjectWrap *first, ObjectWrap *second) {
 
         first->objPtr->speed.y = Sa + ( Sb - Sa ) / ma;
         second->objPtr->speed.y = Sb + ( Sa - Sb ) / mb;
-
-        first->objPtr->speed.y *= 0.9f;
-        second->objPtr->speed.y *= 0.9f;
 
         LOG(TRACE, "MASSES:\n A == %f\n B == %f", ma, mb);
         LOG(TRACE, "SPEEDS BEFORE:\n First == %f\n Second == %f", Sa, Sb);
@@ -185,13 +183,18 @@ bool CheckIfCollide(ObjectWrap *first, ObjectWrap *second) {
     return false;
 }
 
-void GetShot(ObjectWrap *projectile, ObjectWrap *victim) {
+void GetShot(ObjectTracker *tracker, ObjectWrap *projectile, ObjectWrap *victim) {
+
     projectile->request = DELETE;
-    victim->request = DELETE;
-    if ( victim->objectType == PLAYER ) LOG(WARNING, "%s", "Removing player object");
+    if ( victim->objectType == PROJECTILE ) victim->request = DELETE;
+
+    if ( victim->objectType == ASTEROID ) {
+        victim->livesLeft--;
+        victim->request = SEPARATE;
+    }
 }
 
-Collider InitCollider(float sizeMult, void (*ActionOnCollision)(ObjectWrap *first, ObjectWrap *second)) {
+Collider InitCollider(float sizeMult, void (*ActionOnCollision)(ObjectTracker *tracker, ObjectWrap *first, ObjectWrap *second)) {
     return (Collider){
         true,
         (Rectangle){ -50 * sizeMult,
@@ -252,4 +255,41 @@ int CleanupLists(ObjectTracker *tracker) {
         ClearList(&tracker->objList[i]->collider);
     }
     return 0;
+}
+
+int UpdateCollider(ObjectWrap *wrap) {
+
+    float leftMostPoint = 10000;
+    float rightMostPoint = -10000;
+    float topMostPoint = 10000;
+    float bottomMostPoint = -10000;
+
+    for ( unsigned int i = 0; i < wrap->objPtr->shape.arrayLength; i++)
+    {
+        leftMostPoint = wrap->objPtr->shape.points[i].x < leftMostPoint ? wrap->objPtr->shape.points[i].x : leftMostPoint;
+        rightMostPoint = wrap->objPtr->shape.points[i].x > rightMostPoint ? wrap->objPtr->shape.points[i].x : rightMostPoint;
+        topMostPoint = wrap->objPtr->shape.points[i].y < topMostPoint ? wrap->objPtr->shape.points[i].y : topMostPoint;
+        bottomMostPoint = wrap->objPtr->shape.points[i].y > bottomMostPoint ? wrap->objPtr->shape.points[i].y : bottomMostPoint;
+    }
+
+    wrap->collider.collider.x = leftMostPoint * 0.9f;
+    wrap->collider.collider.y = topMostPoint * 0.9f;
+    wrap->collider.collider.width = fabsf(leftMostPoint - rightMostPoint) * 0.9f;
+    wrap->collider.collider.height = fabsf(topMostPoint - bottomMostPoint) * 0.9f;
+    return 0;
+}
+
+void PlayerCollision(ObjectTracker *tracker, ObjectWrap *player, ObjectWrap *offender) {
+    player->livesLeft--;
+
+    if ( !player->livesLeft ) {
+        GAME_STATE = GAME_OVER;
+        return;
+    }
+
+
+    if ( offender->objectType == PROJECTILE ) offender->request = DELETE;
+    if ( offender->objectType == ASTEROID ) Bounce(tracker, player, offender);
+
+    return;
 }
