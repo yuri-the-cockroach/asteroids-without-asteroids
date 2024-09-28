@@ -1,9 +1,40 @@
 #include "render.h"
 #include "structs.h"
+#include "visdebugger.h"
 #include <raylib.h>
 #include <string.h>
 
+void DisplayText(Vector2 pos, int fontSize, Color color, const char *restrict format, ...) {
+    char messageString[1024] = "";
+
+    va_list argptr;
+
+    int argcount = 0;
+    int i = 0;
+    char current;
+
+    // Count how many arguments we have
+    // by counting format specifiers in a format string
+    do {
+        current = format[i];
+        if (current == '%')
+            argcount++;
+        i++;
+    } while (current != '\0');
+
+    // Pass all the arguments to the vsprinf, which will fill it into the
+    // message string. If argptr is 0, then it will just be ignored (hopefully)
+    va_start(argptr, argcount);
+    vsprintf(messageString, format, argptr);
+    va_end(argptr);
+
+    // Actually print to stderr
+    DrawText(messageString, (int)pos.x, (int)pos.y, fontSize, color);
+}
+
+
 void DrawObject(ObjectWrap *wrap) {
+
     if (VISUAL_DEBUG)
         DrawRectangleLines(
             (int)(wrap->collider.collider.x + wrap->objPtr->position.x),
@@ -16,10 +47,28 @@ void DrawObject(ObjectWrap *wrap) {
         (Vector2){ wrap->objPtr->position.x, wrap->objPtr->position.y + 50 },
         18,
         WHITE,
-        "Heading: %f\nSpeed.x: %f\nSpeed.y: %f",
+        "Heading: %f\nIsCollidable: %d\nSpeed.x: %f\nSpeed.y: %f",
         (double)wrap->objPtr->heading,
+        wrap->collider.isCollidable,
         (double)wrap->objPtr->speed.x,
         (double)wrap->objPtr->speed.y);
+
+    DebugDisplayText(
+            (Vector2) {wrap->objPtr->position.x, wrap->objPtr->position.y + 118 },
+            18,
+            WHITE,
+            "Points Pos:");
+    for (unsigned long i = 0; i < wrap->objPtr->shape.arrayLength; i++ ) {
+
+        DebugDisplayText(
+            (Vector2) {wrap->objPtr->position.x, wrap->objPtr->position.y + 136 + (float)i * 18},
+            18,
+            WHITE,
+            "x: %f y: %f",
+            wrap->objPtr->shape.points[i].x,
+            wrap->objPtr->shape.points[i].y
+            );
+    }
 
     if (wrap->objPtr->shape.arrayLength == 0) {
         LOG(WARNING, "%s", "Attempting to draw an empty shape");
@@ -61,6 +110,9 @@ void DrawObject(ObjectWrap *wrap) {
         1.0,  // Thikness of the line
         WHITE // Color of the line
     );
+
+    if ( wrap->objectType == ASTEROID )
+        DisplayText(wrap->objPtr->position, 24, WHITE, "%s", "MAMY EBAL");
 }
 
 void DrawGrid2D(int dist, Color color) {
@@ -136,6 +188,9 @@ void RunScreenRender(ObjectTracker *tracker) {
     SCREEN_HEIGHT = GetScreenHeight();
     tracker->playerCamera.offset.x = (float)SCREEN_WIDTH / 2;
     tracker->playerCamera.offset.y = (float)SCREEN_HEIGHT / 2;
+
+
+    DisplayText((Vector2){ 20, 50 }, 24, RED, "LIVES LEFT: %d", tracker->playerPtr->livesLeft);
 
     DebugDisplayText((Vector2){ 20, 20 },
                      18,
