@@ -1,5 +1,7 @@
 #+title: Todo
 
+Currentrly doing: Asteroid sparation loigc
+
 - [-] Menues
   - [X] Start Screen
   - [X] Pause
@@ -27,19 +29,39 @@
 
 - [X] Memory handelling (hopefully)
 
-- [ ] Stress testing and self-reporting
+- [X] Stress testing and self-reporting
 
-- [-] Logging
-  - [X] Base logging system
-  - [ ] Rewrite the program to use logger system
-    - [ ] main
-    - [ ] objectHandler
-    - [ ] objectLogic
-    - [ ] renderer
-    - [ ] utils
-    - [ ] gamelogic
-    - [ ] syslogic
-    - [ ] logger(?)
+- [X] Base logging system
+
+- [ ] Review the code and do a refactor
+  - [ ] main.c
+  - [ ] src/asteroid.c
+  - [ ] src/asteroid.h
+  - [ ] src/asteroidsutils.c
+  - [ ] src/asteroidsutils.h
+  - [ ] src/collision.c
+  - [ ] src/collision.h
+  - [ ] src/gamelogic.c
+  - [ ] src/gamelogic.h
+  - [ ] src/logger.c
+  - [ ] src/logger.h
+  - [ ] src/menulogic.c
+  - [ ] src/menulogic.h
+  - [ ] src/objecthandler.c
+  - [ ] src/objecthandler.h
+  - [ ] src/objectlogic.c
+  - [ ] src/objectlogic.h
+  - [ ] src/render.c
+  - [ ] src/render.h
+  - [ ] src/statemachine.c
+  - [ ] src/statemachine.h
+  - [ ] src/structs.h
+  - [ ] src/syslogic.c
+  - [ ] src/syslogic.h
+  - [ ] src/visdebugger.c
+  - [ ] src/visdebugger.h
+
+
 
 - [X] String formatting into return
 
