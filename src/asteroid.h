@@ -15,5 +15,6 @@ Vector2 *GenerateAsteroidShape(void);
 ObjectWrap *CreateAsteroid(ObjectTracker *tracker, Vector2 initPosition,
                     Vector2 initSpeed, float constRotationSpeed, float size);
 
+int Separate(ObjectTracker *tracker, ObjectWrap *parent);
 
 #endif // ASTEROID_H_
