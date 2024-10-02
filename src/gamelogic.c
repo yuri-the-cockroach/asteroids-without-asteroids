@@ -39,7 +39,7 @@ void DebugingKeyHandler(ObjectTracker *tracker) {
         if (IsKeyPressed('P')) DEBUG_PAUSE = !DEBUG_PAUSE;
         if (IsKeyPressed('1')) {
 
-            CreateAsteroid(tracker, (Vector2){ 0, -200 }, (Vector2){ 0, 0 }, 1, 1);
+            CreateAsteroid(tracker, (Vector2){ -200, 0 }, (Vector2){ 0, 0 }, 1, 1);
             /* CreateAsteroid( */
             /*     tracker, (Vector2){ 300, 600 }, (Vector2){ 0, 0 }, 0, 1); */
             /* CreateAsteroid( */
@@ -116,11 +116,41 @@ void DebugingKeyHandler(ObjectTracker *tracker) {
             }
         }
 
+
+        if (IsKeyPressed('B') && BENCH_LOG_FILE_PTR) {
+            if ( !BENCHMARKING )
+            {
+                BENCHMARKING = true;
+                for (unsigned int i = 0; i < MAX_OBJECT_COUNT - 1; i++) {
+                    AsteroidSafeSpawn(tracker);
+                    /* CreateAsteroid( */
+                    /*     tracker, */
+                    /*     (Vector2){ GetRandomFloat(0, (float)SCREEN_WIDTH), */
+                    /*                GetRandomFloat(0, (float)SCREEN_HEIGHT) }, */
+
+                    /*     (Vector2){ GetRandomFloat(-100, 100), */
+                    /*                GetRandomFloat(-100, 100) }, */
+                    /*     GetRandomFloat(-5, 5), */
+                    /*     1); */
+                }
+            } else {
+                BENCHMARKING = false;
+                unsigned long iterations = tracker->objListLen;
+                if (iterations > 1) {
+                    for (unsigned long i = iterations - 1; i > 0; i--) {
+                        if ( tracker->objList[i] == tracker->playerPtr ) continue;
+                        tracker->objList[i]->request = DELETE;
+                    }
+                }
+            }
+        }
+
         if (IsKeyPressed('0')) {
             unsigned long iterations = tracker->objListLen;
             if (iterations > 1) {
                 for (unsigned long i = iterations - 1; i > 0; i--) {
-                    DeleteTrackedObject(tracker, i);
+                    if ( tracker->objList[i] == tracker->playerPtr ) continue;
+                    tracker->objList[i]->request = DELETE;
                 }
             }
         }
@@ -158,9 +188,9 @@ void ShipControlls(ObjectTracker *tracker) {
         RotateObject(tracker->playerPtr, -PLAYER_ROTATION_SPEED);
 
     if (IsKeyDown(KEY_SPACE)) {
-        if (GetTimeMS() - lastShot > (long)1e6 / RATE_OF_FIRE) {
-            lastShot = GetTimeMS();
-            CreateProjectile(tracker, tracker->objList[0]);
+        if (GetTimeMicS() - lastShot > (long)1e6 / RATE_OF_FIRE) {
+            lastShot = GetTimeMicS();
+            CreateProjectile(tracker, tracker->playerPtr);
         }
     }
 }
