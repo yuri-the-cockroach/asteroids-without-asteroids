@@ -1,71 +1,52 @@
-#include "src/render.h"
-#include "src/structs.h"
-#include "src/logger.h"
 #include "src/asteroidsutils.h"
-#include "src/syslogic.h"
+#include "src/logger.h"
 #include "src/objecthandler.h"
+#include "src/render.h"
 #include "src/statemachine.h"
+#include "src/structs.h"
+#include "src/syslogic.h"
 
-enum loglevel CURRENT_LOG_LEVEL = DEFAULT_LOG_LEVEL;
+enum loglevel CURRENT_LOG_LEVEL_CONSOLE = DEFAULT_LOG_LEVEL;
+enum loglevel CURRENT_LOG_LEVEL_FILE = DEFAULT_LOG_LEVEL;
 
 int SCREEN_WIDTH = 1600;
 int SCREEN_HEIGHT = 900;
 
+bool VISUAL_DEBUG_SHOW_POINTS = false;
 bool VISUAL_DEBUG = false;
 bool DEBUGGING = false;
 bool DEBUG_PAUSE = false;
-
+bool BENCHMARKING = false;
 int FPS_TARGET = 75;
 
 long lastShot = 0;
 bool CAMERA_FOLLOW = true;
 bool GDB_BREAK = false;
 
+long BENCH_COLLIDER_TIME = 0;
+FILE *BENCH_LOG_FILE_PTR;
+
+char LOG_FILE_NAME[64];
+FILE *LOG_FILE_PTR;
 
 int main(int argc, char **argv) {
     errno = 0;
 
-
     // Handle the startup arguments
-    if (argc > 1) {
-        for (int i = 1; i < argc; i++) {
-            if (!strcmp(argv[i], "-l") || !strcmp(argv[i], "--loglevel"))
-            {
-                i++;
+    RunConfig();
+    GetStartUpArguments(argc, argv);
 
-                int newLogLevel = ClampInt(atoi(argv[i]), 0, 8);
-                if (newLogLevel) {
-                    CURRENT_LOG_LEVEL = (enum loglevel)newLogLevel;
-                    continue;
-                }
-
-                if (strcmp(argv[i], "0")) {
-                    CURRENT_LOG_LEVEL = 0;
-                    continue;
-                }
-            }
-
-            if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "--debugging")) {
-                DEBUGGING = true;
-                LOG(DEBUG, "%s", "Debugging is enabled");
-                continue;
-            }
-
-            if (!strcmp(argv[i], "-v") || !strcmp(argv[i], "--visual")) {
-                VISUAL_DEBUG = true;
-                LOG(DEBUG, "%s", "Debugging is enabled");
-                continue;
-            }
-        }
-    }
-
-
+    CURRENT_LOG_LEVEL_FILE = CURRENT_LOG_LEVEL_FILE < CURRENT_LOG_LEVEL_CONSOLE
+                                 ? CURRENT_LOG_LEVEL_CONSOLE
+                                 : CURRENT_LOG_LEVEL_FILE;
 
     // Handle the interseption of signals
     signal(SIGINT, SigIntHandler);
     signal(SIGTERM, SigIntHandler);
+    signal(SIGSEGV, SigSegvHandel);
 
     StateMachine();
+    fclose(LOG_FILE_PTR);
+    if (BENCH_LOG_FILE_PTR) fclose(BENCH_LOG_FILE_PTR);
     return 0;
-
 }
