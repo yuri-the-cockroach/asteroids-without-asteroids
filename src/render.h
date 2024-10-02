@@ -4,6 +4,7 @@
 #include "structs.h"
 #include "visdebugger.h"
 #include"logger.h"
+#include <stdarg.h>
 
 void DisplayText(Vector2 pos, int fontSize, Color color, const char *restrict format, ...);
 
@@ -20,6 +21,6 @@ void DrawGrid2D( int dist, Color color);
 
 void RunScreenRender(ObjectTracker *tracker);
 void RunWorldRender(ObjectTracker *tracker);
-void RunMenuRender(struct menuParent *menu, const char *restrict title);
+void RunMenuRender(struct menuParent *menu, const char *restrict title, int subTitleLinesNum, ...);
 
 #endif // RENDER_H_

@@ -1,8 +1,6 @@
 #include "render.h"
 #include "structs.h"
-#include "visdebugger.h"
 #include <raylib.h>
-#include <string.h>
 
 void DisplayText(Vector2 pos, int fontSize, Color color, const char *restrict format, ...) {
     char messageString[1024] = "";
@@ -53,21 +51,23 @@ void DrawObject(ObjectWrap *wrap) {
         (double)wrap->objPtr->speed.x,
         (double)wrap->objPtr->speed.y);
 
-    DebugDisplayText(
+    if (VISUAL_DEBUG_SHOW_POINTS) {
+        DebugDisplayText(
             (Vector2) {wrap->objPtr->position.x, wrap->objPtr->position.y + 118 },
             18,
             WHITE,
             "Points Pos:");
-    for (unsigned long i = 0; i < wrap->objPtr->shape.arrayLength; i++ ) {
+        for (unsigned long i = 0; i < wrap->objPtr->shape.arrayLength; i++ ) {
 
-        DebugDisplayText(
-            (Vector2) {wrap->objPtr->position.x, wrap->objPtr->position.y + 136 + (float)i * 18},
-            18,
-            WHITE,
-            "x: %f y: %f",
-            wrap->objPtr->shape.points[i].x,
-            wrap->objPtr->shape.points[i].y
+            DebugDisplayText(
+                (Vector2) {wrap->objPtr->position.x, wrap->objPtr->position.y + 136 + (float)i * 18},
+                18,
+                WHITE,
+                "x: %f y: %f",
+                wrap->objPtr->shape.points[i].x,
+                wrap->objPtr->shape.points[i].y
             );
+        }
     }
 
     if (wrap->objPtr->shape.arrayLength == 0) {
@@ -191,6 +191,9 @@ void RunScreenRender(ObjectTracker *tracker) {
 
 
     DisplayText((Vector2){ 20, 50 }, 24, RED, "LIVES LEFT: %d", tracker->playerPtr->livesLeft);
+    DisplayText((Vector2){ 20, 78 }, 20, WHITE, "PLAYER SCORE: %d", tracker->playerScore);
+
+    if ( BENCHMARKING ) DisplayText((Vector2){(float)SCREEN_WIDTH / 2 - (float)(MeasureText("BENCHMARKING", 36)), 40 }, 36, RED, "BENCHMARKING");
 
     DebugDisplayText((Vector2){ 20, 20 },
                      18,
@@ -201,10 +204,12 @@ void RunScreenRender(ObjectTracker *tracker) {
     DrawFPS(0, 0);
 }
 
-void RunMenuRender(struct menuParent *menu, const char *restrict title) {
+void RunMenuRender(struct menuParent *menu, const char *restrict title, int subTitleLinesNum, ...) {
     const int titleFontSize = 42;
     const int fontSize = 32;
     int start = SCREEN_HEIGHT / 2 - menu->optionListLen * fontSize / 2;
+    int titlePos = 100;
+
     SCREEN_WIDTH = GetScreenWidth();
     SCREEN_HEIGHT = GetScreenHeight();
 
@@ -218,9 +223,20 @@ void RunMenuRender(struct menuParent *menu, const char *restrict title) {
 
     DrawText(title,
              (SCREEN_WIDTH - MeasureText(title, titleFontSize)) / 2,
-             100,
+             titlePos,
              titleFontSize,
              WHITE);
+
+
+    va_list argptr;
+    va_start(argptr, subTitleLinesNum);
+    for ( int i = 0; i < subTitleLinesNum; i++ ) {
+        char *subtitle = va_arg(argptr, char*);
+        DrawText(subtitle,
+                 (SCREEN_WIDTH - MeasureText(subtitle, fontSize)) / 2,
+                 fontSize * (i + 1) + titlePos + 12, fontSize, WHITE);
+    }
+    va_end(argptr);
 
     for (int i = 0; i < menu->optionListLen; i++) {
         if (i == menu->selected) {
