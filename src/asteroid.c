@@ -1,15 +1,30 @@
 #include "asteroid.h"
 #include "asteroidsutils.h"
 #include "collision.h"
+#include "logger.h"
 #include "objecthandler.h"
 #include "structs.h"
-#include "logger.h"
 #include <math.h>
+#include <raylib.h>
 
-void AsteroidSafeSpawn(ObjectTracker *tracker) {
+ObjectWrap *AsteroidSafeSpawn(ObjectTracker *tracker) {
 
     ObjectWrap *wrap = CreateAsteroid(
-        tracker, (Vector2){ 0, 0 }, (Vector2){ 0, 0 }, 0, GetRandomFloat(1, 3));
+        tracker,
+        (Vector2){ 0, 0 },
+        (Vector2){
+        GetRandomFloat(-100, 100),
+        GetRandomFloat(-100, 100)
+    },
+        GetRandomFloat(-3, 3),
+        GetRandomFloat(1, 3));
+
+    if ( !wrap ) {
+
+        LOG(WARNING, "%s", "Cannot create an asteroid, got a NULL pointer");
+        return NULL;
+    }
+
     Vector2 newPos = (Vector2){ 0, 0 };
     do {
         newPos = (Vector2){ GetRandomFloat(WORLD_POS_MIN_X, WORLD_POS_MAX_X),
@@ -26,6 +41,7 @@ void AsteroidSafeSpawn(ObjectTracker *tracker) {
 
         wrap->objPtr->position = newPos;
     } while (FindAnyCollision(tracker, wrap));
+    return wrap;
 }
 
 ObjectWrap *CreateAsteroid(ObjectTracker *tracker, Vector2 initPosition,
@@ -77,7 +93,7 @@ Vector2 *GenerateAsteroidShape(void) {
 
 int Separate(ObjectTracker *tracker, ObjectWrap *parent) {
 
-    float changeDirectionBy = 10;
+    const float separationAddsSpeed = 50;
 
     if (parent->objectType != ASTEROID) {
         LOG(ERROR,
@@ -86,7 +102,7 @@ int Separate(ObjectTracker *tracker, ObjectWrap *parent) {
         return -1;
     }
 
-    if ( parent->livesLeft == 0 ) {
+    if (parent->livesLeft == 0) {
         parent->request = DELETE;
         return 0;
     }
@@ -94,19 +110,22 @@ int Separate(ObjectTracker *tracker, ObjectWrap *parent) {
     ObjectWrap *asteroidLeft = CreateAsteroid(
         tracker,
         (Vector2){ parent->objPtr->position.x, parent->objPtr->position.y },
-        (Vector2){ parent->objPtr->speed.x, parent->objPtr->speed.y   },
-        parent->objPtr->rotateSpeed,
+        (Vector2){ parent->objPtr->speed.x, parent->objPtr->speed.y },
+        -parent->objPtr->rotateSpeed,
         1);
     ObjectWrap *asteroidRight = CreateAsteroid(
         tracker,
         (Vector2){ parent->objPtr->position.x, parent->objPtr->position.y },
-        (Vector2){ parent->objPtr->speed.x, parent->objPtr->speed.y   },
-        -parent->objPtr->rotateSpeed,
+        (Vector2){ parent->objPtr->speed.x, parent->objPtr->speed.y },
+        parent->objPtr->rotateSpeed,
         1);
 
+    if (!asteroidLeft || !asteroidRight) {
+        LOG(WARNING,
+            "%s",
+            "Create asteroid returned null. Gonna just remove the parent");
+        parent->request = DELETE;
 
-    if ( !asteroidLeft || !asteroidRight ) {
-        LOG(ERROR, "%s", "Create asteroid returned null");
         return -1;
     }
 
@@ -116,31 +135,42 @@ int Separate(ObjectTracker *tracker, ObjectWrap *parent) {
     asteroidLeft->objPtr->heading = parent->objPtr->heading;
     asteroidRight->objPtr->heading = parent->objPtr->heading;
 
-    asteroidLeft->objPtr->position.x += 60;
-    asteroidRight->objPtr->position.x -= 60;
+    asteroidLeft->objPtr->position.x -= sinf(parent->objPtr->heading) * (parent->collider.collider.x + parent->collider.collider.width);
+    asteroidLeft->objPtr->position.y -= cosf(parent->objPtr->heading) * (parent->collider.collider.y + parent->collider.collider.height);
 
-    asteroidLeft->objPtr->speed.x = parent->objPtr->speed.x * sinf(tracker->playerPtr->objPtr->heading);
-    asteroidRight->objPtr->speed.y = parent->objPtr->speed.y * cosf(tracker->playerPtr->objPtr->heading);
+    asteroidRight->objPtr->position.x += sinf(parent->objPtr->heading) * (parent->collider.collider.x + parent->collider.collider.width);
+    asteroidRight->objPtr->position.y += cosf(parent->objPtr->heading) * (parent->collider.collider.y + parent->collider.collider.height);
 
-    asteroidLeft->objPtr->speed.x = parent->objPtr->speed.x * sinf(tracker->playerPtr->objPtr->heading);
-    asteroidRight->objPtr->speed.y = parent->objPtr->speed.y * cosf(tracker->playerPtr->objPtr->heading);
+    asteroidLeft->objPtr->speed.x -=
+        separationAddsSpeed * sinf(parent->objPtr->heading);
+    asteroidLeft->objPtr->speed.y -=
+        separationAddsSpeed * cosf(parent->objPtr->heading);
+
+    asteroidRight->objPtr->speed.x +=
+        separationAddsSpeed * sinf(parent->objPtr->heading);
+    asteroidRight->objPtr->speed.y +=
+        separationAddsSpeed * cosf(parent->objPtr->heading);
 
     asteroidLeft->collider.mass /= 2;
     asteroidRight->collider.mass /= 2;
 
-    asteroidLeft->objPtr->shape.arrayLength = parent->objPtr->shape.arrayLength / 2;
-    asteroidRight->objPtr->shape.arrayLength = parent->objPtr->shape.arrayLength / 2;
+    asteroidLeft->objPtr->shape.arrayLength =
+        parent->objPtr->shape.arrayLength / 2;
+    asteroidRight->objPtr->shape.arrayLength =
+        parent->objPtr->shape.arrayLength / 2;
 
-
-    for ( unsigned long i = 0; i < parent->objPtr->shape.arrayLength / 2; i++ ) {
-        asteroidRight->objPtr->shape.refPoints[i] = parent->objPtr->shape.refPoints[i];
-        asteroidLeft->objPtr->shape.refPoints[i] = parent->objPtr->shape.refPoints[parent->objPtr->shape.arrayLength / 2 + i];
-
+    for (unsigned long i = 0; i < parent->objPtr->shape.arrayLength / 2; i++) {
+        asteroidRight->objPtr->shape.refPoints[i] =
+            parent->objPtr->shape.refPoints[i];
+        asteroidLeft->objPtr->shape.refPoints[i] =
+            parent->objPtr->shape
+                .refPoints[parent->objPtr->shape.arrayLength / 2 + i];
     }
 
-
-
-    LOG(DEBUG, "\nAsteroidLeft speed x: %f\nAsteroidRight speed x %f", asteroidLeft->objPtr->speed.x, asteroidRight->objPtr->speed.x);
+    LOG(DEBUG,
+        "\nAsteroidLeft speed x: %f\nAsteroidRight speed x %f",
+        asteroidLeft->objPtr->speed.x,
+        asteroidRight->objPtr->speed.x);
 
     parent->request = DELETE;
     return 0;
