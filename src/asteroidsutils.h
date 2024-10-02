@@ -2,7 +2,12 @@
 #define ASTEROIDSUTILS_H_
 
 #include "structs.h"
+#include "logger.h"
+#include <time.h>
+#include <sys/stat.h>
 
+#pragma GCC diagnostic ignored "-Wvarargs"
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
 
 #define UNUSED(x) (void)(x)
 
@@ -21,7 +26,7 @@ int ClampInt(int d, int min, int max);
 float GetRandomFloat(float min, float max);
 
 // Get current time in milliseconds
-long GetTimeMS(void);
+long GetTimeMicS(void);
 
 // Cleanup memory find all NULLs in memory
 // remove them and rearenge memory
@@ -32,4 +37,9 @@ int RollOverInt(int d, int min, int max);
 
 // Rollover float, if it gets over max or under min
 float RollOverFloat(float d, float min, float max);
+
+int CreateLogFile(void);
+
+int GetStartUpArguments(int argc, char **argv);
+
 #endif // UTILS_H_
