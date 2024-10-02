@@ -10,6 +10,12 @@
  Return either TRUE or FALSE */
 bool FindAnyCollision(ObjectTracker *tracker, ObjectWrap *first);
 
+/* Sort the list by X coordinate */
+void SortListByX(ObjectTracker *tracker);
+
+/* An algorithm that shoud in theory be a lot faster */
+void FastFindCollisions(ObjectTracker *tracker, unsigned long index);
+
 /* Collision checking */
 void FindCollisions(ObjectTracker *tracker, ObjectWrap *wrap);
 

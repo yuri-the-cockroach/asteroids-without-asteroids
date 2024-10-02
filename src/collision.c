@@ -28,6 +28,63 @@ bool FindAnyCollision(ObjectTracker *tracker, ObjectWrap *first) {
     return false;
 }
 
+void SortListByX(ObjectTracker *tracker) {
+    unsigned long i = 1;
+    unsigned long gotToPos = 0;
+    while (i < tracker->objListLen) {
+
+        ObjectWrap *prev = tracker->objList[i - 1];
+        ObjectWrap *current = tracker->objList[i];
+        if (current->objPtr->position.x >= prev->objPtr->position.x) {
+            if (i > gotToPos) {
+                gotToPos = i;
+            } else
+                i = gotToPos;
+            i++;
+            continue;
+        }
+        tracker->objList[i] = prev;
+        tracker->objList[i - 1] = current;
+
+        if (i > 1)
+            i--;
+    }
+}
+
+void FastFindCollisions(ObjectTracker *tracker, unsigned long index) {
+
+    ObjectWrap *current = tracker->objList[index];
+    if (tracker->objListLen < 2)
+        return;
+
+    if (!current)
+        return;
+
+    if (current->request == DELETE) return;
+
+
+
+    ObjectWrap *next;
+
+    for (unsigned long j = index + 1; j < tracker->objListLen; j++) {
+        next = tracker->objList[j];
+
+        if (tracker->objList[j] == NULL || current == next || next->request == DELETE || !next->collider.isCollidable)
+            continue;
+
+        if (current->collider.collider.x + current->collider.collider.width <= next->collider.collider.x )
+            break;
+        if ( !CheckIfCollide(current, next) ) continue;
+
+        if (current->objectType > next->objectType) {
+            current->collider.ActionOnCollision(tracker, current, next);
+            continue;
+        }
+        next->collider.ActionOnCollision(tracker, next, current);
+    }
+    return;
+}
+
 void FindCollisions(ObjectTracker *tracker, ObjectWrap *first) {
     if (tracker->objListLen < 2)
         return;
@@ -191,6 +248,7 @@ void GetShot(ObjectTracker *tracker, ObjectWrap *projectile, ObjectWrap *victim)
     if ( victim->objectType == ASTEROID ) {
         victim->livesLeft--;
         victim->request = SEPARATE;
+        tracker->playerScore++;
     }
 }
 
@@ -252,6 +310,7 @@ int ClearList(Collider *parent) {
 
 int CleanupLists(ObjectTracker *tracker) {
     for ( unsigned long i = 0; i < tracker->objListLen; i++ ) {
+        if (!tracker->objList[i]) continue;
         ClearList(&tracker->objList[i]->collider);
     }
     return 0;
