@@ -1,11 +1,24 @@
 #include "objecthandler.h"
 #include "asteroid.h"
+#include "asteroidsutils.h"
 #include "collision.h"
+#include "logger.h"
 #include "objectlogic.h"
 #include "structs.h"
+#include "benchmarking.h"
 
 // Returns a list of objects that need to be drawn
 void RunActionList(ObjectTracker *tracker) {
+    long benchmarkStart = 0;
+    long sortCalledAt = 0;
+    BENCH_COLLIDER_TIME = 0;
+        LOG(BENCH, "%s", "<- Starting action list ->");
+
+    BenchStart(&benchmarkStart);
+
+    BenchStart(&sortCalledAt);
+    SortListByX(tracker);
+    BenchEnd(&sortCalledAt, "Sorter");
 
     // Run through all the tracked objects
     for (unsigned long i = 0; i < tracker->objListLen; i++) {
@@ -30,21 +43,42 @@ void RunActionList(ObjectTracker *tracker) {
                 break;
 
             case UPDATE: // Call the updater function of the element
-                UpdateObj(tracker, current);
+            {
+                UpdateObj(tracker, i);
                 break;
+            }
 
             case IGNORE:
                 continue;
         }
     }
+    if (BENCHMARKING) {
+        LOG(BENCH, "Collider took %ldus for %d objects", BENCH_COLLIDER_TIME, tracker->objListLen);
+        BENCH_COLLIDER_TIME = 0;
+    }
+
+    if (BENCHMARKING) LOG(BENCH, "<- Action list finished in %ldus ->", GetTimeMicS() - benchmarkStart);
+
     CleanupMemory(tracker);
     CleanupLists(tracker);
 }
 
-void UpdateObj(ObjectTracker *tracker, ObjectWrap *wrap) {
+void UpdateObj(ObjectTracker *tracker, unsigned long index) {
 
+    ObjectWrap *wrap = tracker->objList[index];
+    long start = 0;
+
+    if ( BENCHMARKING ) start = GetTimeMicS();
     if ( wrap->collider.isCollidable)
-        FindCollisions(tracker, wrap);
+        FastFindCollisions(tracker, i);
+    if ( BENCHMARKING ) BENCH_COLLIDER_TIME += (GetTimeMicS() - start);
+
+    /* long start = 0; */
+
+    /* if ( BENCHMARKING ) start = GetTimeMicS(); */
+    /* if ( wrap->collider.isCollidable) */
+    /*     FindCollisions(tracker, wrap); */
+    /* if ( BENCHMARKING ) BENCH_COLLIDER_TIME += (GetTimeMicS() - start); */
 
     if (wrap->isRotatableByGame) {
         RotateObject(wrap, (wrap->objPtr->rotateSpeed));
@@ -61,6 +95,7 @@ ObjectTracker *InitTracker(void) {
         NULL,
         { 0 },
         (ObjectWrap **)calloc(MAX_OBJECT_COUNT, sizeof(ObjectWrap *)),
+        0,
         0
     };
     return tracker;
@@ -209,9 +244,11 @@ void DeleteTrackedObject(ObjectTracker *tracker, unsigned long index) {
 }
 
 void DeleteTracker(ObjectTracker *tracker) {
+    CleanupMemory(tracker);
     for ( unsigned long i = 0; i < tracker->objListLen; i++ ) {
-        if ( tracker->objList[i] ) DeleteTrackedObject(tracker, i);
+        if ( tracker->objList[i] ) tracker->objList[i]->request = DELETE;
     }
+    RunActionList(tracker);
     free(tracker->objList);
     free(tracker);
 }

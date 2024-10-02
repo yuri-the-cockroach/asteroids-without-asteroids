@@ -13,7 +13,7 @@
 void RunActionList(ObjectTracker *tracker);
 
 /* Called on a single ObjectWrap* and goes through the update checklist */
-void UpdateObj(ObjectTracker *tracker, ObjectWrap *wrap);
+void UpdateObj(ObjectTracker *tracker, unsigned long index);
 
 /* Takes care of safely deleting the object and cleaning up after it */
 void DeleteObjWrap(ObjectWrap *wrap);
