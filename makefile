@@ -9,10 +9,21 @@ export GLFW_LINUX_ENABLE_X11=FALSE
 export GLFW_LINUX_ENABLE_WAYLAND=TRUE
 export LD_LIBRARY_PATH=/home/cockroach/coding/c/asteroids/build
 export BUILDLIST=( $OBJECTLOGIC $GAMELOGIC $SYSLOGIC )
-export WARNINGS=-Wall -Wextra -Weverything -Wno-unsafe-buffer-usage -Wno-declaration-after-statement -Wno-missing-noreturn -Wno-padded -Wno-switch-default
+
+export WARNINGS+= -Wall
+export WARNINGS+= -Wextra
+export WARNINGS+= -Weverything
+export WARNINGS+= -Wno-unsafe-buffer-usage
+export WARNINGS+= -Wno-declaration-after-statement
+export WARNINGS+= -Wno-missing-noreturn
+export WARNINGS+= -Wno-padded
+export WARNINGS+= -Wno-switch-default
+export WARNINGS+= -Wno-double-promotion
+
 export RUN_MAIN=1
 export OPTIMIZE=-Og -g
 # export OPTIMIZE=-O3
+export LIBS+= -lunwind
 export LIBS+= -llogger
 export LIBS+= -lasteroidsutils
 export LIBS+= -lrender
@@ -32,6 +43,7 @@ export LIBS+= -lvisdebugger
 export LIBS+= -lstatemachine
 export LIBS+= -lmenulogic
 export LIBS+= -lasteroid
+export LIBS+= -lbenchmarking
 
 define buildLib
 	@if [ -z $1 ]; then echo "No argument provided"; exit 1; fi
@@ -43,7 +55,20 @@ define buildLib
 endef
 
 buildall:
-	mold -run make -j asteroidsutils tracker objectlogic gamelogic syslogic render logger collision visdebugger statemachine menulogic asteroid
+	mold -run make -j \
+		asteroidsutils \
+		tracker \
+		objectlogic \
+		gamelogic \
+		syslogic \
+		render \
+		logger \
+		collision \
+		visdebugger \
+		statemachine \
+		menulogic \
+		asteroid \
+		benchmarking
 	mold -run make main
 
 menulogic:
@@ -85,11 +110,14 @@ statemachine:
 asteroid:
 	$(call buildLib,asteroid)
 
+benchmarking:
+	$(call buildLib,benchmarking)
+
 main:
 	@if [ -f main.o ]; then rm main.o; fi
 	bear -- clang $(WARNINGS) -std=gnu17 -ferror-limit=0 -rpath $(OPTIMIZE) -Isrc -Lbuild $(LIBS) -o build/main.o main.c
 
 run: main.o
-	./build/main.o -l 6 -d -v
+	./build/main.o -b -lc 0 -lf 6 -d
 
 # end
