@@ -1,4 +1,5 @@
 #include "logger.h"
+#include "structs.h"
 
 
 // This is an internal function.
@@ -7,8 +8,10 @@ void Logger(const char *restrict inFile, const char *restrict inFunc,
             const int onLine, const enum loglevel loglevel,
             const char *restrict format, ...) {
 
-    if (CURRENT_LOG_LEVEL < loglevel)
+    if (CURRENT_LOG_LEVEL_FILE < loglevel && CURRENT_LOG_LEVEL_CONSOLE < loglevel)
         return;
+
+    if ( loglevel == BENCH && !BENCHMARKING ) return;
 
     char messageString[1024] = "";
 
@@ -17,6 +20,7 @@ void Logger(const char *restrict inFile, const char *restrict inFunc,
     int argcount = 0;
     int i = 0;
     char current;
+    FILE *file = BENCHMARKING && loglevel == BENCH ? BENCH_LOG_FILE_PTR : LOG_FILE_PTR;
 
     // Count how many arguments we have
     // by counting format specifiers in a format string
@@ -43,9 +47,20 @@ void Logger(const char *restrict inFile, const char *restrict inFunc,
             time.tv_sec % 60,
             time.tv_usec);
     // Actually print to stderr
-    fprintf(stderr,
+
+    if ( CURRENT_LOG_LEVEL_CONSOLE >= loglevel )
+        fprintf(stderr,
+                "[%s] %s %s->%s:%d %s\n",
+                loglvlToString[loglevel],
+                formatedTime,
+                inFile,
+                inFunc,
+                onLine,
+                messageString);
+
+    fprintf(file,
             "[%s] %s %s->%s:%d %s\n",
-            loglvlToString[loglevel],
+            loglvlToStringNoColor[loglevel],
             formatedTime,
             inFile,
             inFunc,
