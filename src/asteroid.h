@@ -6,7 +6,7 @@
 #include "objecthandler.h"
 
 /* Will spawn asteroid in such a way, that it won't collide with anything */
-void AsteroidSafeSpawn(ObjectTracker *tracker);
+ObjectWrap *AsteroidSafeSpawn(ObjectTracker *tracker);
 
  /* Generates a surface for an asteroid */
 Vector2 *GenerateAsteroidShape(void);

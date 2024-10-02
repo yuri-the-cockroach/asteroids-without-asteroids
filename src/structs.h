@@ -26,15 +26,16 @@
 /* -------------------- enums --------------------  */
 
 enum loglevel {
-    NOLOG = 0,
-    FATAL = 1,
-    ERROR = 2,
+    NOLOG   = 0,
+    FATAL   = 1,
+    ERROR   = 2,
     WARNING = 3,
-    INFO = 4,
-    FIXME = 5,
-    DEBUG = 6,
-    TRACE = 7,
-    ALL = 8
+    BENCH   = 4,
+    INFO    = 5,
+    FIXME   = 6,
+    DEBUG   = 7,
+    TRACE   = 8,
+    ALL     = 9
 };
 
 enum game_state {
@@ -45,19 +46,36 @@ enum game_state {
     RUNNING = 4,
     PAUSE = 5,
     EXIT = -1,
+    CLEANUP = -2,
+    NOOP = -255
 };
 
-static const char *loglvlToString[9] = {
+static const char *loglvlToString[10] = {
     "NOLOG",
     "\033[1;31mFATAL\033[0;37m",
     "\033[0;31mERROR\033[0;37m",
     "\033[1;33mWARNING\033[0;37m",
+    "\033[0;32mBENCH\033[0;37m",
     "\033[0;32mINFO\033[0;37m",
     "\033[0;34mFIXME\033[0;37m",
     "\033[1;35mDEBUG\033[0;37m",
     "\033[0;35mTRACE\033[0;37m",
     "ALL"
 };
+
+static const char *loglvlToStringNoColor[10] = {
+    "NOLOG",
+    "FATAL",
+    "ERROR",
+    "WARNING",
+    "BENCH",
+    "INFO",
+    "FIXME",
+    "DEBUG",
+    "TRACE",
+    "ALL"
+};
+
 
 enum request { IGNORE = 0, UPDATE = 1, SEPARATE = 2, DELETE = -1 };
 enum type { NOTYPE = 0, ASTEROID = 1, PROJECTILE = 2, PLAYER = 3 };
@@ -104,13 +122,26 @@ static const float ASTEROID_HEIGHT_VARIATION = 10;
 /* Externally defined dynamic global variables */
 
 /* Debugging vars */
+
+extern bool BENCHMARKING;
+extern long BENCH_COLLIDER_TIME;
+static const char *restrict BENCH_LOG_FILE_NAME = "asteroids-benchlog.log";
+extern FILE *BENCH_LOG_FILE_PTR;
+
 extern bool DEBUGGING;
 extern bool DEBUG_PAUSE;
 extern bool VISUAL_DEBUG;
-extern enum loglevel CURRENT_LOG_LEVEL;
+extern bool VISUAL_DEBUG_SHOW_POINTS;
+extern enum loglevel CURRENT_LOG_LEVEL_CONSOLE;
+extern enum loglevel CURRENT_LOG_LEVEL_FILE;
+
+extern char LOG_FILE_NAME[64];
+extern FILE *LOG_FILE_PTR;
 extern bool GDB_BREAK;
 
 /* Game flow related */
+
+extern enum game_state NEXT_STATE;
 extern enum game_state GAME_STATE;
 extern long lastShot;
 extern int SCREEN_WIDTH;
@@ -118,6 +149,9 @@ extern int SCREEN_HEIGHT;
 extern int FPS_TARGET;
 extern bool CAMERA_FOLLOW;
 
+
+/* Benchmarking */
+static const int SAMPLES = 1024;
 
 static const Vector2 PLAYER_SHAPE_POINTS[] = {
     (Vector2){ 0,   -50 }, // Is always treated as the fronts-most point, used to
@@ -191,6 +225,7 @@ struct tracker {
     Camera2D playerCamera;
     ObjectWrap **objList;
     unsigned long objListLen;
+    unsigned int playerScore;
 };
 
 struct menuOption {
