@@ -28,6 +28,12 @@ struct menuParent SetupMainMenu(void);
 
 struct menuParent SetupPauseMenu(void);
 
+struct menuParent SetupGameOverMenu(void);
+
+
+void TriggerMainMenu(void);
+void TriggerRestart(void);
+
 // Get the entry from the top of the stack without removing it from the stack
 struct menuParent* MenuStackGet(struct menuStack *stack);
 

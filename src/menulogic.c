@@ -6,12 +6,23 @@ void TriggerGameOver(void) {
     GAME_STATE = GAME_OVER;
 }
 
+void TriggerRestart(void) {
+    GAME_STATE = CLEANUP;
+    NEXT_STATE = START_NEW;
+}
+
 void TriggerNewGame(void) {
     GAME_STATE = START_NEW;
 }
 
+void TriggerMainMenu(void) {
+    GAME_STATE = CLEANUP;
+    NEXT_STATE = MAIN_MENU;
+}
+
 void TriggerExitGame(void) {
-    GAME_STATE = EXIT;
+    GAME_STATE = CLEANUP;
+    NEXT_STATE = EXIT;
 }
 
 int SelectCurrent(struct menuParent *menu) {
@@ -56,12 +67,22 @@ int MenuStackClear(struct menuStack *stack) {
     }
     return 0;
 }
+struct menuParent SetupGameOverMenu(void) {
+    const int numberOfItems = 3;
+    struct menuOption *optionList = calloc(numberOfItems, sizeof(struct menuOption));
+    optionList[0] = (struct menuOption){ "RESTART", *TriggerRestart };
+    optionList[1] = (struct menuOption){ "MAIN MENU", *TriggerMainMenu };
+    optionList[2] = (struct menuOption){ "EXIT", *TriggerExitGame };
+
+    return (struct menuParent){ 0, numberOfItems, optionList};
+}
 
 struct menuParent SetupPauseMenu(void){
-    const int numberOfItems = 2;
+    const int numberOfItems = 3;
     struct menuOption *optionList = calloc(numberOfItems, sizeof(struct menuOption));
-    optionList[0] = (struct menuOption){ "MAIN MENU", *TriggerGameOver };
-    optionList[1] = (struct menuOption){ "EXIT", *TriggerExitGame };
+    optionList[0] = (struct menuOption){ "RESTART", *TriggerRestart };
+    optionList[1] = (struct menuOption){ "MAIN MENU", *TriggerMainMenu };
+    optionList[2] = (struct menuOption){ "EXIT", *TriggerExitGame };
 
     return (struct menuParent){ 0, numberOfItems, optionList};
 }
