@@ -258,7 +258,8 @@ void RunScreenRender(ObjectTracker *tracker) {
     DrawFPS(0, 0);
 }
 
-void RunMenuRender(struct menuParent *menu, const char *restrict title, int subTitleLinesNum, ...) {
+void RunMenuRender(struct menuParent *menu, const char *restrict title,
+                   int subTitleLinesNum, ...) {
     const int titleFontSize = 42;
     const int fontSize = 32;
     int start = SCREEN_HEIGHT / 2 - menu->optionListLen * fontSize / 2;
@@ -273,22 +274,21 @@ void RunMenuRender(struct menuParent *menu, const char *restrict title, int subT
                   SCREEN_HEIGHT / 2,
                   (Color){ 38, 38, 38, 190 });
 
-
-
     DrawText(title,
              (SCREEN_WIDTH - MeasureText(title, titleFontSize)) / 2,
              titlePos,
              titleFontSize,
              WHITE);
 
-
     va_list argptr;
     va_start(argptr, subTitleLinesNum);
-    for ( int i = 0; i < subTitleLinesNum; i++ ) {
-        char *subtitle = va_arg(argptr, char*);
+    for (int i = 0; i < subTitleLinesNum; i++) {
+        char *subtitle = va_arg(argptr, char *);
         DrawText(subtitle,
                  (SCREEN_WIDTH - MeasureText(subtitle, fontSize)) / 2,
-                 fontSize * (i + 1) + titlePos + 12, fontSize, WHITE);
+                 fontSize * (i + 1) + titlePos + 12,
+                 fontSize,
+                 WHITE);
     }
     va_end(argptr);
 
