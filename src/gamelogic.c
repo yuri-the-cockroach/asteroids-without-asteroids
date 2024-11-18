@@ -170,8 +170,11 @@ void DebugingKeyHandler(ObjectTracker *tracker) {
             /*     GetRandomFloat(0.5, 2)); */
 
         if (IsKeyPressed('-')) {
-            if (tracker->objListLen > 1)
-                tracker->objList[tracker->objListLen - 1]->request = DELETE;
+            if (tracker->objListLen > 1) {
+                ObjectWrap *toDelete = tracker->objList[tracker->objListLen - 1];
+                if ( toDelete == tracker->playerPtr ) toDelete = tracker->objList[tracker->objListLen - 2];
+                toDelete->request = DELETE;
+            }
         }
     }
 }
