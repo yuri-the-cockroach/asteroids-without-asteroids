@@ -2,7 +2,8 @@
 #include "structs.h"
 #include <raylib.h>
 
-void DisplayText(Vector2 pos, int fontSize, Color color, const char *restrict format, ...) {
+void DisplayText(Vector2 pos, int fontSize, Color color,
+                 const char *restrict format, ...) {
     char messageString[1024] = "";
 
     va_list argptr;
@@ -59,21 +60,21 @@ void DrawObject(ObjectWrap *wrap) {
         (double)wrap->objPtr->speed.y);
 
     if (VISUAL_DEBUG_SHOW_POINTS) {
-        DebugDisplayText(
-            (Vector2) {wrap->objPtr->position.x, wrap->objPtr->position.y + 118 },
-            18,
-            WHITE,
-            "Points Pos:");
-        for (unsigned long i = 0; i < wrap->objPtr->shape.arrayLength; i++ ) {
+        DebugDisplayText((Vector2){ wrap->objPtr->position.x,
+                                    wrap->objPtr->position.y + 118 },
+                         18,
+                         WHITE,
+                         "Points Pos:");
+        for (unsigned long i = 0; i < wrap->objPtr->shape.arrayLength; i++) {
 
             DebugDisplayText(
-                (Vector2) {wrap->objPtr->position.x, wrap->objPtr->position.y + 136 + (float)i * 18},
+                (Vector2){ wrap->objPtr->position.x,
+                           wrap->objPtr->position.y + 136 + (float)i * 18 },
                 18,
                 WHITE,
                 "x: %f y: %f",
                 wrap->objPtr->shape.points[i].x,
-                wrap->objPtr->shape.points[i].y
-            );
+                wrap->objPtr->shape.points[i].y);
         }
     }
 
@@ -118,7 +119,7 @@ void DrawObject(ObjectWrap *wrap) {
         WHITE // Color of the line
     );
 
-    if ( wrap->objectType == ASTEROID )
+    if (wrap->objectType == ASTEROID)
         DisplayText(wrap->objPtr->position, 24, WHITE, "%s", "MAMY EBAL");
 }
 
