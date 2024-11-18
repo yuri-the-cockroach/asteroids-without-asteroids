@@ -37,20 +37,27 @@ long GetTimeMicS(void) {
 }
 
 void CleanupMemory(ObjectTracker *tracker) {
-    for (unsigned long i = 0; i < tracker->objListLen; i++) {
-        if (tracker->objList[i] != 0)
-            continue;
+    unsigned long i = 0;
+    unsigned long firstNull = MAX_OBJECT_COUNT;
+    unsigned long nullCounter = 0;
+    ObjectWrap *current = 0;
 
-        if (tracker->objList[tracker->objListLen - 1] == 0) {
-            tracker->objListLen--;
-            i = 0;
-            continue;
+    while ( i < tracker->objListLen ) {
+        current = tracker->objList[i];
+        if ( !current ) {
+            firstNull = i < firstNull ? i : firstNull;
+            nullCounter++;
         }
-
-        tracker->objList[i] = tracker->objList[tracker->objListLen - 1];
-        tracker->objList[tracker->objListLen - 1] = 0;
-        tracker->objListLen--;
+        if ( current && firstNull < i) {
+            tracker->objList[firstNull] = current;
+            tracker->objList[i] = 0;
+            i = firstNull;
+            nullCounter = 0;
+            firstNull = MAX_OBJECT_COUNT;
+        }
+        i++;
     }
+    tracker->objListLen -= nullCounter;
 }
 
 int CreateLogFile(void) {
