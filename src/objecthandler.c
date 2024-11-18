@@ -60,7 +60,6 @@ void RunActionList(ObjectTracker *tracker) {
     if (BENCHMARKING) LOG(BENCH, "<- Action list finished in %ldus ->", GetTimeMicS() - benchmarkStart);
 
     CleanupMemory(tracker);
-    CleanupLists(tracker);
 }
 
 void UpdateObj(ObjectTracker *tracker, unsigned long index) {
