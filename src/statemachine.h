@@ -8,6 +8,7 @@
 #include "structs.h"
 #include "menulogic.h"
 
+void *RenderJob(void* pointer);
 int StateMachine(void);
 void RunConfig(void);
 

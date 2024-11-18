@@ -10,6 +10,7 @@
 
 #include <raylib.h>
 #include <stdio.h>
+#include <time.h>
 
 enum game_state GAME_STATE = INIT;
 enum game_state NEXT_STATE = NOOP;
@@ -29,7 +30,8 @@ void RunConfig(void) {
 
 int StateMachine(void) {
     long timerStartTotalCycle = 0;
-    long timerStartRender = 0;
+    long timerWorldRender = 0;
+    long timerScreenRender = 0;
     long timerStartKeys = 0;
 
     ObjectTracker *tracker = NULL;
@@ -92,12 +94,17 @@ int StateMachine(void) {
                 if (!DEBUG_PAUSE)
                     RunActionList(tracker);
 
-                BenchStart(&timerStartRender);
-                // Rendering
-                RunWorldRender(tracker);
-                RunScreenRender(tracker);
 
-                BenchEnd(&timerStartRender, "Renderer");
+                // Rendering
+
+                BenchStart(&timerWorldRender);
+                RunWorldRender(tracker);
+                BenchEnd(&timerWorldRender, "World Renderer");
+
+                BenchStart(&timerScreenRender);
+                RunScreenRender(tracker);
+                BenchEnd(&timerScreenRender, "Screen Renderer");
+
                 BenchEnd(&timerStartTotalCycle, "Total cycle");
                 LOG(BENCH, "%s", "<--- Ended frame cycle --->\n");
                 break;
