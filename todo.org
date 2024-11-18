@@ -1,18 +1,29 @@
 #+title: Todo
 
-Currentrly doing: Asteroid sparation loigc
+Currentrly doing:
 
 - [-] Menues
   - [X] Start Screen
   - [X] Pause
-  - [ ] Game-over screen
+  - [X] Game-over screen
+  - [ ] Difficulty choosing
 
-- [X] Game Logic
+
+- [X] Rendering
+  - [X] Don't render stuff that's not on the screen
+
+- [-] Game Logic
+  - [-] Asteroids
+    - [ ] Dynamic spawn system
+    - [X] Procedural shape generator
+    - [X] Separation on getting shot
   - [X] Seperate camera and game space
   - [X] Make game world bigger
+  - [ ] Automatic asteroid spawn based on the difficulty and time alive
 
 - [-] Collisions
   - [X] Base system implementation
+  - [X] Faster collision algorithm
   - [ ] Rewrite to use multithreading
   - [ ] Rewrite to use multiple collision zones
   - [ ] Better rotations on impact
@@ -22,10 +33,6 @@ Currentrly doing: Asteroid sparation loigc
     - [X] Base systems
     - [ ] Make them more suitable for a game
 
-- [-] Asteroids
-  - [ ] Dynamic spawn system
-  - [X] Procedural shape generator
-  - [ ] Separation on getting shot
 
 - [X] Memory handelling (hopefully)
 
