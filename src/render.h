@@ -23,4 +23,6 @@ void RunScreenRender(ObjectTracker *tracker);
 void RunWorldRender(ObjectTracker *tracker);
 void RunMenuRender(struct menuParent *menu, const char *restrict title, int subTitleLinesNum, ...);
 
+void DrawRectLineNotFucked(int x, int y, int width, int height, Color color);
+
 #endif // RENDER_H_

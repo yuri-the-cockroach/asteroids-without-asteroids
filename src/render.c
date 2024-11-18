@@ -30,6 +30,13 @@ void DisplayText(Vector2 pos, int fontSize, Color color, const char *restrict fo
     DrawText(messageString, (int)pos.x, (int)pos.y, fontSize, color);
 }
 
+void DrawRectLineNotFucked(int x, int y, int width, int height, Color color) {
+    DrawLine(x, y, x + width, y, RED);
+    DrawLine(x + width, y, x + width, y + height, RED);
+    DrawLine(x + width, y + height, x, y + height, RED);
+    DrawLine(x, y + height, x, y, RED);
+    return;
+}
 
 void DrawObject(ObjectWrap *wrap) {
 
