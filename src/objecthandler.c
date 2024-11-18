@@ -181,8 +181,8 @@ void CreatePlayer(ObjectTracker *tracker, Vector2 initPosition, float size) {
     player->livesLeft = 2;
 
     // Camera stuff
-    tracker->playerCamera.target = (Vector2){ tracker->objList[0]->objPtr->position.x + 20.0f,
-                               tracker->objList[0]->objPtr->position.y + 20.0f };
+    tracker->playerCamera.target = (Vector2){ tracker->playerPtr->objPtr->position.x,
+                               tracker->playerPtr->objPtr->position.y };
     tracker->playerCamera.offset =
         (Vector2){ (float)SCREEN_WIDTH / 2.0f, (float)SCREEN_HEIGHT / 2.0f };
 
