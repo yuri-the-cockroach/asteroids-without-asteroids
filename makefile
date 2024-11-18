@@ -117,6 +117,11 @@ main:
 	@if [ -f main.o ]; then rm main.o; fi
 	bear -- clang $(WARNINGS) -std=gnu17 -ferror-limit=0 -rpath $(OPTIMIZE) -Isrc -Lbuild $(LIBS) -o build/main.o main.c
 
+
+# -lc level for consol debug output
+# -lf level for file debug output
+# -d  debug mode
+# -b  breakpoint mode ( press b to toggle GDB_BREAK variable )
 run: main.o
 	./build/main.o -b -lc 0 -lf 6 -d
 
