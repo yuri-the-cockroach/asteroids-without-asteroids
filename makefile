@@ -123,6 +123,6 @@ main:
 # -d  debug mode
 # -b  breakpoint mode ( press b to toggle GDB_BREAK variable )
 run: main.o
-	./build/main.o -b -lc 0 -lf 6 -d
+	./build/main.o -b -lc 0 -lf 7 -d
 
 # end
