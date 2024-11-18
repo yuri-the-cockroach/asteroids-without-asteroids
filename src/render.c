@@ -182,10 +182,43 @@ void RunWorldRender(ObjectTracker *tracker) {
         return;
     }
 
+    Vector2 screenStart = {
+        tracker->playerCamera.target.x - tracker->playerCamera.offset.x / tracker->playerCamera.zoom,
+        tracker->playerCamera.target.y - tracker->playerCamera.offset.y / tracker->playerCamera.zoom
+    };
+
+    Vector2 screenEnd = { screenStart.x + (float)SCREEN_WIDTH / tracker->playerCamera.zoom,
+                          screenStart.y + (float)SCREEN_HEIGHT / tracker->playerCamera.zoom};
+
+    /* DrawRectLineNotFucked( */
+    /*     screenStart.x, screenStart.y, screenEnd.x - screenStart.x, screenEnd.y - screenStart.y, RED); */
+    int DrawingObjCount = 0;
     for (unsigned int i = 0; i < tracker->objListLen; i++) {
-        if (tracker->objList[i]->draw)
-            DrawObject(tracker->objList[i]);
+        ObjectWrap *current = tracker->objList[i];
+
+        if (!current || !current->draw)
+            continue;
+
+        Vector2 colliderStart = {
+            current->objPtr->position.x + current->collider.collider.x,
+            current->objPtr->position.y + current->collider.collider.y
+        };
+        Vector2 colliderEnd = {
+            current->objPtr->position.x + current->collider.collider.x + current->collider.collider.width,
+            current->objPtr->position.y + current->collider.collider.y + current->collider.collider.height
+        };
+
+        if ( colliderEnd.x < screenStart.x ||
+             screenEnd.x < colliderStart.x ||
+             colliderEnd.y < screenStart.y ||
+             screenEnd.y < colliderStart.y )
+            continue;
+
+        DrawObject(tracker->objList[i]);
+
+        DrawingObjCount++;
     }
+    LOG(TRACE, "Drawing %d objects", DrawingObjCount);
 
     EndMode2D();
 }
