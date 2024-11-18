@@ -230,11 +230,24 @@ void RunScreenRender(ObjectTracker *tracker) {
     tracker->playerCamera.offset.x = (float)SCREEN_WIDTH / 2;
     tracker->playerCamera.offset.y = (float)SCREEN_HEIGHT / 2;
 
+    DisplayText((Vector2){ 20, 50 },
+                24,
+                RED,
+                "LIVES LEFT: %d",
+                tracker->playerPtr->livesLeft);
+    DisplayText((Vector2){ 20, 78 },
+                20,
+                WHITE,
+                "PLAYER SCORE: %d",
+                tracker->playerScore);
 
-    DisplayText((Vector2){ 20, 50 }, 24, RED, "LIVES LEFT: %d", tracker->playerPtr->livesLeft);
-    DisplayText((Vector2){ 20, 78 }, 20, WHITE, "PLAYER SCORE: %d", tracker->playerScore);
-
-    if ( BENCHMARKING ) DisplayText((Vector2){(float)SCREEN_WIDTH / 2 - (float)(MeasureText("BENCHMARKING", 36)), 40 }, 36, RED, "BENCHMARKING");
+    if (BENCHMARKING)
+        DisplayText((Vector2){ (float)SCREEN_WIDTH / 2 -
+                                   (float)(MeasureText("BENCHMARKING", 36)),
+                               40 },
+                    36,
+                    RED,
+                    "BENCHMARKING");
 
     DebugDisplayText((Vector2){ 20, 20 },
                      18,
