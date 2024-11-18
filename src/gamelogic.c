@@ -146,14 +146,13 @@ void DebugingKeyHandler(ObjectTracker *tracker) {
         }
 
         if (IsKeyPressed('0')) {
-            unsigned long iterations = tracker->objListLen;
-            if (iterations > 1) {
-                for (unsigned long i = iterations - 1; i > 0; i--) {
-                    if ( tracker->objList[i] == tracker->playerPtr ) continue;
-                    tracker->objList[i]->request = DELETE;
-                }
+            for ( unsigned int i = 0; i < tracker->objListLen; i++ ) {
+                ObjectWrap *current = tracker->objList[i];
+                if ( !current || current == tracker->playerPtr ) continue;
+                current->request = DELETE;
             }
         }
+
 
         if (IsKeyPressed('='))
             AsteroidSafeSpawn(tracker);
