@@ -243,6 +243,7 @@ void DeleteTrackedObject(ObjectTracker *tracker, unsigned long index) {
 }
 
 void DeleteTracker(ObjectTracker *tracker) {
+    if ( !tracker ) return;
     CleanupMemory(tracker);
     for ( unsigned long i = 0; i < tracker->objListLen; i++ ) {
         if ( tracker->objList[i] ) tracker->objList[i]->request = DELETE;
