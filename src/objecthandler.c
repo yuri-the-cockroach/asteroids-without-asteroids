@@ -69,7 +69,7 @@ void UpdateObj(ObjectTracker *tracker, unsigned long index) {
 
     if ( BENCHMARKING ) start = GetTimeMicS();
     if ( wrap->collider.isCollidable)
-        FastFindCollisions(tracker, i);
+        FastFindCollisions(tracker, index);
     if ( BENCHMARKING ) BENCH_COLLIDER_TIME += (GetTimeMicS() - start);
 
     /* long start = 0; */
