@@ -39,12 +39,6 @@ int StateMachine(void) {
     struct menuParent mainMenu = SetupMainMenu();
     struct menuParent pauseMenu = SetupPauseMenu();
     struct menuParent gameOverMenu = SetupGameOverMenu();
-    /* struct menuStack mStack = (struct menuStack){ */
-    /*     0, calloc(MAX_MENU_STACK_SIZE, sizeof(struct menuParent)) */
-    /* }; */
-
-    /* MenuStackPush(&mStack, mainMenu); */
-
 
     while (true) {
 
