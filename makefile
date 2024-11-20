@@ -4,10 +4,10 @@
 # @file
 # @version 0.1
 
-export PLATFORM=PLATFORM_DESKTOP
-export GLFW_LINUX_ENABLE_X11=FALSE
-export GLFW_LINUX_ENABLE_WAYLAND=TRUE
-export LD_LIBRARY_PATH=/home/cockroach/coding/c/asteroids/build
+export PLATFORM=PLATFORM_DESKTOP_RGFW
+# export GLFW_LINUX_ENABLE_X11=FALSE
+# export GLFW_LINUX_ENABLE_WAYLAND=TRUE
+# export LD_LIBRARY_PATH=/home/cockroach/coding/c/asteroids/build
 export BUILDLIST=( $OBJECTLOGIC $GAMELOGIC $SYSLOGIC )
 
 export WARNINGS+= -Wall
@@ -32,7 +32,7 @@ export LIBS+= -lsyslogic
 export LIBS+= -lgamelogic
 export LIBS+= -lraylib
 export LIBS+= -lobjecthandler
-export LIBS+= -lGL
+# export LIBS+= -lGL
 export LIBS+= -lm
 export LIBS+= -lpthread
 export LIBS+= -ldl
@@ -115,14 +115,14 @@ benchmarking:
 
 main:
 	@if [ -f main.o ]; then rm main.o; fi
-	bear -- clang $(WARNINGS) -std=gnu17 -ferror-limit=0 -rpath $(OPTIMIZE) -Isrc -Lbuild $(LIBS) -o build/main.o main.c
-
+	bear -- clang $(WARNINGS) -std=gnu17 -ferror-limit=0 -rpath . $(OPTIMIZE) -Isrc -o object-files/main.o -c main.c -Lbuild $(LIBS)
+	clang $(WARNINGS) -std=gnu17 -ferror-limit=0 -rpath . $(OPTIMIZE) -o build/main object-files/main.o -Lbuild $(LIBS)
 
 # -lc level for consol debug output
 # -lf level for file debug output
 # -d  debug mode
 # -b  breakpoint mode ( press b to toggle GDB_BREAK variable )
 run: main.o
-	./build/main.o -b -lc 0 -lf 7 -d
+	cd build && ./main -b -lc 0 -lf 7 -d
 
 # end
