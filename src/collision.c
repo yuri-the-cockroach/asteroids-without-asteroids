@@ -96,7 +96,7 @@ void FastFindCollisions(ObjectTracker *tracker, unsigned long index) {
     for (unsigned long j = index + 1; j < tracker->objListLen; j++) {
         next = tracker->objList[j];
 
-        if (tracker->objList[j] == NULL || current == next || next->request == DELETE || !next->collider.isCollidable)
+        if (tracker->objList[j] == NULL || current == next || next->request != UPDATE || !next->collider.isCollidable)
             continue;
 
         if (current->collider.collider.x + current->collider.collider.width <= next->collider.collider.x )
