@@ -89,6 +89,8 @@ void FastFindCollisions(ObjectTracker *tracker, unsigned long index) {
 
     if (current->request == DELETE) return;
 
+
+
     ObjectWrap *next;
 
     for (unsigned long j = index + 1; j < tracker->objListLen; j++) {
@@ -99,7 +101,7 @@ void FastFindCollisions(ObjectTracker *tracker, unsigned long index) {
 
         if (current->collider.collider.x + current->collider.collider.width <= next->collider.collider.x )
             break;
-        if ( current->collider.collider.y + current->collider.collider.height <= next->collider.collider.y ) continue;
+        if ( !CheckIfCollide(current, next) ) continue;
 
         if (current->objectType > next->objectType) {
             current->collider.ActionOnCollision(tracker, current, next);
@@ -172,6 +174,66 @@ void Bounce(ObjectTracker *tracker, ObjectWrap *first, ObjectWrap *second) {
         below->objPtr->position.y += BOUCE_CONSTANT * frameTime;
     }
     return;
+}
+
+bool CheckIfCollide(ObjectWrap *first, ObjectWrap *second) {
+
+    // This abomination will make the logic actually readable
+    Vector2 firstStart = {
+        first->objPtr->position.x +    // leftmost point of the collider
+            first->collider.collider.x, // in the abs coord system
+
+        first->objPtr->position.y +   // topmost point of the collider
+            first->collider.collider.y // in the abs coord system
+    };
+    Vector2 firstEnd = { firstStart.x + // The rightmost point
+                             first->collider.collider.width,
+                         first->objPtr->position.y + first->collider.collider.y +
+                             first->collider.collider.height };
+    Vector2 secondStart = {
+        second->objPtr->position.x + second->collider.collider.x,
+        second->objPtr->position.y + second->collider.collider.y
+    };
+    Vector2 secondEnd = { second->objPtr->position.x +
+                              second->collider.collider.x +
+                              second->collider.collider.width,
+                          second->objPtr->position.y +
+                              second->collider.collider.y +
+                              second->collider.collider.height };
+
+    // Explanation:
+    // Assume x == 0 is the leftmost point of the system
+    // And y == 0 is the topmost point of the system
+    //
+    // firstStart.x -- Leftmost point of the first object
+    // firstEnd.x -- Rightmost point of the first object
+    // secondStart.x -- Leftmost point of the second object
+    // secondEnd.x -- Rightmost point of the second object
+    //
+    // |--------| <- first object
+    //      |--------| <- second object
+    //
+    // firstStart.y -- Topmost point of the first object
+    // firstEnd.y -- Bottommost point of the first object
+    // secondStart.y -- Topmost point of the second object
+    // secondEnd.y -- Bottommost point of the second object
+    //
+    // ___
+    //  | <- first object
+    //  | ___
+    //  |  | <- second object
+    //  |  |
+    // --- |
+    //     |
+    //    ---
+    //
+    // If they overlap in both axis, then they collide
+    // Actuall logic
+    if ((firstStart.x < secondEnd.x && secondStart.x < firstEnd.x) &&
+        (firstStart.y < secondEnd.y && secondStart.y < firstEnd.y))
+        return true;
+
+    return false;
 }
 
 void GetShot(ObjectTracker *tracker, ObjectWrap *projectile, ObjectWrap *victim) {
