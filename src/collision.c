@@ -85,37 +85,6 @@ void FastFindCollisions(ObjectTracker *tracker, unsigned long index) {
     return;
 }
 
-void FindCollisions(ObjectTracker *tracker, ObjectWrap *first) {
-    if (tracker->objListLen < 2)
-        return;
-
-    if (!first)
-        return;
-
-    if (first->request == DELETE) return;
-
-    for (unsigned int j = 0; j < tracker->objListLen; j++) {
-        ObjectWrap *second = tracker->objList[j];
-
-        if (tracker->objList[j] == NULL || first == second || second->request == DELETE || !second->collider.isCollidable)
-            continue;
-
-        if (FindInList(&first->collider, second) != -1) continue;
-
-        if (!CheckIfCollide(first, second))
-            continue;
-
-        Push(&first->collider, second);
-        Push(&second->collider, first);
-
-        if (first->objectType > second->objectType) {
-            first->collider.ActionOnCollision(tracker, first, second);
-            continue;
-        }
-        second->collider.ActionOnCollision(tracker, second, first);
-    }
-}
-
 void ApplyMassBasedRandRotation(ObjectWrap *wrap) {
 
     float massMod = 1 / wrap->collider.mass;
