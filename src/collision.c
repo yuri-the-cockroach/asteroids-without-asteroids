@@ -52,34 +52,6 @@ void SortListByX(ObjectTracker *tracker) {
 }
 
 void FastFindCollisions(ObjectTracker *tracker, unsigned long index) {
-    // Explanation:
-    // Assume x == 0 is the leftmost point of the system
-    // And y == 0 is the topmost point of the system
-    //
-    // firstStart.x -- Leftmost point of the first object
-    // firstEnd.x -- Rightmost point of the first object
-    // secondStart.x -- Leftmost point of the second object
-    // secondEnd.x -- Rightmost point of the second object
-    //
-    // |--------| <- first object
-    //      |--------| <- second object
-    //
-    // firstStart.y -- Topmost point of the first object
-    // firstEnd.y -- Bottommost point of the first object
-    // secondStart.y -- Topmost point of the second object
-    // secondEnd.y -- Bottommost point of the second object
-    //
-    // ___
-    //  | <- first object
-    //  | ___
-    //  |  | <- second object
-    //  |  |
-    // --- |
-    //     |
-    //    ---
-    //
-    // If they overlap in both axis, then they collide
-
     ObjectWrap *current = tracker->objList[index];
     if (tracker->objListLen < 2)
         return;
