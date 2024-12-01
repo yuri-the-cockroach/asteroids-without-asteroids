@@ -1,7 +1,7 @@
 #include "gamelogic.h"
+#include "asteroid.h"
 #include "asteroidsutils.h"
 #include "structs.h"
-#include "asteroid.h"
 #include <raylib.h>
 
 void OnPlayerAccellerate(ObjectStruct *object, float speed) {
@@ -10,7 +10,6 @@ void OnPlayerAccellerate(ObjectStruct *object, float speed) {
 }
 
 void DebugingKeyHandler(ObjectTracker *tracker) {
-
 
     if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_C)) {
         LOG(DEBUG, "%s", "CTRL and C is pressed");
@@ -36,14 +35,17 @@ void DebugingKeyHandler(ObjectTracker *tracker) {
     }
 
     if (GAME_STATE == RUNNING) {
-        if (IsKeyPressed('P')) DEBUG_PAUSE = !DEBUG_PAUSE;
+        if (IsKeyPressed('P'))
+            DEBUG_PAUSE = !DEBUG_PAUSE;
         if (IsKeyPressed('1')) {
 
-            CreateAsteroid(tracker, (Vector2){ -200, 0 }, (Vector2){ 0, 0 }, 1, 1);
+            CreateAsteroid(
+                tracker, (Vector2){ -200, 0 }, (Vector2){ 0, 0 }, 1, 1);
             /* CreateAsteroid( */
             /*     tracker, (Vector2){ 300, 600 }, (Vector2){ 0, 0 }, 0, 1); */
             /* CreateAsteroid( */
-            /*     tracker, (Vector2){ 500, 600 }, (Vector2){ -90, 0 }, 0, 1); */
+            /*     tracker, (Vector2){ 500, 600 }, (Vector2){ -90, 0 }, 0, 1);
+             */
 
             /* CreateAsteroid( */
             /*     tracker, (Vector2){ 300, 900 }, (Vector2){ 90, 0 }, 0, 1); */
@@ -53,7 +55,8 @@ void DebugingKeyHandler(ObjectTracker *tracker) {
             /* CreateAsteroid( */
             /*     tracker, (Vector2){ 300, 300 }, (Vector2){ 90, 0 }, 0, 1); */
             /* CreateAsteroid( */
-            /*     tracker, (Vector2){ 500, 300 }, (Vector2){ -90, 0 }, 0, 1); */
+            /*     tracker, (Vector2){ 500, 300 }, (Vector2){ -90, 0 }, 0, 1);
+             */
         }
 
         if (IsKeyPressed('2')) {
@@ -116,17 +119,16 @@ void DebugingKeyHandler(ObjectTracker *tracker) {
             }
         }
 
-
         if (IsKeyPressed('B') && BENCH_LOG_FILE_PTR) {
-            if ( !BENCHMARKING )
-            {
+            if (!BENCHMARKING) {
                 BENCHMARKING = true;
                 for (unsigned int i = 0; i < MAX_OBJECT_COUNT - 1; i++) {
                     AsteroidSafeSpawn(tracker);
                     /* CreateAsteroid( */
                     /*     tracker, */
                     /*     (Vector2){ GetRandomFloat(0, (float)SCREEN_WIDTH), */
-                    /*                GetRandomFloat(0, (float)SCREEN_HEIGHT) }, */
+                    /*                GetRandomFloat(0, (float)SCREEN_HEIGHT) },
+                     */
 
                     /*     (Vector2){ GetRandomFloat(-100, 100), */
                     /*                GetRandomFloat(-100, 100) }, */
@@ -138,7 +140,8 @@ void DebugingKeyHandler(ObjectTracker *tracker) {
                 unsigned long iterations = tracker->objListLen;
                 if (iterations > 1) {
                     for (unsigned long i = iterations - 1; i > 0; i--) {
-                        if ( tracker->objList[i] == tracker->playerPtr ) continue;
+                        if (tracker->objList[i] == tracker->playerPtr)
+                            continue;
                         tracker->objList[i]->request = DELETE;
                     }
                 }
@@ -146,33 +149,36 @@ void DebugingKeyHandler(ObjectTracker *tracker) {
         }
 
         if (IsKeyPressed('0')) {
-            for ( unsigned int i = 0; i < tracker->objListLen; i++ ) {
+            for (unsigned int i = 0; i < tracker->objListLen; i++) {
                 ObjectWrap *current = tracker->objList[i];
-                if ( !current || current == tracker->playerPtr ) continue;
+                if (!current || current == tracker->playerPtr)
+                    continue;
                 current->request = DELETE;
             }
         }
 
-
         if (IsKeyPressed('='))
             AsteroidSafeSpawn(tracker);
-            /* CreateAsteroid( */
-            /*     tracker, */
-            /*     (Vector2){ GetRandomFloat( */
-            /*                    tracker->objList[0]->objPtr->position.x - 500, */
-            /*                    tracker->objList[0]->objPtr->position.x + 500), */
-            /*                GetRandomFloat( */
-            /*                    tracker->objList[0]->objPtr->position.y - 500, */
-            /*                    tracker->objList[0]->objPtr->position.y + 500) }, */
-            /*     (Vector2){ GetRandomFloat(-100, 100), */
-            /*                GetRandomFloat(-100, 100) }, */
-            /*     GetRandomFloat(-5, 5), */
-            /*     GetRandomFloat(0.5, 2)); */
+        /* CreateAsteroid( */
+        /*     tracker, */
+        /*     (Vector2){ GetRandomFloat( */
+        /*                    tracker->objList[0]->objPtr->position.x - 500, */
+        /*                    tracker->objList[0]->objPtr->position.x + 500), */
+        /*                GetRandomFloat( */
+        /*                    tracker->objList[0]->objPtr->position.y - 500, */
+        /*                    tracker->objList[0]->objPtr->position.y + 500) },
+         */
+        /*     (Vector2){ GetRandomFloat(-100, 100), */
+        /*                GetRandomFloat(-100, 100) }, */
+        /*     GetRandomFloat(-5, 5), */
+        /*     GetRandomFloat(0.5, 2)); */
 
         if (IsKeyPressed('-')) {
             if (tracker->objListLen > 1) {
-                ObjectWrap *toDelete = tracker->objList[tracker->objListLen - 1];
-                if ( toDelete == tracker->playerPtr ) toDelete = tracker->objList[tracker->objListLen - 2];
+                ObjectWrap *toDelete =
+                    tracker->objList[tracker->objListLen - 1];
+                if (toDelete == tracker->playerPtr)
+                    toDelete = tracker->objList[tracker->objListLen - 2];
                 toDelete->request = DELETE;
             }
         }
@@ -199,12 +205,14 @@ void ShipControlls(ObjectTracker *tracker) {
 
 void MenuControlls(struct menuParent *menu) {
     if (IsKeyPressed('W')) {
-        menu->selected = RollOverInt((menu->selected - 1), 0, menu->optionListLen - 1);
+        menu->selected =
+            RollOverInt((menu->selected - 1), 0, menu->optionListLen - 1);
         LOG(DEBUG, "Menu->selected == %d", menu->selected);
     }
 
     if (IsKeyPressed('S')) {
-        menu->selected = RollOverInt((menu->selected + 1), 0, menu->optionListLen - 1);
+        menu->selected =
+            RollOverInt((menu->selected + 1), 0, menu->optionListLen - 1);
         LOG(DEBUG, "Menu->selected == %d", menu->selected);
     }
 
