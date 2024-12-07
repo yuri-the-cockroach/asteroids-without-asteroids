@@ -76,8 +76,7 @@ static const char *loglvlToStringNoColor[10] = {
     "ALL"
 };
 
-
-enum request { IGNORE = 0, UPDATE = 1, SEPARATE = 2, DELETE = -1 };
+enum request { IGNORE = 0, UPDATE = 1, SEPARATE = 2, CREATE = 3, DELETE = -1 };
 enum type { NOTYPE = 0, ASTEROID = 1, PROJECTILE = 2, PLAYER = 3 };
 
 /* -------------------- typedefs --------------------  */

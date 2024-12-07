@@ -33,6 +33,10 @@ void RunActionList(ObjectTracker *tracker) {
         ObjectWrap *current = tracker->objList[i];
         switch (current->request) {
 
+            case CREATE:
+                current->request = UPDATE;
+                continue;
+
             case DELETE: // Delete element from the list
                 DeleteTrackedObject(tracker, i);
                 continue;
@@ -174,7 +178,7 @@ void CreatePlayer(ObjectTracker *tracker, Vector2 initPosition, float size) {
                    (Vector2){ 0, 0 },
                    0);
 
-    player->request = UPDATE;
+    player->request = CREATE;
     player->isRotatableByGame = false;
     player->updatePosition = true;
     player->draw = true;
@@ -226,7 +230,7 @@ void CreateProjectile(ObjectTracker *tracker, ObjectWrap *parent) {
     projectile[0] = InitWrap();
 
     projectile->objectType = PROJECTILE;
-    projectile->request = UPDATE;
+    projectile->request = CREATE;
     projectile->updatePosition = true;
     projectile->draw = true;
     projectile->isRotatableByGame = true;

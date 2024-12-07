@@ -66,7 +66,7 @@ ObjectWrap *CreateAsteroid(ObjectTracker *tracker, Vector2 initPosition,
         constRotationSpeed);
 
     asteroid->objectType = ASTEROID;
-    asteroid->request = UPDATE;
+    asteroid->request = CREATE;
     asteroid->updatePosition = true;
     asteroid->draw = true;
     asteroid->isRotatableByGame = true;
