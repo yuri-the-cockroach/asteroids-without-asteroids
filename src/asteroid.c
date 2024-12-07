@@ -50,6 +50,7 @@ ObjectWrap *CreateAsteroid(ObjectTracker *tracker, Vector2 initPosition,
 
     ObjectWrap *asteroid = malloc(sizeof(ObjectWrap));
     asteroid[0] = InitWrap();
+    asteroid[0].objectType = ASTEROID;
     if (AddWrapToList(tracker, asteroid)) {
         errno = 0;
         free(asteroid); // TODO: Make a propper logger and call it when

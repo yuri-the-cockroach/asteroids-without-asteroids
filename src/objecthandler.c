@@ -127,12 +127,17 @@ int AddWrapToList(ObjectTracker *tracker, ObjectWrap *wrap) {
         return errno;
     }
 
-    if (tracker->objListLen >= MAX_OBJECT_COUNT) {
+    if (wrap->objectType == ASTEROID && tracker->objListLen >= SOFT_MAX_ASTEROIDS) {
         errno = ECHRNG;
-        LOG(ERROR, "Too many objects in tracker->objListLen is at %ld. errno: %d", tracker->objListLen, errno);
+        LOG(ERROR, "Too many asteroids tracker->objListLen is at %ld. errno: %d", tracker->objListLen, errno);
         return errno;
     }
 
+    if (tracker->objListLen >= MAX_OBJECT_COUNT) {
+        errno = ECHRNG;
+        LOG(ERROR, "Too many objects tracker->objListLen is at %ld. errno: %d", tracker->objListLen, errno);
+        return errno;
+    }
 
     if ( wrap->objectType == PLAYER  ) {
         if ( tracker->playerPtr ) {
@@ -142,7 +147,6 @@ int AddWrapToList(ObjectTracker *tracker, ObjectWrap *wrap) {
         }
         tracker->playerPtr = wrap;
     }
-
 
     tracker->objList[tracker->objListLen] = wrap;
     tracker->objListLen++;
