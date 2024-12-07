@@ -218,9 +218,9 @@ void CreateProjectile(ObjectTracker *tracker, ObjectWrap *parent) {
                   sizeof(PROJECTILE_SHAPE_POINTS) / sizeof(Vector2),
                   PROJECTILE_SIZE),
         (Vector2){ parent->objPtr->position.x +
-                       (parent->objPtr->shape.points[0].x * 2.0f),
-                   parent->objPtr->position.y +
-                       (parent->objPtr->shape.points[0].y * 2.0f) },
+        parent->objPtr->shape.points[0].x * 2.0f ,     // I don't know why this works, but other approach doesn't
+        parent->objPtr->position.y +                   // and at this point I don't care.
+        parent->objPtr->shape.points[0].y * 2.0f  },   // Just don't change it, keep it the way it is
         (Vector2){ parent->objPtr->shape.points[0].x * PROJECTILE_SPEED +
                        parent->objPtr->speed.x,
                    parent->objPtr->shape.points[0].y * PROJECTILE_SPEED +
