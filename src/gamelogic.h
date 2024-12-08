@@ -11,6 +11,7 @@
 
 
 
+int SpawnAsteroidOnTime(ObjectTracker *tracker);
 void MenuControlls(struct menuParent *menu);
 void DebugingKeyHandler(ObjectTracker *tracker);
 void OnPlayerAccellerate(ObjectStruct *object, float speed);

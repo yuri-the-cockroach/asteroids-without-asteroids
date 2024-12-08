@@ -204,6 +204,18 @@ void PlayerRuntimeControlls(ObjectTracker *tracker) {
 }
 
 void NewGame(ObjectTracker *tracker) {
-    lastShot = 0;
+    LAST_SHOT = 0;
     CreatePlayer(tracker, (Vector2){ 0, 0 }, 0.5);
+}
+
+int SpawnAsteroidOnTime(ObjectTracker *tracker) {
+    long curTime;
+    if (NEXT_ASTEROID_SPAWN > (curTime = GetTimeMicS()) ) return 0;
+
+    LAST_ASTEROID_SPAWN = GetTimeMicS();
+    NEXT_ASTEROID_SPAWN = LAST_ASTEROID_SPAWN +  (long)(100.f * (20.f / ( log((float)tracker->playerScore / 100.f + 1.5f))));
+
+    AsteroidSafeSpawn(tracker);
+
+    return 1;
 }
