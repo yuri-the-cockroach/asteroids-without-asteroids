@@ -113,7 +113,9 @@ shared/libcollider.so: makefile src/collider.h src/collider.c
 	$(call buildLib,collider)
 
 shared/libvisdebugger.so: makefile src/visdebugger.h src/visdebugger.c
-	$(call buildLib,visdebugger)
+ifdef DEBUGGING
+		$(call buildLib,visdebugger)
+endif
 
 shared/libstatemachine.so: makefile src/statemachine.h src/statemachine.c
 	$(call buildLib,statemachine)
