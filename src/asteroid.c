@@ -25,27 +25,32 @@ ObjectWrap *AsteroidSafeSpawn(ObjectTracker *tracker) {
         GetRandomFloat(1, 3));
 
     if ( !wrap ) {
-
         LOG(WARNING, "%s", "Cannot create an asteroid, got a NULL pointer");
         return NULL;
     }
 
+    Vector2 playerPos = tracker->playerPtr ? tracker->playerPtr->objPtr->position : (Vector2){0, 0};
     Vector2 newPos = (Vector2){ 0, 0 };
     do {
         newPos = (Vector2){ GetRandomFloat(WORLD_POS_MIN_X, WORLD_POS_MAX_X),
-                            GetRandomFloat(WORLD_POS_MIN_Y, WORLD_POS_MAX_Y) };
-
-        // This abomination will just check if the wrap closer than 200 units to
+                            GetRandomFloat(WORLD_POS_MIN_Y, WORLD_POS_MAX_Y)};
+        // This abomination will just check if the wrap closer than 200u or further than 1000u to
         // the player
-        if (tracker->playerPtr &&
-            fabsf(fabsf(tracker->playerPtr->objPtr->position.x) -
-                  fabsf(newPos.x)) < 200 &&
-            fabsf(fabsf(tracker->playerPtr->objPtr->position.y) -
-                  fabsf(newPos.y)) < 200)
-            continue;
-
+        if (tracker->playerPtr && (
+                fabsf(playerPos.x - newPos.x) < 300
+                || fabsf(playerPos.x - newPos.x) > 4000
+                || fabsf(playerPos.y - newPos.y) < 300
+                || fabsf(playerPos.y - newPos.y) > 4000
+            )
+        ) continue;
         wrap->objPtr->position = newPos;
     } while (FindAnyCollision(tracker, wrap));
+
+    float gamma = atan2f(playerPos.x - newPos.x, playerPos.y - newPos.y);
+    wrap->objPtr->speed = (Vector2){
+        GetRandomFloat(-20, 20) + sinf(gamma) * ( GetRandomFloat(20, 100) ),
+        GetRandomFloat(-20, 20) + cosf(gamma) * ( GetRandomFloat(20, 100) )
+    };
     return wrap;
 }
 
