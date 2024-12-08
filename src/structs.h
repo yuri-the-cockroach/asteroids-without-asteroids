@@ -225,7 +225,7 @@ struct tracker {
 };
 
 struct menuOption {
-    char *name;
+    const char *restrict name;
     void (*MenuAction) (void);
 };
 
