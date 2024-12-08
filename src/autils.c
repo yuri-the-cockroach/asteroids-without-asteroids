@@ -1,6 +1,12 @@
-#include "asteroidsutils.h"
-#include "structs.h"
+// system includes
+#include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <errno.h>
+
+// local includes
+#include "autils.h"
+#include "structs.h"
 
 float GetRandomFloat(float min, float max) {
     return (float)(GetRandomValue((int)(min * 1000), (int)(max * 1000))) / 1000;

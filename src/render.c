@@ -1,6 +1,12 @@
+// system includes
+#include <raylib.h>
+#include <stdlib.h>
+
+// local includes
 #include "render.h"
 #include "structs.h"
-#include <raylib.h>
+#include "autils.h"
+
 
 void DisplayText(Vector2 pos, int fontSize, Color color,
                  const char *restrict format, ...) {

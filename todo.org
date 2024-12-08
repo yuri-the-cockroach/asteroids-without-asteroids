@@ -45,7 +45,7 @@ Currentrly doing:
   - [ ] src/asteroid.c
   - [ ] src/asteroid.h
   - [ ] src/asteroidsutils.c
-  - [ ] src/asteroidsutils.h
+  - [ ] src/autils.h
   - [ ] src/collision.c
   - [ ] src/collision.h
   - [ ] src/gamelogic.c

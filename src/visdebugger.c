@@ -1,9 +1,11 @@
+#ifdef DEBUGGING
 #include "visdebugger.h"
+#include "autils.h"
 
-#pragma GCC diagnostic ignored "-Wvarargs"
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#pragma GCC diagnostic ignored "-Wformat-nonliteral" // Ignore, because format is const char *restrict, so it's not an issue
 
-void DebugDisplayText(Vector2 pos, int fontSize, Color color, const char *restrict format, ...) {
+void DebugDisplayText(Vector2 pos, int fontSize, Color color,
+                      const char *restrict format, ...) {
     if (!VISUAL_DEBUG)
         return;
 

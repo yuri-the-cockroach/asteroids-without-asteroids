@@ -1,6 +1,6 @@
 #include "gamelogic.h"
 #include "asteroid.h"
-#include "asteroidsutils.h"
+#include "autils.h"
 #include "structs.h"
 #include <raylib.h>
 

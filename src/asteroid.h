@@ -1,7 +1,7 @@
 #ifndef ASTEROID_H_
 #define ASTEROID_H_
 #include "structs.h"
-#include "asteroidsutils.h"
+#include "autils.h"
 #include "objectlogic.h"
 #include "objecthandler.h"
 

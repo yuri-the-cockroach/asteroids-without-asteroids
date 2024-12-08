@@ -1,12 +1,14 @@
 #include "statemachine.h"
-#include "asteroidsutils.h"
+#include "autils.h"
 #include "gamelogic.h"
 #include "logger.h"
 #include "menulogic.h"
 #include "objecthandler.h"
 #include "render.h"
 #include "structs.h"
-#include "benchmarking.h"
+#ifdef BENCHMARKING
+    #include "benchmarking.h"
+#endif // BENCHMARKING
 
 #include <raylib.h>
 #include <stdio.h>

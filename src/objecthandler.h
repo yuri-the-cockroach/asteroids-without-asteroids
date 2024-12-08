@@ -3,7 +3,7 @@
 
 #include "structs.h"
 
-#include "asteroidsutils.h"
+#include "autils.h"
 #include "collision.h"
 #include "gamelogic.h"
 #include "objectlogic.h"

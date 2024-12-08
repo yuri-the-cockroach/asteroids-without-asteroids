@@ -6,7 +6,7 @@
 #include "menulogic.h"
 #include "objecthandler.h"
 #include "logger.h"
-#include "asteroidsutils.h"
+#include "autils.h"
 #include "objectlogic.h"
 
 

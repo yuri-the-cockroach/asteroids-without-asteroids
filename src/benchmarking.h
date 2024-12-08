@@ -2,7 +2,7 @@
 #define BENCHMARKING_H_
 #include "structs.h"
 #include "logger.h"
-#include "asteroidsutils.h"
+#include "autils.h"
 
 int BenchStart(long *timerStart);
 
