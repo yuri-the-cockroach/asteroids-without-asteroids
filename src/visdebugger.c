@@ -14,6 +14,11 @@ void DebugDisplayText(Vector2 pos, int fontSize, Color color,
     va_list argptr;
 
     int argcount = 0;
+
+    // I have no idea why, but compiler complains that this argument is unused
+    // inspite of being used in vsprintf. This will shut it up without
+    // disableing the diagnositc with pragma
+    UNUSED(argcount);
     int i = 0;
     char current;
 
@@ -35,3 +40,4 @@ void DebugDisplayText(Vector2 pos, int fontSize, Color color,
     // Actually print to stderr
     DrawText(messageString, (int)pos.x, (int)pos.y, fontSize, color);
 }
+#endif // DEBUGGING

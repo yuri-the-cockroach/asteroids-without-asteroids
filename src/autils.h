@@ -6,9 +6,6 @@
 #include <time.h>
 #include <sys/stat.h>
 
-#pragma GCC diagnostic ignored "-Wvarargs"
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-
 #define UNUSED(x) (void)(x)
 
 // Clap float from min to max

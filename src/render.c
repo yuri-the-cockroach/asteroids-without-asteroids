@@ -15,6 +15,7 @@ void DisplayText(Vector2 pos, int fontSize, Color color,
     va_list argptr;
 
     int argcount = 0;
+    UNUSED(argcount);
     int i = 0;
     char current;
 
