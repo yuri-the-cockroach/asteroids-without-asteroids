@@ -94,26 +94,25 @@ static const int WORLD_POS_MAX_X = 10000;
 static const int WORLD_POS_MIN_Y = 0;
 static const int WORLD_POS_MAX_Y = 10000;
 
+static const int SOFT_MAX_ASTEROIDS = 1000;
+static const int MAX_OBJECT_COUNT = 1024;
+
+// player related
 static const int RATE_OF_FIRE = 5;
 static const int PROJECTILE_SPEED = 20;
 static const float PROJECTILE_SIZE = 0.1f;
-static const int SOFT_MAX_ASTEROIDS = 1000;
-static const int MAX_OBJECT_COUNT = 1024;
 static const int PLAYER_ROTATION_SPEED = 5;
 static const int PLAYER_MOVE_SPEED = 5;
-
 static const int BASE_ACCELL = 5;
 static const int BASE_ROTATE = 5;
 
-static const int BORDER_OFFSET = 40;
 static const enum loglevel DEFAULT_LOG_LEVEL = WARNING;
 
 static const int MAX_MENU_STACK_SIZE = 32;
+
+static const long ASTEROID_SPAWN_DELAY = 10;
 static const unsigned long ASTEROID_CORNERS_COUNT = 20;
-static const float ASTEROID_HEIGHT_VARIATION = 10;
-
-
-
+static const float ASTEROID_HEIGHT_VARIATION = 15;
 
 // Externally defined dynamic global variables
 
