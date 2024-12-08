@@ -127,9 +127,8 @@ ObjectWrap InitWrap(void) {
         false,
         { 0, 0, 0, 0 },
         0,
-        NULL,
-        0,
-        NULL},
+        NULL
+        },
         0
     };
 }
