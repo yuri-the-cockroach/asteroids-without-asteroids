@@ -251,57 +251,8 @@ Collider InitCollider(float sizeMult,
                     100 * sizeMult,
                     },
         sizeMult * sizeMult,
-        ActionOnCollision,
-        0,
-        calloc(MAX_OBJECT_COUNT, sizeof(Collider *))
+        ActionOnCollision
     };
-}
-
-// Push to the end of list
-int Push(Collider *parent, ObjectWrap *wrap) {
-    if (parent->collidedListLen > MAX_OBJECT_COUNT - 1) {
-        LOG(ERROR,
-            "%s",
-            "Cannot push the object to the list, list is already full");
-        return -1; // List too long
-    }
-    parent->collidedList[parent->collidedListLen] = wrap;
-    parent->collidedListLen++;
-    return parent->collidedListLen - 1;
-}
-
-// Find the entry in the list
-int FindInList(Collider *parent, ObjectWrap *wrap) {
-    for (int i = 0; i < parent->collidedListLen; i++) {
-        if (parent->collidedList[i] == wrap)
-            return i;
-    }
-    LOG(ALL, "%s", "Wrap not found in list");
-    return -1;
-}
-
-// Pop entry from the list
-ObjectWrap *Pop(Collider *parent, int index) {
-    if (index > parent->collidedListLen)
-        return NULL;
-    if (parent->collidedList[index] == NULL)
-        LOG(WARNING, "%s", "Entry is in the list, but is NULL");
-    return parent->collidedList[index];
-}
-
-// Clear the list
-int ClearList(Collider *parent) {
-    if (parent->collidedListLen > MAX_OBJECT_COUNT) {
-        LOG(FATAL, "%s", "List length is more than allowd, cannot proceed");
-        err(ERANGE, "List length out of range");
-    }
-
-    for (int i = 0; i < MAX_OBJECT_COUNT; i++) {
-        parent->collidedList[i] = NULL;
-    }
-
-    parent->collidedListLen = 0;
-    return 0;
 }
 
 int CleanupLists(ObjectTracker *tracker) {

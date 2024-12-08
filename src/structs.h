@@ -193,14 +193,10 @@ struct ObjectStruct {
 };
 
 struct Collider {
-    bool isCollidable;          // True if object's collision is enabled
+    bool isCollidable;   // True if object's collision is enabled
     Rectangle collider;
     float mass;
-
     void (*ActionOnCollision)(ObjectTracker *tracker, ObjectWrap *first, ObjectWrap *second);
-    int collidedListLen;
-    ObjectWrap **collidedList;
-
 };
 
 struct ObjectWrap {
