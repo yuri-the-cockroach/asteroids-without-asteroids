@@ -5,13 +5,13 @@
 #include "objectlogic.h"
 #include "objecthandler.h"
 
-/* Will spawn asteroid in such a way, that it won't collide with anything */
+// Will spawn asteroid in such a way, that it won't collide with anything
 ObjectWrap *AsteroidSafeSpawn(ObjectTracker *tracker);
 
- /* Generates a surface for an asteroid */
+// Generates a surface for an asteroid
 Vector2 *GenerateAsteroidShape(void);
 
-/* A wrapper funciton for AddWrapToList, to create an asteroid */
+// A wrapper funciton for AddWrapToList, to create an asteroid
 ObjectWrap *CreateAsteroid(ObjectTracker *tracker, Vector2 initPosition,
                     Vector2 initSpeed, float constRotationSpeed, float size);
 

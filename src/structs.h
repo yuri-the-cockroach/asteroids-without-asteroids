@@ -81,18 +81,18 @@ typedef struct ObjectStruct ObjectStruct;
 typedef struct ShapeStruct ShapeStruct;
 typedef struct Collider Collider;
 
-/* -------------------- constants --------------------  */
+// -------------------- constants --------------------
 
 
-/* -------------------- Physics constants --------------------  */
+// -------------------- Physics constants --------------------
 
 static const float ELASTICITY_FACTOR = 0.5; // How much energy object recives back on bouce
 
-static const int WORLD_POS_MIN_X = -5000;
-static const int WORLD_POS_MAX_X = 5000;
+static const int WORLD_POS_MIN_X = 0;
+static const int WORLD_POS_MAX_X = 10000;
 
-static const int WORLD_POS_MIN_Y = -5000;
-static const int WORLD_POS_MAX_Y = 5000;
+static const int WORLD_POS_MIN_Y = 0;
+static const int WORLD_POS_MAX_Y = 10000;
 
 static const int RATE_OF_FIRE = 5;
 static const int PROJECTILE_SPEED = 20;
