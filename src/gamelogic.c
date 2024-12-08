@@ -146,8 +146,8 @@ void ShipControlls(ObjectTracker *tracker) {
         RotateObject(tracker->playerPtr, -PLAYER_ROTATION_SPEED);
 
     if (IsKeyDown(KEY_SPACE)) {
-        if (GetTimeMicS() - lastShot > (long)1e6 / RATE_OF_FIRE) {
-            lastShot = GetTimeMicS();
+        if (GetTimeMicS() - LAST_SHOT > (long)1e6 / RATE_OF_FIRE) {
+            LAST_SHOT = GetTimeMicS();
             CreateProjectile(tracker, tracker->playerPtr);
         }
     }
