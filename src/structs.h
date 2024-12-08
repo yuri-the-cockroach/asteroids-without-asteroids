@@ -5,25 +5,19 @@
 #include <raymath.h>
 #include <rcamera.h>
 
-
 // Sys stuff
 #include <sys/time.h>
-#include <signal.h>
 
 // Include
 #include <err.h>
-#include <errno.h>
-
 // StdThingings
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 // Local Headers
 
-/* -------------------- enums --------------------  */
+// -------------------- enums --------------------
 
 enum loglevel {
     NOLOG   = 0,

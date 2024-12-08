@@ -1,9 +1,11 @@
+// system includes
+#include <stdlib.h>
+#include <errno.h>
+
+// local includes
 #include "collision.h"
-#include "asteroid.h"
-#include "asteroidsutils.h"
+#include "autils.h"
 #include "structs.h"
-#include <signal.h>
-#pragma GCC diagnostic ignored "-Wdouble-promotion"
 
 bool FindAnyCollision(ObjectTracker *tracker, ObjectWrap *first) {
     if (tracker->objListLen < 2)

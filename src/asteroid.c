@@ -1,11 +1,16 @@
+// system includes
+#include <math.h>
+#include <raylib.h>
+#include <stdlib.h>
+#include <errno.h>
+
+// local includes
 #include "asteroid.h"
-#include "asteroidsutils.h"
+#include "autils.h"
 #include "collision.h"
 #include "logger.h"
 #include "objecthandler.h"
 #include "structs.h"
-#include <math.h>
-#include <raylib.h>
 
 ObjectWrap *AsteroidSafeSpawn(ObjectTracker *tracker) {
 

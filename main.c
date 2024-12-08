@@ -1,7 +1,9 @@
-#include "src/asteroidsutils.h"
-#include "src/logger.h"
-#include "src/objecthandler.h"
-#include "src/render.h"
+// system includes
+#include <errno.h>
+#include <signal.h>
+
+// local includes
+#include "src/autils.h"
 #include "src/statemachine.h"
 #include "src/structs.h"
 #include "src/syslogic.h"

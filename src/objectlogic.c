@@ -1,9 +1,14 @@
-#include "objectlogic.h"
-#include "asteroidsutils.h"
-#include "collision.h"
-#include "structs.h"
+// system includes
 #include <math.h>
 #include <raylib.h>
+#include <stdlib.h>
+#include <string.h>
+
+// local includes
+#include "objectlogic.h"
+#include "autils.h"
+#include "collision.h"
+#include "structs.h"
 
 // This will be adjusted by frametime, so it can be more than
 // BOUNCEBACK_MAX_FORCE
