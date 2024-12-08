@@ -81,7 +81,6 @@ all:
 		shared/libbenchmarking.so
 	mold -run make main
 
-
 shared/libmenulogic.so: makefile src/menulogic.h src/menulogic.c
 	$(call buildLib,menulogic)
 
@@ -130,10 +129,13 @@ main: makefile main.c
 # -lc level for consol debug output
 # -lf level for file debug output
 run: main
-	./main -lc 0 -lf 7
+	./main -lc 2 -lf 7
 clean:
 	if [ -s object-files ]; then rm object-files/*.o; fi
 	if [ -s shared ]; then rm shared/*.so; fi
 	if [ -e main ]; then rm main; fi
+
+debug:
+	gdb -i=mi main
 
 # end
