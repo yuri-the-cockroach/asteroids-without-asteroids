@@ -125,9 +125,6 @@ void DrawObject(ObjectWrap *wrap) {
         1.0,  // Thikness of the line
         WHITE // Color of the line
     );
-
-    if (wrap->objectType == ASTEROID)
-        DisplayText(wrap->objPtr->position, 24, WHITE, "%s", "MAMY EBAL");
 }
 
 void DrawGrid2D(int dist, Color color) {
