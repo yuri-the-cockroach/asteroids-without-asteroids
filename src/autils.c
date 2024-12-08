@@ -136,25 +136,6 @@ int GetStartUpArguments(int argc, char **argv) {
                     continue;
                 }
             }
-
-
-            if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "--debugging")) {
-                DEBUGGING = true;
-                LOG(DEBUG, "%s", "Debugging is enabled");
-                continue;
-            }
-
-            if (!strcmp(argv[i], "-b") || !strcmp(argv[i], "--benchmarking")) {
-                BENCH_LOG_FILE_PTR = fopen(BENCH_LOG_FILE_NAME, "w");
-                LOG(DEBUG, "%s", "Benchmarking is enabled");
-                continue;
-            }
-
-            if (!strcmp(argv[i], "-v") || !strcmp(argv[i], "--visual")) {
-                VISUAL_DEBUG = true;
-                LOG(DEBUG, "%s", "Debugging is enabled");
-                continue;
-            }
         }
     }
     return 0;
