@@ -4,125 +4,136 @@
 # @file
 # @version 0.1
 
-export PLATFORM=PLATFORM_DESKTOP_RGFW
-# export GLFW_LINUX_ENABLE_X11=FALSE
-# export GLFW_LINUX_ENABLE_WAYLAND=TRUE
-# export LD_LIBRARY_PATH=/home/cockroach/coding/c/asteroids/build
-export BUILDLIST=( $OBJECTLOGIC $GAMELOGIC $SYSLOGIC )
+export GLFW_LINUX_ENABLE_X11=FALSE
+export GLFW_LINUX_ENABLE_WAYLAND=TRUE
 
-export WARNINGS+= -Wall
-export WARNINGS+= -Wextra
-export WARNINGS+= -Weverything
-export WARNINGS+= -Wno-unsafe-buffer-usage
-export WARNINGS+= -Wno-declaration-after-statement
-export WARNINGS+= -Wno-missing-noreturn
-export WARNINGS+= -Wno-padded
-export WARNINGS+= -Wno-switch-default
-export WARNINGS+= -Wno-double-promotion
+export WARNINGS += -Wall
+export WARNINGS += -Wextra
+export WARNINGS += -Weverything
+export WARNINGS += -Wno-unsafe-buffer-usage
+export WARNINGS += -Wno-declaration-after-statement
+export WARNINGS += -Wno-missing-noreturn
+export WARNINGS += -Wno-padded
+export WARNINGS += -Wno-switch-default
+export WARNINGS += -Wno-double-promotion
+export WARNINGS += -Wno-pre-c23-compat
 
-export RUN_MAIN=1
-export OPTIMIZE=-Og -g
-# export OPTIMIZE=-O3
+# Optimizations options (will be overriten if debugging is enabled)
+export OPTIMIZE=-O2 -g0
+
 export LIBS+= -lunwind
 export LIBS+= -llogger
-export LIBS+= -lasteroidsutils
+export LIBS+= -lautils
 export LIBS+= -lrender
 export LIBS+= -lobjectlogic
 export LIBS+= -lsyslogic
 export LIBS+= -lgamelogic
 export LIBS+= -lraylib
 export LIBS+= -lobjecthandler
-# export LIBS+= -lGL
 export LIBS+= -lm
 export LIBS+= -lpthread
 export LIBS+= -ldl
 export LIBS+= -lrt
 export LIBS+= -lglfw
 export LIBS+= -lcollision
-export LIBS+= -lvisdebugger
 export LIBS+= -lstatemachine
 export LIBS+= -lmenulogic
 export LIBS+= -lasteroid
+
+# Define these to enable debugging and benchmarking respectively
+export DEBUGGING = -DDEBUGGING
+export BENCHMARKING = -DBENCHMARKING
+
+ifdef DEBUGGING
+
+export LIBS += -lvisdebugger
+export OPTIMIZE = -O0 -g2 # Overrides previous optimization options
+export SANITIZER += -fsanitize=address
+export SANITIZER += -fsanitize-address-use-after-return=always
+export SANITIZER += -fno-omit-frame-pointer
+
+endif # DEBUGGING
+
+ifdef BENCHMARKING
 export LIBS+= -lbenchmarking
+endif # BENCHMARKING
+
 
 define buildLib
-	@if [ -z $1 ]; then echo "No argument provided"; exit 1; fi
-	@if [ -f object-files/$1.o ]; then rm object-files/$1.o; fi
-	@if [ -f build/$1.so ]; then rm build/$1.so; fi
-
-    clang $(WARNINGS) $(OPTIMIZE) -std=gnu17 -fPIC -ferror-limit=0 -I src/ -o object-files/$1.o -c src/$1.c
-    clang $(WARNINGS) $(OPTIMIZE) -std=gnu17 -fPIC -ferror-limit=0 -shared -o build/lib$1.so object-files/$1.o
+    clang  $(WARNINGS) $(OPTIMIZE) $(SANITIZER) $(DEBUGGING) $(BENCHMARKING) -std=c23 -fPIC -ferror-limit=0 -I src/ -o object-files/$1.o -c src/$1.c
+    clang  $(WARNINGS) $(OPTIMIZE) $(SANITIZER) $(DEBUGGING) $(BENCHMARKING) -std=c23 -fPIC -ferror-limit=0 -shared -o shared/lib$1.so object-files/$1.o
 endef
 
-buildall:
-	mold -run make -j \
-		asteroidsutils \
-		tracker \
-		objectlogic \
-		gamelogic \
-		syslogic \
-		render \
-		logger \
-		collision \
-		visdebugger \
-		statemachine \
-		menulogic \
-		asteroid \
-		benchmarking
+all:
+	mold -run make -j $(nproc) \
+		shared/liblogger.so \
+		shared/libautils.so \
+		shared/libobjecthandler.so \
+		shared/libobjectlogic.so \
+		shared/libgamelogic.so \
+		shared/libsyslogic.so \
+		shared/librender.so \
+		shared/libcollision.so \
+		shared/libvisdebugger.so \
+		shared/libstatemachine.so \
+		shared/libmenulogic.so \
+		shared/libasteroid.so \
+		shared/libbenchmarking.so
 	mold -run make main
 
-menulogic:
+
+shared/libmenulogic.so: makefile src/menulogic.h src/menulogic.c
 	$(call buildLib,menulogic)
 
-collision:
+shared/libcollision.so: makefile src/collision.h src/collision.c
 	$(call buildLib,collision)
 
-render:
+shared/librender.so: makefile src/render.h src/render.c
 	$(call buildLib,render)
 
-logger:
+shared/liblogger.so: makefile src/logger.h src/logger.c
 	$(call buildLib,logger)
 
-asteroidsutils:
-	$(call buildLib,asteroidsutils)
+shared/libautils.so: makefile src/autils.h src/autils.c
+	$(call buildLib,autils)
 
-objectlogic:
+shared/libobjectlogic.so: makefile src/objectlogic.h src/objectlogic.c
 	$(call buildLib,objectlogic)
 
-gamelogic:
+shared/libgamelogic.so: makefile src/gamelogic.h src/gamelogic.c
 	$(call buildLib,gamelogic)
 
-syslogic:
+shared/libsyslogic.so: makefile src/syslogic.h src/syslogic.c
 	$(call buildLib,syslogic)
 
-tracker:
+shared/libobjecthandler.so: makefile src/objecthandler.h src/objecthandler.c
 	$(call buildLib,objecthandler)
 
-collider:
+shared/libcollider.so: makefile src/collider.h src/collider.c
 	$(call buildLib,collider)
 
-visdebugger:
+shared/libvisdebugger.so: makefile src/visdebugger.h src/visdebugger.c
 	$(call buildLib,visdebugger)
 
-statemachine:
+shared/libstatemachine.so: makefile src/statemachine.h src/statemachine.c
 	$(call buildLib,statemachine)
 
-asteroid:
+shared/libasteroid.so: makefile src/asteroid.h src/asteroid.c
 	$(call buildLib,asteroid)
 
-benchmarking:
+shared/libbenchmarking.so: makefile src/benchmarking.h src/benchmarking.c
 	$(call buildLib,benchmarking)
 
-main:
-	@if [ -f main.o ]; then rm main.o; fi
-	bear -- clang $(WARNINGS) -std=gnu17 -ferror-limit=0 -rpath . $(OPTIMIZE) -Isrc -o object-files/main.o -c main.c -Lbuild $(LIBS)
-	clang $(WARNINGS) -std=gnu17 -ferror-limit=0 -rpath . $(OPTIMIZE) -o build/main object-files/main.o -Lbuild $(LIBS)
+main: makefile main.c
+	clang $(WARNINGS) -std=c23 -ferror-limit=0 -rpath shared $(OPTIMIZE) $(SANITIZER) $(DEBUGGING) $(BENCHMARKING) -o main main.c -Isrc -Lshared $(LIBS)
 
 # -lc level for consol debug output
 # -lf level for file debug output
-# -d  debug mode
-# -b  breakpoint mode ( press b to toggle GDB_BREAK variable )
-run: main.o
-	cd build && ./main -b -lc 0 -lf 7 -d
+run: main
+	./main -lc 0 -lf 7
+clean:
+	if [ -s object-files ]; then rm object-files/*.o; fi
+	if [ -s shared ]; then rm shared/*.so; fi
+	if [ -e main ]; then rm main; fi
 
 # end
