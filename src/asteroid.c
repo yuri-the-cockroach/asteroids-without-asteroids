@@ -83,7 +83,7 @@ ObjectWrap *CreateAsteroid(ObjectTracker *tracker, Vector2 initPosition,
 }
 
 Vector2 *GenerateAsteroidShape(void) {
-    Vector2 *CornerList = calloc(ASTEROID_CORNERS_COUNT, sizeof(Vector2));
+    Vector2 *CornerList = (Vector2*)calloc(ASTEROID_CORNERS_COUNT, sizeof(Vector2));
     for (unsigned long i = 0; i < ASTEROID_CORNERS_COUNT; i++) {
         CornerList[i] = (Vector2){
             (50 + GetRandomFloat(-ASTEROID_HEIGHT_VARIATION,
