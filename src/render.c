@@ -41,6 +41,7 @@ void DrawRectLineNotFucked(int x, int y, int width, int height, Color color) {
 
 void DrawObject(ObjectWrap *wrap) {
 
+    #ifdef DEBUGGING
     if (VISUAL_DEBUG)
         DrawRectangleLines(
             (int)(wrap->collider.collider.x + wrap->objPtr->position.x),
@@ -77,15 +78,14 @@ void DrawObject(ObjectWrap *wrap) {
                 wrap->objPtr->shape.points[i].y);
         }
     }
+    #endif // DEBUGGING
 
     if (wrap->objPtr->shape.arrayLength == 0) {
         LOG(WARNING, "%s", "Attempting to draw an empty shape");
     }
 
     unsigned int prevPoint = 0;
-    for (unsigned int curPoint = 1; curPoint < wrap->objPtr->shape.arrayLength;
-         curPoint++)
-    {
+    for (unsigned int curPoint = 1; curPoint < wrap->objPtr->shape.arrayLength; curPoint++) {
         DrawLineEx(
             (Vector2){ // Draw from x/y
                        wrap->objPtr->shape.points[prevPoint].x +
@@ -241,20 +241,23 @@ void RunScreenRender(ObjectTracker *tracker) {
                 "PLAYER SCORE: %d",
                 tracker->playerScore);
 
-    if (BENCHMARKING)
-        DisplayText((Vector2){ (float)SCREEN_WIDTH / 2 -
-                                   (float)(MeasureText("BENCHMARKING", 36)),
-                               40 },
-                    36,
-                    RED,
-                    "BENCHMARKING");
+    #ifdef BENCHMARKING
+        if (BENCHRUNNING)
+            DisplayText((Vector2){ (float)SCREEN_WIDTH / 2 -
+                                    (float)(MeasureText("BENCHMARKING", 36)),
+                                40 },
+                        36,
+                        RED,
+                        "BENCHMARKING");
+    #endif // BENCHMARKING
 
+    #ifdef DEBUGGING
     DebugDisplayText((Vector2){ 20, 20 },
-                     18,
-                     WHITE,
-                     "Length of the list: %lu",
-                     tracker->objListLen);
-
+                    18,
+                    WHITE,
+                    "Length of the list: %lu",
+                    tracker->objListLen);
+    #endif // DEBUGGING
     DrawFPS(0, 0);
 }
 
@@ -295,8 +298,7 @@ void RunMenuRender(struct menuParent *menu, const char *restrict title,
     for (int i = 0; i < menu->optionListLen; i++) {
         if (i == menu->selected) {
             DrawText(menu->optionList[i].name,
-                     (SCREEN_WIDTH -
-                      MeasureText(menu->optionList[i].name, fontSize)) /
+                     (SCREEN_WIDTH - MeasureText(menu->optionList[i].name, fontSize)) /
                          2,
                      start + fontSize * i,
                      fontSize,

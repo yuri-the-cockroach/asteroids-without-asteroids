@@ -14,19 +14,23 @@ enum loglevel CURRENT_LOG_LEVEL_FILE = DEFAULT_LOG_LEVEL;
 int SCREEN_WIDTH = 1600;
 int SCREEN_HEIGHT = 900;
 
-bool VISUAL_DEBUG_SHOW_POINTS = false;
-bool VISUAL_DEBUG = false;
-bool DEBUGGING = false;
-bool DEBUG_PAUSE = false;
-bool BENCHMARKING = false;
 int FPS_TARGET = 75;
 
 long lastShot = 0;
 bool CAMERA_FOLLOW = true;
 bool GDB_BREAK = false;
 
-long BENCH_COLLIDER_TIME = 0;
-FILE *BENCH_LOG_FILE_PTR;
+#ifdef DEBUGGING
+    bool DEBUG_PAUSE = false;
+    bool VISUAL_DEBUG_SHOW_POINTS = false;
+    bool VISUAL_DEBUG = false;
+#endif // DEBUGGING
+
+#ifdef BENCHMARKING
+    bool BENCHRUNNING = false;
+    long BENCH_COLLIDER_TIME = 0;
+    FILE *BENCH_LOG_FILE_PTR;
+#endif // BENCHMARKING
 
 char LOG_FILE_NAME[64];
 FILE *LOG_FILE_PTR;
@@ -49,6 +53,9 @@ int main(int argc, char **argv) {
 
     StateMachine();
     fclose(LOG_FILE_PTR);
+
+    #ifdef BENCHMARKING
     if (BENCH_LOG_FILE_PTR) fclose(BENCH_LOG_FILE_PTR);
+    #endif
     return 0;
 }

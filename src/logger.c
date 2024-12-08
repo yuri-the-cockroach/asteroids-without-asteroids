@@ -11,29 +11,21 @@ void Logger(const char *restrict inFile, const char *restrict inFunc,
     if (CURRENT_LOG_LEVEL_FILE < loglevel && CURRENT_LOG_LEVEL_CONSOLE < loglevel)
         return;
 
-    if ( loglevel == BENCH && !BENCHMARKING ) return;
-
     char messageString[1024] = "";
 
     va_list argptr;
 
-    int argcount = 0;
-    int i = 0;
-    char current;
-    FILE *file = BENCHMARKING && loglevel == BENCH ? BENCH_LOG_FILE_PTR : LOG_FILE_PTR;
+    FILE *file = LOG_FILE_PTR;
+    #ifdef BENCHMARKING
+        file = loglevel == BENCH ? BENCH_LOG_FILE_PTR : file;
+    #endif
 
     // Count how many arguments we have
     // by counting format specifiers in a format string
-    do {
-        current = format[i];
-        if (current == '%')
-            argcount++;
-        i++;
-    } while (current != '\0');
 
     // Pass all the arguments to the vsprinf, which will fill it into the
     // message string. If argptr is 0, then it will just be ignored (hopefully)
-    va_start(argptr, argcount);
+    va_start(argptr, 0);
     vsprintf(messageString, format, argptr);
     va_end(argptr);
 

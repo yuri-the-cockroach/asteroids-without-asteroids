@@ -113,28 +113,36 @@ static const unsigned long ASTEROID_CORNERS_COUNT = 20;
 static const float ASTEROID_HEIGHT_VARIATION = 10;
 
 
-/* Externally defined dynamic global variables */
 
-/* Debugging vars */
 
-extern bool BENCHMARKING;
-extern long BENCH_COLLIDER_TIME;
-static const char *restrict BENCH_LOG_FILE_NAME = "asteroids-benchlog.log";
-extern FILE *BENCH_LOG_FILE_PTR;
+// Externally defined dynamic global variables
 
-extern bool DEBUGGING;
-extern bool DEBUG_PAUSE;
-extern bool VISUAL_DEBUG;
-extern bool VISUAL_DEBUG_SHOW_POINTS;
+// Debugging vars
+# ifdef DEBUGGING
+    extern bool DEBUG_PAUSE;
+    extern bool VISUAL_DEBUG;
+    extern bool VISUAL_DEBUG_SHOW_POINTS;
+    extern bool GDB_BREAK;
+#endif // DEBUGGING
+
+// Logging vars
 extern enum loglevel CURRENT_LOG_LEVEL_CONSOLE;
 extern enum loglevel CURRENT_LOG_LEVEL_FILE;
 
 extern char LOG_FILE_NAME[64];
 extern FILE *LOG_FILE_PTR;
-extern bool GDB_BREAK;
 
-/* Game flow related */
+// Benchmarking
+#ifdef BENCHMARKING
+    extern bool BENCHRUNNING;
+    extern long BENCH_COLLIDER_TIME;
+    extern FILE *BENCH_LOG_FILE_PTR;
 
+    static const char *restrict BENCH_LOG_FILE_NAME = "asteroids-benchlog.log";
+    static const int SAMPLES = 1024;
+#endif // BENCHMARKING
+
+// Game flow related
 extern enum game_state NEXT_STATE;
 extern enum game_state GAME_STATE;
 extern long lastShot;

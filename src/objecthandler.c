@@ -1,24 +1,37 @@
+// system includes
+#include <stdlib.h>
+#include <errno.h>
+
+// local includes
 #include "objecthandler.h"
 #include "asteroid.h"
-#include "asteroidsutils.h"
+#include "autils.h"
 #include "collision.h"
 #include "logger.h"
 #include "objectlogic.h"
 #include "structs.h"
-#include "benchmarking.h"
+#ifdef BENCHMARKING
+    #include "benchmarking.h"
+#endif // BENCHMARKING
 
 // Returns a list of objects that need to be drawn
 void RunActionList(ObjectTracker *tracker) {
+
+#ifdef BENCHMARKING
     long benchmarkStart = 0;
     long sortCalledAt = 0;
     BENCH_COLLIDER_TIME = 0;
-        LOG(BENCH, "%s", "<- Starting action list ->");
+    LOG(BENCH, "%s", "<- Starting action list ->");
 
     BenchStart(&benchmarkStart);
-
     BenchStart(&sortCalledAt);
+#endif // BENCHMARKING
+
     SortListByX(tracker);
+
+#ifdef BENCHMARKING
     BenchEnd(&sortCalledAt, "Sorter");
+#endif
 
     // Run through all the tracked objects
     for (unsigned long i = 0; i < tracker->objListLen; i++) {
@@ -56,12 +69,15 @@ void RunActionList(ObjectTracker *tracker) {
                 continue;
         }
     }
-    if (BENCHMARKING) {
-        LOG(BENCH, "Collider took %ldus for %d objects", BENCH_COLLIDER_TIME, tracker->objListLen);
-        BENCH_COLLIDER_TIME = 0;
-    }
 
-    if (BENCHMARKING) LOG(BENCH, "<- Action list finished in %ldus ->", GetTimeMicS() - benchmarkStart);
+    #ifdef BENCHMARKING
+        if (BENCHRUNNING) {
+            LOG(BENCH, "Collider took %ldus for %d objects", BENCH_COLLIDER_TIME, tracker->objListLen);
+            BENCH_COLLIDER_TIME = 0;
+        }
+
+        if (BENCHRUNNING) LOG(BENCH, "<- Action list finished in %ldus ->", GetTimeMicS() - benchmarkStart);
+    #endif
 
     CleanupMemory(tracker);
 }
@@ -71,17 +87,12 @@ void UpdateObj(ObjectTracker *tracker, unsigned long index) {
     ObjectWrap *wrap = tracker->objList[index];
     long start = 0;
 
-    if ( BENCHMARKING ) start = GetTimeMicS();
-    if ( wrap->collider.isCollidable)
-        FastFindCollisions(tracker, index);
-    if ( BENCHMARKING ) BENCH_COLLIDER_TIME += (GetTimeMicS() - start);
-
-    /* long start = 0; */
-
-    /* if ( BENCHMARKING ) start = GetTimeMicS(); */
-    /* if ( wrap->collider.isCollidable) */
-    /*     FindCollisions(tracker, wrap); */
-    /* if ( BENCHMARKING ) BENCH_COLLIDER_TIME += (GetTimeMicS() - start); */
+    #ifdef BENCHMARKING
+        if ( BENCHRUNNING ) start = GetTimeMicS();
+        if ( wrap->collider.isCollidable)
+            FastFindCollisions(tracker, index);
+        if ( BENCHRUNNING ) BENCH_COLLIDER_TIME += (GetTimeMicS() - start);
+    #endif
 
     if (wrap->isRotatableByGame) {
         RotateObject(wrap, (wrap->objPtr->rotateSpeed));

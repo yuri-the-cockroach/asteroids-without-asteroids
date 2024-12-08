@@ -9,6 +9,8 @@ void OnPlayerAccellerate(ObjectStruct *object, float speed) {
     object->speed.y += object->shape.points[0].y * (speed * GetFrameTime());
 }
 
+
+#ifdef DEBUGGING
 void DebugingKeyHandler(ObjectTracker *tracker) {
 
     if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_C)) {
@@ -120,8 +122,8 @@ void DebugingKeyHandler(ObjectTracker *tracker) {
         }
 
         if (IsKeyPressed('B') && BENCH_LOG_FILE_PTR) {
-            if (!BENCHMARKING) {
-                BENCHMARKING = true;
+            if (!BENCHRUNNING) {
+                BENCHRUNNING = true;
                 for (unsigned int i = 0; i < MAX_OBJECT_COUNT - 1; i++) {
                     AsteroidSafeSpawn(tracker);
                     /* CreateAsteroid( */
@@ -136,7 +138,7 @@ void DebugingKeyHandler(ObjectTracker *tracker) {
                     /*     1); */
                 }
             } else {
-                BENCHMARKING = false;
+                BENCHRUNNING = false;
                 unsigned long iterations = tracker->objListLen;
                 if (iterations > 1) {
                     for (unsigned long i = iterations - 1; i > 0; i--) {
@@ -184,6 +186,7 @@ void DebugingKeyHandler(ObjectTracker *tracker) {
         }
     }
 }
+#endif // DEBUGGING
 
 void ShipControlls(ObjectTracker *tracker) {
     if (IsKeyDown('W'))

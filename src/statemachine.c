@@ -17,6 +17,13 @@ enum game_state NEXT_STATE = NOOP;
 
 // Set default values for basic variables
 void RunConfig(void) {
+
+    #ifdef BENCHMARKING
+    BENCH_LOG_FILE_PTR = fopen(BENCH_LOG_FILE_NAME, "w");
+    LOG(DEBUG, "%s", "Compiled with benchmarking support.\nBenchmarking is enabled");
+
+    #endif
+
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "asteroids without asteroids");
 
