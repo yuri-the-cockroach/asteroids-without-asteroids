@@ -23,18 +23,26 @@ struct menuParent MenuStackPop(struct menuStack *stack);
 // Empty the menu stack
 int MenuStackClear(struct menuStack *stack);
 
-
-struct menuParent SetupMainMenu(void);
-
-struct menuParent SetupPauseMenu(void);
-
-struct menuParent SetupGameOverMenu(void);
-
+struct menuParent* MenuStackGet(struct menuStack *stack);
 
 void TriggerMainMenu(void);
 void TriggerRestart(void);
 
 // Get the entry from the top of the stack without removing it from the stack
-struct menuParent* MenuStackGet(struct menuStack *stack);
+
+static const struct menuParent refMainMenu = (struct menuParent){ 0, 2,
+        (struct menuOption[]) {
+        (struct menuOption){ "START GAME", *TriggerNewGame },
+        (struct menuOption){ "EXIT", *TriggerExitGame }
+    }
+};
+
+static const struct menuParent refPauseMenu = (struct menuParent){ 0, 3,
+    (struct menuOption[]) {
+    (struct menuOption){ "RESTART", *TriggerRestart },
+    (struct menuOption){ "MAIN MENU", *TriggerMainMenu },
+    (struct menuOption){ "EXIT", *TriggerExitGame }
+    }
+};
 
 #endif // MENULOGIC_H_

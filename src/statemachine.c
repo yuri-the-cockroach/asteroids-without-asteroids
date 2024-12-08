@@ -38,16 +38,17 @@ void RunConfig(void) {
 }
 
 int StateMachine(void) {
+    #ifdef BENCHMARKING
     long timerStartTotalCycle = 0;
     long timerWorldRender = 0;
     long timerScreenRender = 0;
-    long timerStartKeys = 0;
+    // long timerStartKeys = 0;
+    #endif // BENCHMARKING
 
     ObjectTracker *tracker = NULL;
 
-    struct menuParent mainMenu = SetupMainMenu();
-    struct menuParent pauseMenu = SetupPauseMenu();
-    struct menuParent gameOverMenu = SetupGameOverMenu();
+    struct menuParent mainMenu = refMainMenu;
+    struct menuParent pauseMenu = refPauseMenu;
 
     while (true) {
 
@@ -77,46 +78,60 @@ int StateMachine(void) {
             case GAME_OVER: {
                 char msg[128] = "";
                 sprintf(msg, "Your score: %d", tracker->playerScore);
-                MenuControlls(&gameOverMenu);
-                RunMenuRender(&gameOverMenu, "GAME OVER", 1, msg);
+                MenuControlls(&pauseMenu);
+                RunMenuRender(&pauseMenu, "GAME OVER", 1, msg);
                 break;
             }
 
             case RUNNING: {
 
                 LOG(BENCH, "%s", "<--- Started frame cycle --->");
-                BenchStart(&timerStartTotalCycle);
-                if (DEBUGGING)
+                #ifdef BENCHMARKING
+                    BenchStart(&timerStartTotalCycle);
+                #endif // BENCHMARKING
+
+                #ifdef DEBUGGING
                     DebugingKeyHandler(tracker);
+                    if (!DEBUG_PAUSE)
+                        RunActionList(tracker);
+                #else
+                    RunActionList(tracker);
+                #endif // DEBUGGING
 
                 // Controlls
                 PlayerRuntimeControlls(tracker);
                 ShipControlls(tracker);
 
                 // Logic
-                if (!DEBUG_PAUSE)
-                    RunActionList(tracker);
+
 
 
                 // Rendering
 
-                BenchStart(&timerWorldRender);
-                RunWorldRender(tracker);
-                BenchEnd(&timerWorldRender, "World Renderer");
+                #ifdef BENCHMARKING
+                    BenchStart(&timerWorldRender);
+                    RunWorldRender(tracker);
+                    BenchEnd(&timerWorldRender, "World Renderer");
+                    BenchStart(&timerScreenRender);
+                    RunScreenRender(tracker);
+                    BenchEnd(&timerScreenRender, "Screen Renderer");
 
-                BenchStart(&timerScreenRender);
-                RunScreenRender(tracker);
-                BenchEnd(&timerScreenRender, "Screen Renderer");
+                    BenchEnd(&timerStartTotalCycle, "Total cycle");
+                    LOG(BENCH, "%s", "<--- Ended frame cycle --->\n");
+                #else
+                    RunWorldRender(tracker);
+                    RunScreenRender(tracker);
+                #endif // BENCHMARKING
 
-                BenchEnd(&timerStartTotalCycle, "Total cycle");
-                LOG(BENCH, "%s", "<--- Ended frame cycle --->\n");
                 break;
             }
 
             case PAUSE: {
 
-                if (DEBUGGING)
+                #ifdef DEBUGGING
                     DebugingKeyHandler(tracker);
+                #endif // DEBUGGING
+
                 // Controlls
                 PlayerRuntimeControlls(tracker);
                 MenuControlls(&pauseMenu);
