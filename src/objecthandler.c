@@ -252,12 +252,11 @@ void CreateProjectile(ObjectTracker *tracker, ObjectWrap *parent) {
 
 void DeleteObjWrap(ObjectWrap *wrap) {
     DeleteObjectStruct(wrap->objPtr);
-    free(wrap->collider.collidedList);
-    free(wrap);
+    free((void *)wrap);
 }
 
 void DeleteTrackedObject(ObjectTracker *tracker, unsigned long index) {
-    DeleteObjWrap(tracker->objList[index]);
+    DeleteObjWrap((void *)tracker->objList[index]);
     tracker->objList[index] = 0;
 }
 
@@ -268,6 +267,6 @@ void DeleteTracker(ObjectTracker *tracker) {
         if ( tracker->objList[i] ) tracker->objList[i]->request = DELETE;
     }
     RunActionList(tracker);
-    free(tracker->objList);
-    free(tracker);
+    free((void *)tracker->objList);
+    free((void *)tracker);
 }

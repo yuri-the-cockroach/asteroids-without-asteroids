@@ -73,12 +73,12 @@ ShapeStruct InitShape(const Vector2 *pointArray, unsigned int arrayLength,
                       float sizeMult) {
     ShapeStruct toReturn = { sizeMult,
                              arrayLength,
-                             calloc(arrayLength, sizeof(Vector2)),
+                             pointArray ? calloc(arrayLength, sizeof(Vector2)) : NULL,
                              ResizeShape(pointArray, sizeMult, arrayLength) };
-
-    memcpy((void *)toReturn.points,
-           (void *)toReturn.refPoints,
-           sizeof(Vector2) * arrayLength);
+    if ( pointArray )
+        memcpy((void *)toReturn.points,
+            (void *)toReturn.refPoints,
+            sizeof(Vector2) * arrayLength);
     return toReturn;
 }
 
@@ -94,14 +94,8 @@ ObjectStruct InitObject(ShapeStruct shape, Vector2 initPosition,
     };
 }
 
-void DeleteShapeStruct(ShapeStruct *self) {
-    free((void *)self->points);
-    free((void *)self->refPoints);
-    free(self);
-}
-
 void DeleteObjectStruct(ObjectStruct *self) {
     free((void *)self->shape.points);
     free((void *)self->shape.refPoints);
-    free(self);
+    free((void *)self);
 }
