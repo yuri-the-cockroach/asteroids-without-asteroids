@@ -69,11 +69,13 @@ ObjectWrap *CreateAsteroid(ObjectTracker *tracker, Vector2 initPosition,
     }
 
     ObjectStruct *objPtr = malloc(sizeof(ObjectStruct));
+    Vector2 *tempPoints = GenerateAsteroidShape();
     objPtr[0] = InitObject(
-        InitShape(GenerateAsteroidShape(), ASTEROID_CORNERS_COUNT, size),
+        InitShape(tempPoints, ASTEROID_CORNERS_COUNT, size),
         initPosition,
         initSpeed,
         constRotationSpeed);
+    free(tempPoints);
 
     asteroid->objectType = ASTEROID;
     asteroid->request = CREATE;
