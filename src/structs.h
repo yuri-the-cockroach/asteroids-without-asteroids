@@ -73,7 +73,7 @@ static const char *loglvlToStringNoColor[10] = {
 enum request { IGNORE = 0, UPDATE = 1, SEPARATE = 2, CREATE = 3, DELETE = -1 };
 enum type { NOTYPE = 0, ASTEROID = 1, PROJECTILE = 2, PLAYER = 3 };
 
-/* -------------------- typedefs --------------------  */
+// -------------------- typedefs --------------------
 
 typedef struct tracker ObjectTracker;
 typedef struct ObjectWrap ObjectWrap;
@@ -151,10 +151,6 @@ extern int SCREEN_HEIGHT;
 extern int FPS_TARGET;
 extern bool CAMERA_FOLLOW;
 
-
-/* Benchmarking */
-static const int SAMPLES = 1024;
-
 static const Vector2 PLAYER_SHAPE_POINTS[] = {
     (Vector2){ 0,   -50 }, // Is always treated as the fronts-most point, used to
                          // get the heading
@@ -179,14 +175,13 @@ static const Vector2 PROJECTILE_SHAPE_POINTS[] = {
     (Vector2){ 30,  40  }
 };
 
-/* -------------------- structs --------------------  */
-
+// -------------------- structs --------------------
 struct ShapeStruct {
     float sizeMult;
     unsigned int arrayLength;
     Vector2 *points;
     Vector2 *refPoints;
-    /* Function references */
+    // Function references
 };
 
 struct ObjectStruct {
@@ -196,7 +191,6 @@ struct ObjectStruct {
     Vector2 speed;
     ShapeStruct shape;
 };
-
 
 struct Collider {
     bool isCollidable;          // True if object's collision is enabled
@@ -246,5 +240,6 @@ struct menuStack {
     struct menuParent *optionList;
 };
 
-/* -------------------- end --------------------  */
+
+// -------------------- end --------------------
 #endif // STRUCTS_H_

@@ -197,8 +197,6 @@ void RunWorldRender(ObjectTracker *tracker) {
     Vector2 screenEnd = { screenStart.x + (float)SCREEN_WIDTH / tracker->playerCamera.zoom,
                           screenStart.y + (float)SCREEN_HEIGHT / tracker->playerCamera.zoom};
 
-    /* DrawRectLineNotFucked( */
-    /*     screenStart.x, screenStart.y, screenEnd.x - screenStart.x, screenEnd.y - screenStart.y, RED); */
     int DrawingObjCount = 0;
     for (unsigned int i = 0; i < tracker->objListLen; i++) {
         ObjectWrap *current = tracker->objList[i];

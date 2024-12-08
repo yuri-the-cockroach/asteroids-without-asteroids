@@ -42,23 +42,7 @@ void DebugingKeyHandler(ObjectTracker *tracker) {
         if (IsKeyPressed('1')) {
 
             CreateAsteroid(
-                tracker, (Vector2){ -200, 0 }, (Vector2){ 0, 0 }, 1, 1);
-            /* CreateAsteroid( */
-            /*     tracker, (Vector2){ 300, 600 }, (Vector2){ 0, 0 }, 0, 1); */
-            /* CreateAsteroid( */
-            /*     tracker, (Vector2){ 500, 600 }, (Vector2){ -90, 0 }, 0, 1);
-             */
-
-            /* CreateAsteroid( */
-            /*     tracker, (Vector2){ 300, 900 }, (Vector2){ 90, 0 }, 0, 1); */
-            /* CreateAsteroid( */
-            /*     tracker, (Vector2){ 500, 900 }, (Vector2){ 0, 0 }, 0, 1); */
-
-            /* CreateAsteroid( */
-            /*     tracker, (Vector2){ 300, 300 }, (Vector2){ 90, 0 }, 0, 1); */
-            /* CreateAsteroid( */
-            /*     tracker, (Vector2){ 500, 300 }, (Vector2){ -90, 0 }, 0, 1);
-             */
+                tracker, (Vector2){ 200, 0 }, (Vector2){ 0, 0 }, 1, 1);
         }
 
         if (IsKeyPressed('2')) {
@@ -75,11 +59,6 @@ void DebugingKeyHandler(ObjectTracker *tracker) {
 
         if (IsKeyPressed('3')) {
 
-            /* CreateAsteroid( */
-            /*     tracker, (Vector2){ 300, 600 }, (Vector2){ 90, 0 }, 0, 1); */
-            /* CreateAsteroid( */
-            /*     tracker, (Vector2){ 500, 600 }, (Vector2){ -90, 0 }, 0, 2);
-             */
 
             CreateAsteroid(
                 tracker, (Vector2){ 300, 900 }, (Vector2){ -30, 0 }, 0, 4);
@@ -109,15 +88,6 @@ void DebugingKeyHandler(ObjectTracker *tracker) {
         if (IsKeyPressed('9')) {
             for (unsigned int i = 0; i < MAX_OBJECT_COUNT - 1; i++) {
                 AsteroidSafeSpawn(tracker);
-                /* CreateAsteroid( */
-                /*     tracker, */
-                /*     (Vector2){ GetRandomFloat(0, (float)SCREEN_WIDTH), */
-                /*                GetRandomFloat(0, (float)SCREEN_HEIGHT) }, */
-
-                /*     (Vector2){ GetRandomFloat(-100, 100), */
-                /*                GetRandomFloat(-100, 100) }, */
-                /*     GetRandomFloat(-5, 5), */
-                /*     1); */
             }
         }
 
@@ -126,16 +96,6 @@ void DebugingKeyHandler(ObjectTracker *tracker) {
                 BENCHRUNNING = true;
                 for (unsigned int i = 0; i < MAX_OBJECT_COUNT - 1; i++) {
                     AsteroidSafeSpawn(tracker);
-                    /* CreateAsteroid( */
-                    /*     tracker, */
-                    /*     (Vector2){ GetRandomFloat(0, (float)SCREEN_WIDTH), */
-                    /*                GetRandomFloat(0, (float)SCREEN_HEIGHT) },
-                     */
-
-                    /*     (Vector2){ GetRandomFloat(-100, 100), */
-                    /*                GetRandomFloat(-100, 100) }, */
-                    /*     GetRandomFloat(-5, 5), */
-                    /*     1); */
                 }
             } else {
                 BENCHRUNNING = false;
@@ -161,19 +121,6 @@ void DebugingKeyHandler(ObjectTracker *tracker) {
 
         if (IsKeyPressed('='))
             AsteroidSafeSpawn(tracker);
-        /* CreateAsteroid( */
-        /*     tracker, */
-        /*     (Vector2){ GetRandomFloat( */
-        /*                    tracker->objList[0]->objPtr->position.x - 500, */
-        /*                    tracker->objList[0]->objPtr->position.x + 500), */
-        /*                GetRandomFloat( */
-        /*                    tracker->objList[0]->objPtr->position.y - 500, */
-        /*                    tracker->objList[0]->objPtr->position.y + 500) },
-         */
-        /*     (Vector2){ GetRandomFloat(-100, 100), */
-        /*                GetRandomFloat(-100, 100) }, */
-        /*     GetRandomFloat(-5, 5), */
-        /*     GetRandomFloat(0.5, 2)); */
 
         if (IsKeyPressed('-')) {
             if (tracker->objListLen > 1) {
@@ -221,9 +168,6 @@ void MenuControlls(struct menuParent *menu) {
 
     if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE))
         SelectCurrent(menu);
-
-    /* if (IsKeyPressed(KEY_ENTER)) */
-    /*     SelectCurrent(menu); */
 }
 
 void PlayerRuntimeControlls(ObjectTracker *tracker) {

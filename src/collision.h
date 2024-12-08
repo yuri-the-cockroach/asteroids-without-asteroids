@@ -6,29 +6,29 @@
 
 #define BOUCE_CONSTANT 100
 
-/* Check anything collides with this object
- Return either TRUE or FALSE */
+// Check anything collides with this object
+// Return either TRUE or FALSE
 bool FindAnyCollision(ObjectTracker *tracker, ObjectWrap *first);
 
-/* Sort the list by X coordinate */
+// Sort the list by X coordinate
 void SortListByX(ObjectTracker *tracker);
 
-/* An algorithm that shoud in theory be a lot faster */
+// An algorithm that shoud in theory be a lot faster
 void FastFindCollisions(ObjectTracker *tracker, unsigned long index);
 
-/* Collision checking */
+// Collision checking
 void FindCollisions(ObjectTracker *tracker, ObjectWrap *wrap);
 
-/* Changes object's rotation taking it's mass into account */
+// Changes object's rotation taking it's mass into account
 void ApplyMassBasedRandRotation(ObjectWrap *wrap);
 
-/* Check if two objects collide */
+// Check if two objects collide
 bool CheckIfCollide(ObjectWrap *first, ObjectWrap *second);
 
-/* Collision response function */
+// Collision response function
 void Bounce(ObjectTracker *tracker, ObjectWrap *first, ObjectWrap *second);
 
-/* If object callided with a projectile */
+// If object callided with a projectile
 void GetShot(ObjectTracker *tracker, ObjectWrap *first, ObjectWrap *second);
 
 Collider InitCollider(float sizeMult, void (*ActionOnCollision)(ObjectTracker *tracker, ObjectWrap *first, ObjectWrap *second));

@@ -145,11 +145,13 @@ int StateMachine(void) {
             }
 
             case EXIT: {
+                CloseWindow();
                 return 0;
             }
 
             case CLEANUP: {
                 DeleteTracker(tracker);
+                tracker = 0;
                 if ( NEXT_STATE == NOOP ) GAME_STATE = EXIT;
                 GAME_STATE = NEXT_STATE;
                 NEXT_STATE = NOOP;

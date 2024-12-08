@@ -3,9 +3,6 @@
 
 #include "structs.h"
 
-/*  ----------------------<Function definitions start
- * here>----------------------  */
-
 // Update the object position based on the speed, acceleration, rotation etc...
 void UpdateObjectPos(ObjectWrap *wrap);
 

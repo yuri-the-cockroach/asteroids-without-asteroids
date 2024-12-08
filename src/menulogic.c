@@ -40,7 +40,7 @@ int MenuStackPush(struct menuStack *stack, struct menuParent menu) {
     return 0;
 }
 
-struct menuParent* MenuStackGet(struct menuStack *stack) {
+struct menuParent *MenuStackGet(struct menuStack *stack) {
     if ( stack->stackSize == 0 ) {
         LOG(WARNING, "%s", "Menu stack is empty. Returning empty struct");
         return NULL;

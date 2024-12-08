@@ -8,9 +8,9 @@
 
 void DisplayText(Vector2 pos, int fontSize, Color color, const char *restrict format, ...);
 
-/* Calls DrawObject on each object in tracker->drawList
- * nulls it's position in the list after the object is draw
- * and finnaly sets tracker->drawListLen to 0 when everything is done */
+// Calls DrawObject on each object in tracker->drawList
+// nulls it's position in the list after the object is draw
+// and finnaly sets tracker->drawListLen to 0 when everything is done
 void DrawAllFromDrawList(ObjectTracker *tracker);
 
 

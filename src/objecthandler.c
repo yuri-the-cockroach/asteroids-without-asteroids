@@ -122,7 +122,7 @@ ObjectWrap InitWrap(void) {
         false,
         false,
         false,
-        false,
+        0,
         {
         false,
         { 0, 0, 0, 0 },
