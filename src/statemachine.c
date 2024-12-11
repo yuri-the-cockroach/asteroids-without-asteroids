@@ -121,7 +121,6 @@ int StateMachine(void) {
                     BenchStart(&timerScreenRender);
                     RunScreenRender(tracker);
                     BenchEnd(&timerScreenRender, "Screen Renderer");
-
                     BenchEnd(&timerStartTotalCycle, "Total cycle");
                     LOG(BENCH, "%s", "<--- Ended frame cycle --->\n");
                 #else
