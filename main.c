@@ -39,6 +39,8 @@ Vector2 SPEED_PREV = {0, 0};
 char LOG_FILE_NAME[64];
 FILE *LOG_FILE_PTR;
 
+enum difficulty CUR_DIFFICULTY = LOW;
+
 int main(int argc, char **argv) {
     errno = 0;
 
