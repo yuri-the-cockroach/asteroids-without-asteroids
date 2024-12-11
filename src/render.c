@@ -254,11 +254,31 @@ void RunScreenRender(ObjectTracker *tracker) {
     #endif // BENCHMARKING
 
     #ifdef DEBUGGING
+    ObjectStruct *object = tracker->playerPtr->objPtr;
+
+    DebugDisplayText((Vector2){ 20, 110 },
+                    18,
+                    WHITE,
+                    "Acceleration: %f",
+                    object->speed.x - SPEED_PREV.x);
+
+    DebugDisplayText((Vector2){ 20, 130 },
+                    18,
+                    WHITE,
+                    "Acceleration: %f",
+                    object->speed.y - SPEED_PREV.y);
+
     DebugDisplayText((Vector2){ 20, 20 },
                     18,
                     WHITE,
                     "Length of the list: %lu",
                     tracker->objListLen);
+
+    DebugDisplayText((Vector2){ 20, 32 },
+                    18,
+                    WHITE,
+                    "Time untill next asteroid: %f",
+                    NEXT_ASTEROID_SPAWN - GAME_TIME_PASSED);
     #endif // DEBUGGING
     DrawFPS(0, 0);
 }
