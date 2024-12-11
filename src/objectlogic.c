@@ -62,13 +62,11 @@ void RotateObject(ObjectWrap *wrap, float rotateByDeg) {
          current++)
     {
         wrap->objPtr->shape.points[current].x =
-            (float)((wrap->objPtr->shape.refPoints[current].x *
-                     cosf(wrap->objPtr->heading)) -
-                    (wrap->objPtr->shape.refPoints[current].y *
-                     sinf(wrap->objPtr->heading)));
+            wrap->objPtr->shape.refPoints[current].x * cosf(wrap->objPtr->heading) -
+            wrap->objPtr->shape.refPoints[current].y * sinf(wrap->objPtr->heading);
         wrap->objPtr->shape.points[current].y =
-            (wrap->objPtr->shape.refPoints[current].x * sinf(wrap->objPtr->heading)) +
-            (wrap->objPtr->shape.refPoints[current].y * cosf(wrap->objPtr->heading));
+            wrap->objPtr->shape.refPoints[current].x * sinf(wrap->objPtr->heading) +
+            wrap->objPtr->shape.refPoints[current].y * cosf(wrap->objPtr->heading);
     }
 
     if ( wrap->collider.isCollidable ) UpdateCollider(wrap);
