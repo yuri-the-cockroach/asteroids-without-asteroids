@@ -155,8 +155,9 @@ extern FILE *LOG_FILE_PTR;
 #endif // BENCHMARKING
 
 // Game flow related
-extern long NEXT_ASTEROID_SPAWN;
-extern long LAST_ASTEROID_SPAWN;
+extern float GAME_TIME_PASSED;
+extern float NEXT_ASTEROID_SPAWN;
+extern float LAST_ASTEROID_SPAWN;
 extern enum game_state NEXT_STATE;
 extern enum game_state GAME_STATE;
 extern long LAST_SHOT;
