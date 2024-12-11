@@ -33,26 +33,31 @@ enum loglevel {
 };
 
 enum game_state {
-    INIT = 0,
+    INIT      = 0,
     MAIN_MENU = 1,
     START_NEW = 2,
     GAME_OVER = 3,
-    RUNNING = 4,
-    PAUSE = 5,
-    EXIT = -1,
-    CLEANUP = -2,
-    NOOP = -255
+    RUNNING   = 4,
+    PAUSE     = 5,
+    EXIT      = -1,
+    CLEANUP   = -2,
+    NOOP      = -255
 };
-
 
 enum difficulty {
     GAME_JOURNALIST = 0,
-    LOW = 1,
-    MEDIUM = 2,
-    HIGH = 3,
-    VERY_HIGH = 4,
-    INSANE = 5,
-    DOFH = 10
+    LOW             = 1,
+    MEDIUM          = 2,
+    HIGH            = 3,
+    VERY_HIGH       = 4,
+    INSANE          = 5,
+    DOFH            = 10
+};
+
+enum menuOptionType {
+    DUMMY    = -1,
+    SUBMENU  = 1,
+    FUNCTION = 2
 };
 
 static const char *loglvlToString[10] = {
@@ -81,8 +86,20 @@ static const char *loglvlToStringNoColor[10] = {
     "ALL"
 };
 
-enum request { IGNORE = 0, UPDATE = 1, SEPARATE = 2, CREATE = 3, DELETE = -1 };
-enum type { NOTYPE = 0, ASTEROID = 1, PROJECTILE = 2, PLAYER = 3 };
+enum request {
+    IGNORE   = 0,
+    UPDATE   = 1,
+    SEPARATE = 2,
+    CREATE   = 3,
+    DELETE   = -1
+};
+
+enum type {
+    NOTYPE     = 0,
+    ASTEROID   = 1,
+    PROJECTILE = 2,
+    PLAYER     = 3
+};
 
 // -------------------- typedefs --------------------
 
@@ -92,9 +109,8 @@ typedef struct ObjectStruct ObjectStruct;
 typedef struct ShapeStruct ShapeStruct;
 typedef struct Collider Collider;
 
-// -------------------- constants --------------------
 
-
+// -------------------- CONSTANTS --------------------
 // -------------------- Physics constants --------------------
 
 static const float ELASTICITY_FACTOR = 0.5; // How much energy object recives back on bouce
@@ -176,8 +192,7 @@ static const Vector2 PLAYER_SHAPE_POINTS[] = {
 static const Vector2 ASTEROID_SHAPE_POINTS[] = {
     (Vector2){ -50, 50  },
     (Vector2){ 50,  50  },
-    (Vector2){ 50,  -50 }, // Is always treated as the fronts-most point, used to
-                          // get the heading
+    (Vector2){ 50,  -50 },
     (Vector2){ -50, -50 }
 };
 
@@ -195,7 +210,6 @@ struct ShapeStruct {
     unsigned int arrayLength;
     Vector2 *points;
     Vector2 *refPoints;
-    // Function references
 };
 
 struct ObjectStruct {
