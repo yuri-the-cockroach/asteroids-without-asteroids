@@ -12,14 +12,14 @@ Currentrly doing:
 - [X] Rendering
   - [X] Don't render stuff that's not on the screen
 
-- [-] Game Logic
-  - [-] Asteroids
-    - [ ] Dynamic spawn system
+- [X] Game Logic
+  - [X] Asteroids
+    - [X] Dynamic spawn system
     - [X] Procedural shape generator
     - [X] Separation on getting shot
-  - [X] Seperate camera and game space
+  - [X] Separate camera and game space
   - [X] Make game world bigger
-  - [ ] Automatic asteroid spawn based on the difficulty and time alive
+  - [X] Automatic asteroid spawn based on the difficulty and time alive
 
 - [-] Collisions
   - [X] Base system implementation
@@ -28,10 +28,10 @@ Currentrly doing:
   - [ ] Rewrite to use multiple collision zones
   - [ ] Better rotations on impact
 
-- [-] Player
-  - [-] Shooting
+- [X] Player
+  - [X] Shooting
     - [X] Base systems
-    - [ ] Make them more suitable for a game
+    - [X] Make them more suitable for a game
 
 
 - [X] Memory handelling (hopefully)
