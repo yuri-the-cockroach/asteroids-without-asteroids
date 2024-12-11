@@ -140,6 +140,7 @@ static const float ASTEROID_HEIGHT_VARIATION = 15;
 extern enum loglevel CURRENT_LOG_LEVEL_CONSOLE;
 extern enum loglevel CURRENT_LOG_LEVEL_FILE;
 
+extern enum difficulty CUR_DIFFICULTY;
 extern char LOG_FILE_NAME[64];
 extern FILE *LOG_FILE_PTR;
 
