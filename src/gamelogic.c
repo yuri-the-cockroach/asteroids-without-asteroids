@@ -2,11 +2,28 @@
 #include "asteroid.h"
 #include "autils.h"
 #include "structs.h"
+#include "visdebugger.h"
 #include <raylib.h>
 
 void OnPlayerAccellerate(ObjectStruct *object, float speed) {
-    object->speed.x += object->shape.points[0].x * (speed * GetFrameTime());
-    object->speed.y += object->shape.points[0].y * (speed * GetFrameTime());
+    float mult_x = 1;
+    float mult_y = 1;
+
+    if ( fabsf(object->speed.x + speed) > fabsf(object->speed.x) ) {
+        mult_x = fabsf(object->speed.x / 500.f);
+        mult_x = mult_x > 1 ? mult_x : 1;
+    }
+
+    if ( fabsf(object->speed.y + speed) > fabsf(object->speed.y) ) {
+        mult_y = fabsf(object->speed.y / 500.f);
+        mult_y = mult_y > 1 ? mult_y : 1;
+    }
+
+    object->speed.x += (speed / mult_x) * GetFrameTime() * object->shape.points[0].x;
+    object->speed.y += (speed / mult_y) * GetFrameTime() * object->shape.points[0].y;
+
+    // object->speed.x +=  object->shape.points[0].x * (speed * GetFrameTime());
+    // object->speed.y += object->shape.points[0].y * (speed * GetFrameTime());
 }
 
 
