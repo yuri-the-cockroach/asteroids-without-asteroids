@@ -13,6 +13,16 @@
 // but it's good in assembly
 float ClampFloat(float d, float min, float max);
 
+// returns you the sign of the value.
+// 1 if positive
+// -1 if negative
+int fGetSign(float f);
+
+// returns you the sign of the value.
+// 1 if positive
+// -1 if negative
+int GetSign(int i);
+
 // Clap int from min to max
 // I hate this code,
 // but it's good in assembly
