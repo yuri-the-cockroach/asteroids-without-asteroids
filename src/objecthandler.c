@@ -232,9 +232,9 @@ void CreateProjectile(ObjectTracker *tracker, ObjectWrap *parent) {
         parent->objPtr->position.y +                   // and at this point I don't care.
         parent->objPtr->shape.points[0].y * 2.0f  },   // Just don't change it, keep it the way it is
         (Vector2){ parent->objPtr->shape.points[0].x * PROJECTILE_SPEED +
-                       parent->objPtr->speed.x,
-                   parent->objPtr->shape.points[0].y * PROJECTILE_SPEED +
-                       parent->objPtr->speed.y },
+        parent->objPtr->speed.x,
+        parent->objPtr->shape.points[0].y * PROJECTILE_SPEED +
+        parent->objPtr->speed.y },
         5);
 
     projectile[0] = InitWrap();
