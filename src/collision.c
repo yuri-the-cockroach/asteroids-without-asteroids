@@ -80,6 +80,8 @@ void FastFindCollisions(ObjectTracker *tracker, unsigned long index) {
         if (!CheckIfCollide(current, next))
             continue;
 
+        if ( current->objectType == next->objectType && current->objectType == PROJECTILE ) continue;
+
         if (current->objectType > next->objectType) {
             current->collider.ActionOnCollision(tracker, current, next);
             continue;
