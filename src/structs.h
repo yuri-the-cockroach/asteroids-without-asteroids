@@ -44,6 +44,17 @@ enum game_state {
     NOOP = -255
 };
 
+
+enum difficulty {
+    GAME_JOURNALIST = 0,
+    LOW = 1,
+    MEDIUM = 2,
+    HIGH = 3,
+    VERY_HIGH = 4,
+    INSANE = 5,
+    DOFH = 10
+};
+
 static const char *loglvlToString[10] = {
     "NOLOG",
     "\033[1;31mFATAL\033[0;37m",
