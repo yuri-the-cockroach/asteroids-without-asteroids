@@ -66,7 +66,7 @@ void RunActionList(ObjectTracker *tracker) {
             }
 
             case IGNORE:
-                continue;
+                break;
         }
     }
 
