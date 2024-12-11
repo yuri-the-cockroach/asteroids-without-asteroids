@@ -222,17 +222,13 @@ void PlayerRuntimeControlls(ObjectTracker *tracker) {
 
 void NewGame(ObjectTracker *tracker) {
     LAST_SHOT = 0;
-    CreatePlayer(tracker, (Vector2){ 0, 0 }, 0.5);
+    CreatePlayer(tracker, (Vector2){ WORLD_POS_MAX_X / 2.f,WORLD_POS_MAX_Y / 2.f  }, 0.5);
 }
 
 int SpawnAsteroidOnTime(ObjectTracker *tracker) {
-    long curTime;
-    if (NEXT_ASTEROID_SPAWN > (curTime = GetTimeMicS()) ) return 0;
-
-    LAST_ASTEROID_SPAWN = GetTimeMicS();
-    NEXT_ASTEROID_SPAWN = LAST_ASTEROID_SPAWN +  (long)(100.f * (20.f / ( log((float)tracker->playerScore / 100.f + 1.5f))));
-
-    AsteroidSafeSpawn(tracker);
-
+    if (NEXT_ASTEROID_SPAWN >= GAME_TIME_PASSED) return 0;
+    LAST_ASTEROID_SPAWN = GAME_TIME_PASSED;
+    NEXT_ASTEROID_SPAWN = LAST_ASTEROID_SPAWN + ((2.f / ( logf((float)tracker->playerScore / 100.f + 1.2f))) - 1) / (float)CUR_DIFFICULTY;
+    if  (!AsteroidSafeSpawn(tracker)) return -1;
     return 1;
 }
