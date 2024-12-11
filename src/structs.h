@@ -113,8 +113,7 @@ static const int RATE_OF_FIRE = 5;
 static const int PROJECTILE_SPEED = 20;
 static const float PROJECTILE_SIZE = 0.1f;
 static const int PLAYER_ROTATION_SPEED = 5;
-static const int PLAYER_MOVE_SPEED = 5;
-static const int BASE_ACCELL = 5;
+static const int PLAYER_MOVE_SPEED = 20;
 static const int BASE_ROTATE = 5;
 
 static const enum loglevel DEFAULT_LOG_LEVEL = WARNING;
