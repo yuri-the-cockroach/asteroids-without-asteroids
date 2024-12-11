@@ -82,51 +82,54 @@ all:
 		shared/libbenchmarking.so
 	mold -run make main
 
-shared/libmenulogic.so: makefile src/menulogic.h src/menulogic.c
+test:
+	echo $(SANITIZER)
+
+shared/libmenulogic.so: makefile src/menulogic.h src/menulogic.c src/structs.h
 	$(call buildLib,menulogic)
 
-shared/libcollision.so: makefile src/collision.h src/collision.c
+shared/libcollision.so: makefile src/collision.h src/collision.c src/structs.h
 	$(call buildLib,collision)
 
-shared/librender.so: makefile src/render.h src/render.c
+shared/librender.so: makefile src/render.h src/render.c src/structs.h
 	$(call buildLib,render)
 
-shared/liblogger.so: makefile src/logger.h src/logger.c
+shared/liblogger.so: makefile src/logger.h src/logger.c src/structs.h
 	$(call buildLib,logger)
 
-shared/libautils.so: makefile src/autils.h src/autils.c
+shared/libautils.so: makefile src/autils.h src/autils.c src/structs.h
 	$(call buildLib,autils)
 
-shared/libobjectlogic.so: makefile src/objectlogic.h src/objectlogic.c
+shared/libobjectlogic.so: makefile src/objectlogic.h src/objectlogic.c src/structs.h
 	$(call buildLib,objectlogic)
 
-shared/libgamelogic.so: makefile src/gamelogic.h src/gamelogic.c
+shared/libgamelogic.so: makefile src/gamelogic.h src/gamelogic.c src/structs.h
 	$(call buildLib,gamelogic)
 
-shared/libsyslogic.so: makefile src/syslogic.h src/syslogic.c
+shared/libsyslogic.so: makefile src/syslogic.h src/syslogic.c src/structs.h
 	$(call buildLib,syslogic)
 
-shared/libobjecthandler.so: makefile src/objecthandler.h src/objecthandler.c
+shared/libobjecthandler.so: makefile src/objecthandler.h src/objecthandler.c src/structs.h
 	$(call buildLib,objecthandler)
 
-shared/libcollider.so: makefile src/collider.h src/collider.c
+shared/libcollider.so: makefile src/collider.h src/collider.c src/structs.h
 	$(call buildLib,collider)
 
-shared/libvisdebugger.so: makefile src/visdebugger.h src/visdebugger.c
+shared/libvisdebugger.so: makefile src/visdebugger.h src/visdebugger.c src/structs.h
 ifdef DEBUGGING
 		$(call buildLib,visdebugger)
 endif
 
-shared/libstatemachine.so: makefile src/statemachine.h src/statemachine.c
+shared/libstatemachine.so: makefile src/statemachine.h src/statemachine.c src/structs.h
 	$(call buildLib,statemachine)
 
-shared/libasteroid.so: makefile src/asteroid.h src/asteroid.c
+shared/libasteroid.so: makefile src/asteroid.h src/asteroid.c src/structs.h
 	$(call buildLib,asteroid)
 
-shared/libbenchmarking.so: makefile src/benchmarking.h src/benchmarking.c
+shared/libbenchmarking.so: makefile src/benchmarking.h src/benchmarking.c src/structs.h
 	$(call buildLib,benchmarking)
 
-main: makefile main.c
+main: makefile main.c src/structs.h
 	clang $(WARNINGS) -std=c23 -ferror-limit=0 -rpath shared $(OPTIMIZE) $(SANITIZER) $(DEBUGGING) $(BENCHMARKING) -o main main.c -Isrc -Lshared $(LIBS)
 
 # -lc level for consol debug output
@@ -140,5 +143,7 @@ clean:
 
 debug:
 	gdb -i=mi main
+
+sanitize: clean SANITIZER += -fno-omit-frame-pointer
 
 # end
