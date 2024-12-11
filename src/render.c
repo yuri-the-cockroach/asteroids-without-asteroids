@@ -198,7 +198,7 @@ void RunWorldRender(ObjectTracker *tracker) {
     for (unsigned int i = 0; i < tracker->objListLen; i++) {
         ObjectWrap *current = tracker->objList[i];
 
-        if (!current || !current->draw)
+        if (!current || !current->draw || current->request != UPDATE)
             continue;
 
         Vector2 colliderStart = {
