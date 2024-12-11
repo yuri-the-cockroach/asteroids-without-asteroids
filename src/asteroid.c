@@ -13,14 +13,10 @@
 #include "structs.h"
 
 ObjectWrap *AsteroidSafeSpawn(ObjectTracker *tracker) {
-
     ObjectWrap *wrap = CreateAsteroid(
         tracker,
         (Vector2){ 0, 0 },
-        (Vector2){
-        GetRandomFloat(-100, 100),
-        GetRandomFloat(-100, 100)
-    },
+        (Vector2){0, 0},
         GetRandomFloat(-3, 3),
         GetRandomFloat(1, 3));
 
@@ -29,31 +25,53 @@ ObjectWrap *AsteroidSafeSpawn(ObjectTracker *tracker) {
         return NULL;
     }
 
-    Vector2 playerPos = tracker->playerPtr ? tracker->playerPtr->objPtr->position : (Vector2){0, 0};
-    Vector2 newPos = (Vector2){ 0, 0 };
+    Vector2 playerPos;
+
+    float minX = WORLD_POS_MIN_X;
+    float maxX = WORLD_POS_MAX_X;
+    float minY = WORLD_POS_MIN_Y;
+    float maxY = WORLD_POS_MAX_Y;
+
+    if ( tracker->playerPtr ) {
+        playerPos = tracker->playerPtr->objPtr->position;
+        minX = ClampFloat(playerPos.x - 3000, WORLD_POS_MIN_X, WORLD_POS_MAX_X);
+        maxX = ClampFloat(playerPos.x + 3000, WORLD_POS_MIN_X, WORLD_POS_MAX_X);
+        minY = ClampFloat(playerPos.y - 3000, WORLD_POS_MIN_Y, WORLD_POS_MAX_Y);
+        maxY = ClampFloat(playerPos.y + 3000, WORLD_POS_MIN_Y, WORLD_POS_MAX_Y);
+    }
+
+    bool complete = false;
+    int retry = 5;
+
     do {
-        newPos = (Vector2){ GetRandomFloat(WORLD_POS_MIN_X, WORLD_POS_MAX_X),
-                            GetRandomFloat(WORLD_POS_MIN_Y, WORLD_POS_MAX_Y)};
+        wrap->objPtr->position = (Vector2){ GetRandomFloat(minX, maxX),
+                            GetRandomFloat(minY, maxY)};
+        if (  !FindAnyCollision(tracker, wrap) && !(fabsf(wrap->objPtr->position.x - playerPos.x) < 400 || fabsf(wrap->objPtr->position.y - playerPos.y) < 400) )
+            complete = true;
         // This abomination will just check if the wrap closer than 200u or further than 1000u to
         // the player
-        if (tracker->playerPtr && (
-                fabsf(playerPos.x - newPos.x) < 300
-                || fabsf(playerPos.x - newPos.x) > 4000
-                || fabsf(playerPos.y - newPos.y) < 300
-                || fabsf(playerPos.y - newPos.y) > 4000
-            )
-        ) continue;
-        wrap->objPtr->position = newPos;
-    } while (FindAnyCollision(tracker, wrap));
+        retry--;
+    } while (!complete && retry);
 
-    float gamma = atan2f(playerPos.x - newPos.x, playerPos.y - newPos.y);
+    if ( !complete ) {
+        wrap->request = DELETE;
+        return NULL;
+    }
+
+    Vector2 astPos = wrap->objPtr->position;
+    float gamma = atan2f(playerPos.y - astPos.y, playerPos.x - astPos.x);
     wrap->objPtr->speed = (Vector2){
-        GetRandomFloat(-20, 20) + sinf(gamma) * ( GetRandomFloat(20, 100) ),
-        GetRandomFloat(-20, 20) + cosf(gamma) * ( GetRandomFloat(20, 100) )
+         GetRandomFloat(-20, 20) + cosf(gamma) * ( GetRandomFloat(20, 100) ),
+         GetRandomFloat(-20, 20) + sinf(gamma) * ( GetRandomFloat(20, 100) )
     };
     return wrap;
 }
 
+// This function takes care of
+// * Creating and instanciating the object
+// * Adding it into the tracked list
+// * Giving values to anything that needs them
+// Returnes a ready to use object, that needs no tweaks to work.
 ObjectWrap *CreateAsteroid(ObjectTracker *tracker, Vector2 initPosition,
                            Vector2 initSpeed, float constRotationSpeed,
                            float size) {
