@@ -166,7 +166,6 @@ void Bounce(ObjectTracker *tracker, ObjectWrap *first, ObjectWrap *second) {
 }
 
 bool CheckIfCollide(ObjectWrap *first, ObjectWrap *second) {
-
     // This abomination will make the logic actually readable
     Vector2 firstStart = {
         first->objPtr->position.x +     // leftmost point of the collider
