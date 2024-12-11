@@ -48,11 +48,11 @@ void RunActionList(ObjectTracker *tracker) {
 
             case CREATE:
                 current->request = UPDATE;
-                continue;
+                break;
 
             case DELETE: // Delete element from the list
                 DeleteTrackedObject(tracker, i);
-                continue;
+                break;
 
             case SEPARATE:
                 Separate(tracker, tracker->objList[i]);
