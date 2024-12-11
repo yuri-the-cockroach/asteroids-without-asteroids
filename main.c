@@ -19,8 +19,10 @@ int FPS_TARGET = 75;
 long LAST_SHOT = 0;
 bool CAMERA_FOLLOW = true;
 bool GDB_BREAK = false;
-long LAST_ASTEROID_SPAWN = 0;
-long NEXT_ASTEROID_SPAWN = 0;
+float LAST_ASTEROID_SPAWN = 0;
+float NEXT_ASTEROID_SPAWN = 0;
+float GAME_TIME_PASSED = 0;
+Vector2 SPEED_PREV = {0, 0};
 
 #ifdef DEBUGGING
     bool DEBUG_PAUSE = false;
