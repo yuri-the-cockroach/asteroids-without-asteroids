@@ -103,7 +103,7 @@ void DebugingKeyHandler(ObjectTracker *tracker) {
         }
 
         if (IsKeyPressed('9')) {
-            for (unsigned int i = 0; i < MAX_OBJECT_COUNT - 1; i++) {
+            for (int i = 0; i < SOFT_MAX_ASTEROIDS - 1; i++) {
                 AsteroidSafeSpawn(tracker);
             }
         }
