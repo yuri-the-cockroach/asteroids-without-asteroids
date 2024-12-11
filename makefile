@@ -59,7 +59,6 @@ ifdef BENCHMARKING
 export LIBS+= -lbenchmarking
 endif # BENCHMARKING
 
-
 define buildLib
     clang  $(WARNINGS) $(OPTIMIZE) $(SANITIZER) $(DEBUGGING) $(BENCHMARKING) -std=c23 -fPIC -ferror-limit=0 -I src/ -o object-files/$1.o -c src/$1.c
     clang  $(WARNINGS) $(OPTIMIZE) $(SANITIZER) $(DEBUGGING) $(BENCHMARKING) -std=c23 -fPIC -ferror-limit=0 -shared -o shared/lib$1.so object-files/$1.o
