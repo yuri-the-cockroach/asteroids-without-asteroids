@@ -15,7 +15,7 @@
 #endif // BENCHMARKING
 
 // Returns a list of objects that need to be drawn
-void RunActionList(ObjectTracker *tracker) {
+void RunActionList(objTracker *tracker) {
 
 #ifdef BENCHMARKING
     long benchmarkStart = 0;

@@ -3,20 +3,12 @@
 
 #include "structs.h"
 
-#include "menulogic.h"
-#include "objecthandler.h"
-#include "logger.h"
-#include "autils.h"
-#include "objectlogic.h"
-
-
-
-int SpawnAsteroidOnTime(ObjectTracker *tracker);
-void MenuControlls(struct menuParent *menu);
-void DebugingKeyHandler(ObjectTracker *tracker);
-void OnPlayerAccellerate(ObjectStruct *object, float speed);
-void ShipControlls(ObjectTracker *tracker);
-void NewGame(ObjectTracker *tracker);
-void PlayerRuntimeControlls(ObjectTracker *tracker);
+int SpawnAsteroidOnTime(objTracker *tracker);
+const menuParent *MenuControlls(const menuParent *menu, int *menuHighlighted);
+void DebugingKeyHandler(objTracker *tracker);
+void OnPlayerAccellerate(object *object, float speed);
+void ShipControlls(objTracker *tracker);
+void NewGame(objTracker *tracker);
+void PlayerRuntimeControlls(objTracker *tracker);
 
 #endif // GAMELOGIC_H_

@@ -234,15 +234,15 @@ void GetShot(objTracker *tracker, objWrap *projectile,
     if (victim->objectType == ASTEROID) {
         victim->livesLeft--;
         victim->request = SEPARATE;
-        tracker->playerScore++;
+        tracker->playerScore += 1 * CUR_DIFFICULTY;
     }
 }
 
-Collider InitCollider(float sizeMult,
-                      void (*ActionOnCollision)(ObjectTracker *tracker,
-                                                ObjectWrap *first,
-                                                ObjectWrap *second)) {
-    return (Collider){
+collider InitCollider(float sizeMult,
+                      void (*ActionOnCollision)(objTracker *tracker,
+                                                objWrap *first,
+                                                objWrap *second)) {
+    return (collider){
         true,
         (Rectangle){
                     -50 * sizeMult,

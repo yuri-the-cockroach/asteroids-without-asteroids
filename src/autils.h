@@ -37,7 +37,7 @@ long GetTimeMicS(void);
 
 // Cleanup memory find all NULLs in memory
 // remove them and rearenge memory
-void CleanupMemory(ObjectTracker *tracker);
+void CleanupMemory(objTracker *tracker);
 
 // Rollover int, if it gets over max or under min
 int RollOverInt(int d, int min, int max);

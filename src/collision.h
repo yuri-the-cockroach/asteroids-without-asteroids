@@ -8,51 +8,51 @@
 
 // Check anything collides with this object
 // Return either TRUE or FALSE
-bool FindAnyCollision(ObjectTracker *tracker, ObjectWrap *first);
+bool FindAnyCollision(objTracker *tracker, objWrap *first);
 
 // Sort the list by X coordinate
-void SortListByX(ObjectTracker *tracker);
+void SortListByX(objTracker *tracker);
 
 // An algorithm that shoud in theory be a lot faster
-void FastFindCollisions(ObjectTracker *tracker, unsigned long index);
+void FastFindCollisions(objTracker *tracker, unsigned long index);
 
 // Collision checking
-void FindCollisions(ObjectTracker *tracker, ObjectWrap *wrap);
+void FindCollisions(objTracker *tracker, objWrap *wrap);
 
 // Changes object's rotation taking it's mass into account
-void ApplyMassBasedRandRotation(ObjectWrap *wrap);
+void ApplyMassBasedRandRotation(objWrap *wrap);
 
 // Check if two objects collide
-bool CheckIfCollide(ObjectWrap *first, ObjectWrap *second);
+bool CheckIfCollide(objWrap *first, objWrap *second);
 
 // Collision response function
-void Bounce(ObjectTracker *tracker, ObjectWrap *first, ObjectWrap *second);
+void Bounce(objTracker *tracker, objWrap *first, objWrap *second);
 
 // If object callided with a projectile
-void GetShot(ObjectTracker *tracker, ObjectWrap *first, ObjectWrap *second);
+void GetShot(objTracker *tracker, objWrap *first, objWrap *second);
 
-Collider InitCollider(float sizeMult, void (*ActionOnCollision)(ObjectTracker *tracker, ObjectWrap *first, ObjectWrap *second));
+collider InitCollider(float sizeMult, void (*ActionOnCollision)(objTracker *tracker, objWrap *first, objWrap *second));
 
 // Push to the end of list
 // Return value can be -1 unable to push
-int Push(Collider *parent, ObjectWrap *wrap);
+int Push(collider *parent, objWrap *wrap);
 
 // Find the entry in the list
 // Return value can be -1 if not found
-int FindInList(Collider *parent, ObjectWrap *wrap);
+int FindInList(collider *parent, objWrap *wrap);
 
 // Pop entry from the list
 // Return value CAN BE NULL if not found
-ObjectWrap* Pop(Collider *parent, int index);
+objWrap* Pop(collider *parent, int index);
 
 // Clear the list
-int ClearList(Collider *parent);
+int ClearList(collider *parent);
 
 // Clean all the lists
-int CleanupLists(ObjectTracker *tracker);
+int CleanupLists(objTracker *tracker);
 
-int UpdateCollider(ObjectWrap *wrap);
+int UpdateCollider(objWrap *wrap);
 
-void PlayerCollision(ObjectTracker *tracker, ObjectWrap *player, ObjectWrap *offender);
+void PlayerCollision(objTracker *tracker, objWrap *player, objWrap *offender);
 
 #endif // COLLISION_H_

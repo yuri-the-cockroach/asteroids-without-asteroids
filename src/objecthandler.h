@@ -10,40 +10,40 @@
 #include "render.h"
 
 // Go through the list of tracked objects and call UpdateObj function on them
-void RunActionList(ObjectTracker *tracker);
+void RunActionList(objTracker *tracker);
 
-// Called on a single ObjectWrap* and goes through the update checklist
-void UpdateObj(ObjectTracker *tracker, unsigned long index);
+// Called on a single objWrap* and goes through the update checklist
+void UpdateObj(objTracker *tracker, unsigned long index);
 
 // Takes care of safely deleting the object and cleaning up after it
-void DeleteObjWrap(ObjectWrap *wrap);
+void DeleteObjWrap(objWrap *wrap);
 
 // Initializes the tracker and returns it
-ObjectTracker *InitTracker(void);
+objTracker *InitTracker(void);
 
 // Initialize an object wrapper that stores general data
-ObjectWrap InitWrap(void);
+objWrap InitWrap(void);
 
 // Adds the project wrapper to the list of tracked objects
 // This function is not ment to be called from the top level
 // It is ment to be called by a wrapper function that makes a specific object
-int AddWrapToList(ObjectTracker *tracker, ObjectWrap *wrap);
+int AddWrapToList(objTracker *tracker, objWrap *wrap);
 
 // A wrapper funciton for AddWrapToList, to create a player
-void CreatePlayer(ObjectTracker *tracker, Vector2 initPosition,
+void CreatePlayer(objTracker *tracker, Vector2 initPosition,
                   float size);
 
 // Creates a projectile that inherits from it's parent
-void CreateProjectile(ObjectTracker *tracker, ObjectWrap *parent);
+void CreateProjectile(objTracker *tracker, objWrap *parent);
 
-// Destructor for ObjectWrap
-void DeleteObjWrap(ObjectWrap *wrap);
+// Destructor for objWrap
+void DeleteObjWrap(objWrap *wrap);
 
-// Wrapper for ObjectWrapper destructor that hanldes cleanup from the tracking list
-void DeleteTrackedObject(ObjectTracker *tracker, unsigned long index);
+// Wrapper for objWrapper destructor that hanldes cleanup from the tracking list
+void DeleteTrackedObject(objTracker *tracker, unsigned long index);
 
 // Deinit tracker and everything in it
-void DeleteTracker(ObjectTracker *tracker);
+void DeleteTracker(objTracker *tracker);
 
 
 #endif // OBJECTHANDLER_H_

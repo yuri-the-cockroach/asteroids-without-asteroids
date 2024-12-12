@@ -45,7 +45,7 @@ void DebugingKeyHandler(objTracker *tracker) {
     if (IsKeyPressed('T')) {
         GDB_BREAK = !GDB_BREAK;
         printf("Breakpoint says hi\n");
-    }
+   }
     if (IsKeyPressed('V')) {
         VISUAL_DEBUG = !VISUAL_DEBUG;
     }
