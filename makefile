@@ -61,6 +61,8 @@ define buildLib
 endef
 
 all:
+	if [[ ! -e object-files ]]; then mkdir object-files; fi
+	if [[ ! -e shared ]]; then mkdir shared; fi
 	mold -run make -j $(nproc) \
 		shared/liblogger.so \
 		shared/libautils.so \
