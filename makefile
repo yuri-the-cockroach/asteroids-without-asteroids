@@ -72,11 +72,15 @@ all:
 		shared/libsyslogic.so \
 		shared/librender.so \
 		shared/libcollision.so \
-		shared/libvisdebugger.so \
 		shared/libstatemachine.so \
 		shared/libmenulogic.so \
 		shared/libasteroid.so \
 		shared/libbenchmarking.so
+
+ifdef DEBUGGING
+	mold -run make shared/libvisdebugger.so
+endif # DEBUGGING
+
 	mold -run make main
 
 shared/libmenulogic.so: makefile src/menulogic.h src/menulogic.c src/structs.h
@@ -110,9 +114,7 @@ shared/libcollider.so: makefile src/collider.h src/collider.c src/structs.h
 	$(call buildLib,collider)
 
 shared/libvisdebugger.so: makefile src/visdebugger.h src/visdebugger.c src/structs.h
-ifdef DEBUGGING
-		$(call buildLib,visdebugger)
-endif
+	$(call buildLib,visdebugger)
 
 shared/libstatemachine.so: makefile src/statemachine.h src/statemachine.c src/structs.h
 	$(call buildLib,statemachine)
