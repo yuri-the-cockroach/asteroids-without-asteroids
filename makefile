@@ -49,12 +49,6 @@ export LIBS += -lvisdebugger
 export OPTIMIZE = -O0 -g3 # Overrides previous optimization options
 endif # DEBUGGING
 
-ifdef SANITIZE
-export SANITIZER += -fno-omit-frame-pointer
-export SANITIZER += -fsanitize=address
-export SANITIZER += -fsanitize-address-use-after-return=always
-endif # SANITIZE
-
 ifdef BENCHMARKING
 export LIBS+= -lbenchmarking
 endif # BENCHMARKING
@@ -80,9 +74,6 @@ all:
 		shared/libasteroid.so \
 		shared/libbenchmarking.so
 	mold -run make main
-
-test:
-	echo $(SANITIZER)
 
 shared/libmenulogic.so: makefile src/menulogic.h src/menulogic.c src/structs.h
 	$(call buildLib,menulogic)
@@ -143,6 +134,9 @@ clean:
 debug:
 	gdb -i=mi main
 
-sanitize: clean SANITIZER += -fno-omit-frame-pointer
+sanitize: export SANITIZER += -fno-omit-frame-pointer
+sanitize: export SANITIZER += -fsanitize=address
+sanitize: export SANITIZER += -fsanitize-address-use-after-return=always
 
+sanitize: clean all
 # end
