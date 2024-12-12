@@ -1,4 +1,3 @@
-#ifdef DEBUGGING
 #include "visdebugger.h"
 #include "autils.h"
 
@@ -40,4 +39,3 @@ void DebugDisplayText(Vector2 pos, int fontSize, Color color,
     // Actually print to stderr
     DrawText(messageString, (int)pos.x, (int)pos.y, fontSize, color);
 }
-#endif // DEBUGGING
