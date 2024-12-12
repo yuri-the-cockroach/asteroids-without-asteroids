@@ -110,6 +110,8 @@ void DebugingKeyHandler(objTracker *tracker) {
             }
         }
 
+
+        #ifdef BENCHMARKING
         if (IsKeyPressed('B') && BENCH_LOG_FILE_PTR) {
             if (!BENCHRUNNING) {
                 BENCHRUNNING = true;
@@ -128,6 +130,7 @@ void DebugingKeyHandler(objTracker *tracker) {
                 }
             }
         }
+        #endif // BENCHMARKING
 
         if (IsKeyPressed('0')) {
             for (unsigned int i = 0; i < tracker->objListLen; i++) {
