@@ -1,13 +1,12 @@
 // system includes
 #include <stdlib.h>
-#include <errno.h>
 
 // local includes
 #include "collision.h"
 #include "autils.h"
 #include "structs.h"
 
-bool FindAnyCollision(ObjectTracker *tracker, ObjectWrap *first) {
+bool FindAnyCollision(objTracker *tracker, objWrap *first) {
     if (tracker->objListLen < 2)
         return false;
 
@@ -15,7 +14,7 @@ bool FindAnyCollision(ObjectTracker *tracker, ObjectWrap *first) {
         return false;
 
     for (unsigned int j = 0; j < tracker->objListLen; j++) {
-        ObjectWrap *second = tracker->objList[j];
+        objWrap *second = tracker->objList[j];
         if (tracker->objList[j] == NULL)
             continue;
 
@@ -31,13 +30,13 @@ bool FindAnyCollision(ObjectTracker *tracker, ObjectWrap *first) {
     return false;
 }
 
-void SortListByX(ObjectTracker *tracker) {
+void SortListByX(objTracker *tracker) {
     unsigned long i = 1;
     unsigned long gotToPos = 0;
     while (i < tracker->objListLen) {
 
-        ObjectWrap *prev = tracker->objList[i - 1];
-        ObjectWrap *current = tracker->objList[i];
+        objWrap *prev = tracker->objList[i - 1];
+        objWrap *current = tracker->objList[i];
         if (current->objPtr->position.x >= prev->objPtr->position.x) {
             if (i > gotToPos) {
                 gotToPos = i;
@@ -54,8 +53,8 @@ void SortListByX(ObjectTracker *tracker) {
     }
 }
 
-void FastFindCollisions(ObjectTracker *tracker, unsigned long index) {
-    ObjectWrap *current = tracker->objList[index];
+void FastFindCollisions(objTracker *tracker, unsigned long index) {
+    objWrap *current = tracker->objList[index];
     if (tracker->objListLen < 2)
         return;
 
@@ -65,7 +64,7 @@ void FastFindCollisions(ObjectTracker *tracker, unsigned long index) {
     if (current->request == DELETE)
         return;
 
-    ObjectWrap *next;
+    objWrap *next;
 
     for (unsigned long j = index + 1; j < tracker->objListLen; j++) {
         next = tracker->objList[j];
@@ -91,7 +90,7 @@ void FastFindCollisions(ObjectTracker *tracker, unsigned long index) {
     return;
 }
 
-void ApplyMassBasedRandRotation(ObjectWrap *wrap) {
+void ApplyMassBasedRandRotation(objWrap *wrap) {
 
     float massMod = 1 / wrap->collider.mass;
     float randomMod = (float)(GetRandomValue(-1000, 1000)) / 1000;
@@ -99,12 +98,12 @@ void ApplyMassBasedRandRotation(ObjectWrap *wrap) {
     wrap->objPtr->rotateSpeed = 2 * randomMod * massMod;
 }
 
-void Bounce(ObjectTracker *tracker, ObjectWrap *first, ObjectWrap *second) {
+void Bounce(objTracker *tracker, objWrap *first, objWrap *second) {
 
     UNUSED(tracker);
 
-    ObjectWrap *left, *right;
-    ObjectWrap *above, *below;
+    objWrap *left, *right;
+    objWrap *above, *below;
 
     float frameTime = GetFrameTime();
 
@@ -165,7 +164,7 @@ void Bounce(ObjectTracker *tracker, ObjectWrap *first, ObjectWrap *second) {
     return;
 }
 
-bool CheckIfCollide(ObjectWrap *first, ObjectWrap *second) {
+bool CheckIfCollide(objWrap *first, objWrap *second) {
     // This abomination will make the logic actually readable
     Vector2 firstStart = {
         first->objPtr->position.x +     // leftmost point of the collider
@@ -225,8 +224,8 @@ bool CheckIfCollide(ObjectWrap *first, ObjectWrap *second) {
     return false;
 }
 
-void GetShot(ObjectTracker *tracker, ObjectWrap *projectile,
-             ObjectWrap *victim) {
+void GetShot(objTracker *tracker, objWrap *projectile,
+             objWrap *victim) {
 
     projectile->request = DELETE;
     if (victim->objectType == PROJECTILE)
@@ -256,7 +255,7 @@ Collider InitCollider(float sizeMult,
     };
 }
 
-int CleanupLists(ObjectTracker *tracker) {
+int CleanupLists(objTracker *tracker) {
     for (unsigned long i = 0; i < tracker->objListLen; i++) {
         if (!tracker->objList[i])
             continue;
@@ -265,7 +264,7 @@ int CleanupLists(ObjectTracker *tracker) {
     return 0;
 }
 
-int UpdateCollider(ObjectWrap *wrap) {
+int UpdateCollider(objWrap *wrap) {
 
     float leftMostPoint = 10000;
     float rightMostPoint = -10000;
@@ -296,8 +295,8 @@ int UpdateCollider(ObjectWrap *wrap) {
     return 0;
 }
 
-void PlayerCollision(ObjectTracker *tracker, ObjectWrap *player,
-                     ObjectWrap *offender) {
+void PlayerCollision(objTracker *tracker, objWrap *player,
+                     objWrap *offender) {
     player->livesLeft--;
 
     if (!player->livesLeft) {

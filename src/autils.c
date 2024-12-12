@@ -52,11 +52,11 @@ long GetTimeMicS(void) {
     return tv.tv_sec * (long)1e6 + tv.tv_usec;
 }
 
-void CleanupMemory(ObjectTracker *tracker) {
+void CleanupMemory(objTracker *tracker) {
     unsigned long i = 0;
     unsigned long firstNull = MAX_OBJECT_COUNT;
     unsigned long nullCounter = 0;
-    ObjectWrap *current = 0;
+    objWrap *current = 0;
 
     while ( i < tracker->objListLen ) {
         current = tracker->objList[i];

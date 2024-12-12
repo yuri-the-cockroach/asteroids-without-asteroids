@@ -13,7 +13,7 @@
 // This will be adjusted by frametime, so it can be more than
 // BOUNCEBACK_MAX_FORCE
 
-void UpdateObjectPos(ObjectWrap *wrap) {
+void UpdateObjectPos(objWrap *wrap) {
     float frameTime = GetFrameTime();
     Vector2 adjustedSpeed = { wrap->objPtr->speed.x * frameTime,
                               wrap->objPtr->speed.y * frameTime };
@@ -54,7 +54,7 @@ void UpdateObjectPos(ObjectWrap *wrap) {
     wrap->objPtr->position.y = wrap->objPtr->position.y + adjustedSpeed.y;
 }
 
-void RotateObject(ObjectWrap *wrap, float rotateByDeg) {
+void RotateObject(objWrap *wrap, float rotateByDeg) {
 
     wrap->objPtr->heading += (rotateByDeg * GetFrameTime());
     wrap->objPtr->heading = RollOverFloat(wrap->objPtr->heading, 0.0f, PI * 2.0f);
@@ -84,9 +84,9 @@ Vector2 *ResizeShape(const Vector2 *vector, float size,
     return tempPShape;
 }
 
-ShapeStruct InitShape(const Vector2 *pointArray, unsigned int arrayLength,
+shape InitShape(const Vector2 *pointArray, unsigned int arrayLength,
                       float sizeMult) {
-    ShapeStruct toReturn = { sizeMult,
+    shape toReturn = { sizeMult,
                              arrayLength,
                              pointArray ? calloc(arrayLength, sizeof(Vector2)) : NULL,
                              ResizeShape(pointArray, sizeMult, arrayLength) };
@@ -98,9 +98,9 @@ ShapeStruct InitShape(const Vector2 *pointArray, unsigned int arrayLength,
 }
 
 
-ObjectStruct InitObject(ShapeStruct shape, Vector2 initPosition,
+object InitObject(shape shape, Vector2 initPosition,
                         Vector2 initSpeed, float rotSpeed) {
-    return (ObjectStruct){
+    return (object){
         rotSpeed, // Rotation speed
         0, // Starter heading
         initPosition, // Starting position of the object
@@ -109,7 +109,7 @@ ObjectStruct InitObject(ShapeStruct shape, Vector2 initPosition,
     };
 }
 
-void DeleteObjectStruct(ObjectStruct *self) {
+void DeleteObjectStruct(object *self) {
     free((void *)self->shape.points);
     free((void *)self->shape.refPoints);
     free((void *)self);

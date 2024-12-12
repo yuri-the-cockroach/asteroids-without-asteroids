@@ -1,11 +1,13 @@
+#include <raylib.h>
+
 #include "gamelogic.h"
 #include "asteroid.h"
 #include "autils.h"
 #include "structs.h"
 #include "visdebugger.h"
-#include <raylib.h>
+#include "menulogic.h"
 
-void OnPlayerAccellerate(ObjectStruct *object, float speed) {
+void OnPlayerAccellerate(object *object, float speed) {
     float mult_x = 1;
     float mult_y = 1;
 
@@ -28,7 +30,7 @@ void OnPlayerAccellerate(ObjectStruct *object, float speed) {
 
 
 #ifdef DEBUGGING
-void DebugingKeyHandler(ObjectTracker *tracker) {
+void DebugingKeyHandler(objTracker *tracker) {
 
     if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_C)) {
         LOG(DEBUG, "%s", "CTRL and C is pressed");
@@ -129,7 +131,7 @@ void DebugingKeyHandler(ObjectTracker *tracker) {
 
         if (IsKeyPressed('0')) {
             for (unsigned int i = 0; i < tracker->objListLen; i++) {
-                ObjectWrap *current = tracker->objList[i];
+                objWrap *current = tracker->objList[i];
                 if (!current || current == tracker->playerPtr)
                     continue;
                 current->request = DELETE;
@@ -141,7 +143,7 @@ void DebugingKeyHandler(ObjectTracker *tracker) {
 
         if (IsKeyPressed('-')) {
             if (tracker->objListLen > 1) {
-                ObjectWrap *toDelete =
+                objWrap *toDelete =
                     tracker->objList[tracker->objListLen - 1];
                 if (toDelete == tracker->playerPtr)
                     toDelete = tracker->objList[tracker->objListLen - 2];
@@ -152,7 +154,7 @@ void DebugingKeyHandler(ObjectTracker *tracker) {
 }
 #endif // DEBUGGING
 
-void ShipControlls(ObjectTracker *tracker) {
+void ShipControlls(objTracker *tracker) {
     if (IsKeyDown('W'))
         OnPlayerAccellerate(tracker->playerPtr->objPtr, PLAYER_MOVE_SPEED);
     if (IsKeyDown('S'))
@@ -220,15 +222,15 @@ void PlayerRuntimeControlls(ObjectTracker *tracker) {
         tracker->playerCamera.zoom + GetMouseWheelMove() / 10, 0.3f, 3);
 }
 
-void NewGame(ObjectTracker *tracker) {
+void NewGame(objTracker *tracker) {
     LAST_SHOT = 0;
     CreatePlayer(tracker, (Vector2){ WORLD_POS_MAX_X / 2.f,WORLD_POS_MAX_Y / 2.f  }, 0.5);
 }
 
-int SpawnAsteroidOnTime(ObjectTracker *tracker) {
+int SpawnAsteroidOnTime(objTracker *tracker) {
     if (NEXT_ASTEROID_SPAWN >= GAME_TIME_PASSED) return 0;
     LAST_ASTEROID_SPAWN = GAME_TIME_PASSED;
-    NEXT_ASTEROID_SPAWN = LAST_ASTEROID_SPAWN + ((2.f / ( logf((float)tracker->playerScore / 100.f + 1.2f))) - 1) / (float)CUR_DIFFICULTY;
+    NEXT_ASTEROID_SPAWN = LAST_ASTEROID_SPAWN + ((2.f / ( logf((float)tracker->playerScore / 100.f + 1.2f))) - 1);
     if  (!AsteroidSafeSpawn(tracker)) return -1;
     return 1;
 }

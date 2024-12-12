@@ -46,7 +46,7 @@ void DrawRectLineNotFucked(int x, int y, int width, int height, Color color) {
     return;
 }
 
-void DrawObject(ObjectWrap *wrap) {
+void DrawObject(objWrap *wrap) {
 
     #ifdef DEBUGGING
     if (VISUAL_DEBUG)
@@ -171,7 +171,7 @@ void DrawGrid2D(int dist, Color color) {
              WHITE);
 }
 
-void RunWorldRender(ObjectTracker *tracker) {
+void RunWorldRender(objTracker *tracker) {
     BeginMode2D(tracker->playerCamera);
 
     DrawRectangle(WORLD_POS_MIN_X,
@@ -196,7 +196,7 @@ void RunWorldRender(ObjectTracker *tracker) {
 
     int DrawingObjCount = 0;
     for (unsigned int i = 0; i < tracker->objListLen; i++) {
-        ObjectWrap *current = tracker->objList[i];
+        objWrap *current = tracker->objList[i];
 
         if (!current || !current->draw || current->request != UPDATE)
             continue;
@@ -225,7 +225,7 @@ void RunWorldRender(ObjectTracker *tracker) {
     EndMode2D();
 }
 
-void RunScreenRender(ObjectTracker *tracker) {
+void RunScreenRender(objTracker *tracker) {
 
     SCREEN_WIDTH = GetScreenWidth();
     SCREEN_HEIGHT = GetScreenHeight();
@@ -254,7 +254,7 @@ void RunScreenRender(ObjectTracker *tracker) {
     #endif // BENCHMARKING
 
     #ifdef DEBUGGING
-    ObjectStruct *object = tracker->playerPtr->objPtr;
+    object *object = tracker->playerPtr->objPtr;
 
     DebugDisplayText((Vector2){ 20, 110 },
                     18,

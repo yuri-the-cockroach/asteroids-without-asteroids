@@ -45,10 +45,10 @@ int StateMachine(void) {
     // long timerStartKeys = 0;
     #endif // BENCHMARKING
 
-    ObjectTracker *tracker = NULL;
+    objTracker *tracker = NULL;
 
-    struct menuParent mainMenu = refMainMenu;
-    struct menuParent pauseMenu = refPauseMenu;
+    const menuParent *curMenu = &refMainMenu;
+    int menuHighlighted = 0;
 
     while (true) {
 

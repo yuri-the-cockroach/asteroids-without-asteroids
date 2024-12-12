@@ -103,11 +103,14 @@ enum type {
 
 // -------------------- typedefs --------------------
 
-typedef struct tracker ObjectTracker;
-typedef struct ObjectWrap ObjectWrap;
-typedef struct ObjectStruct ObjectStruct;
-typedef struct ShapeStruct ShapeStruct;
-typedef struct Collider Collider;
+typedef struct obj_tracker_struct objTracker;
+typedef struct object_wrap_struct objWrap;
+typedef struct object_struct object;
+typedef struct shape_struct shape;
+typedef struct collider_struct collider;
+typedef struct menu_function_wrap_struct menuFunctionWrap;
+typedef struct menu_parent_struct menuParent;
+typedef struct menu_option_struct menuOption;
 
 
 // -------------------- CONSTANTS --------------------
@@ -205,65 +208,65 @@ static const Vector2 PROJECTILE_SHAPE_POINTS[] = {
 };
 
 // -------------------- structs --------------------
-struct ShapeStruct {
+
+struct shape_struct {
     float sizeMult;
     unsigned int arrayLength;
     Vector2 *points;
     Vector2 *refPoints;
 };
 
-struct ObjectStruct {
+struct object_struct {
     float rotateSpeed;
     float heading;
     Vector2 position;
     Vector2 speed;
-    ShapeStruct shape;
+    shape shape;
 };
 
-struct Collider {
+struct collider_struct {
     bool isCollidable;   // True if object's collision is enabled
     Rectangle collider;
     float mass;
-    void (*ActionOnCollision)(ObjectTracker *tracker, ObjectWrap *first, ObjectWrap *second);
+    void (*ActionOnCollision)(objTracker *tracker, objWrap *first, objWrap *second);
 };
 
-struct ObjectWrap {
+struct object_wrap_struct {
     enum type objectType;
     enum request request;   // What to do with this object on the next iteration
                             // will be called on it
     bool updatePosition;    // True if object's position needs to be updated
     bool draw;              // True if object needs to be drawn
     bool isRotatableByGame; // Constant rotation speed, if needed. Ignored if 0
-    ObjectStruct *objPtr;   // Pointer to the actuall object that is governed
+    object *objPtr;   // Pointer to the actuall object that is governed
 
-    Collider collider;
+    collider collider;
     int livesLeft;
 };
 
-struct tracker {
-    ObjectWrap *playerPtr;
+struct obj_tracker_struct {
+    objWrap *playerPtr;
     Camera2D playerCamera;
-    ObjectWrap **objList;
+    objWrap **objList;
     unsigned long objListLen;
     unsigned int playerScore;
 };
 
-struct menuOption {
+struct menu_function_wrap_struct {
+    void (*func)(void *args);
+    void *payload;
+};
+
+struct menu_option_struct {
     const char *restrict name;
-    void (*MenuAction) (void);
+    enum menuOptionType type;
+    const void *menuOptionData;
 };
 
-struct menuParent {
-    int selected;
+struct menu_parent_struct {
     int optionListLen;
-    struct menuOption *optionList;
+    struct menu_option_struct *optionList;
 };
-
-struct menuStack {
-    int stackSize;
-    struct menuParent *optionList;
-};
-
 
 // -------------------- end --------------------
 #endif // STRUCTS_H_

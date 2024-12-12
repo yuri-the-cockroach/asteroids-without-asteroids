@@ -43,7 +43,7 @@ void RunActionList(ObjectTracker *tracker) {
         // Check if there's any elements ahead at all. If not just decrement
         // the length of the list.
 
-        ObjectWrap *current = tracker->objList[i];
+        objWrap *current = tracker->objList[i];
         switch (current->request) {
 
             case CREATE:
@@ -82,9 +82,9 @@ void RunActionList(ObjectTracker *tracker) {
     CleanupMemory(tracker);
 }
 
-void UpdateObj(ObjectTracker *tracker, unsigned long index) {
+void UpdateObj(objTracker *tracker, unsigned long index) {
 
-    ObjectWrap *wrap = tracker->objList[index];
+    objWrap *wrap = tracker->objList[index];
     long start = 0;
 
     #ifdef BENCHMARKING
@@ -103,20 +103,20 @@ void UpdateObj(ObjectTracker *tracker, unsigned long index) {
 
 }
 
-ObjectTracker *InitTracker(void) {
-    ObjectTracker *tracker = calloc(1, sizeof(ObjectTracker));
-    tracker[0] = (ObjectTracker){
+objTracker *InitTracker(void) {
+    objTracker *tracker = calloc(1, sizeof(objTracker));
+    tracker[0] = (objTracker){
         NULL,
         { 0 },
-        (ObjectWrap **)calloc(MAX_OBJECT_COUNT, sizeof(ObjectWrap *)),
+        (objWrap **)calloc(MAX_OBJECT_COUNT, sizeof(objWrap*)),
         0,
         0
     };
     return tracker;
 }
 
-ObjectWrap InitWrap(void) {
-    return (ObjectWrap){
+objWrap InitWrap(void) {
+    return (objWrap){
         NOTYPE,
         IGNORE,
         false,
@@ -133,7 +133,7 @@ ObjectWrap InitWrap(void) {
     };
 }
 
-int AddWrapToList(ObjectTracker *tracker, ObjectWrap *wrap) {
+int AddWrapToList(objTracker *tracker, objWrap *wrap) {
 
     if (!wrap) {
         errno = EFAULT;
@@ -168,9 +168,9 @@ int AddWrapToList(ObjectTracker *tracker, ObjectWrap *wrap) {
 }
 
 // Pass the default speed, default rotation speed, default position
-void CreatePlayer(ObjectTracker *tracker, Vector2 initPosition, float size) {
+void CreatePlayer(objTracker *tracker, Vector2 initPosition, float size) {
 
-    ObjectWrap *player = malloc(sizeof(ObjectWrap));
+    objWrap *player = malloc(sizeof(objWrap));
     player[0] = InitWrap();
     player->objectType = PLAYER;
 
@@ -179,7 +179,7 @@ void CreatePlayer(ObjectTracker *tracker, Vector2 initPosition, float size) {
         return;
     }
 
-    ObjectStruct *objPtr = malloc(sizeof(ObjectStruct));
+    object *objPtr = malloc(sizeof(object));
     objPtr[0] =
         InitObject(InitShape(PLAYER_SHAPE_POINTS,
                              sizeof(PLAYER_SHAPE_POINTS) / sizeof(Vector2),
@@ -211,9 +211,9 @@ void CreatePlayer(ObjectTracker *tracker, Vector2 initPosition, float size) {
 }
 
 
-void CreateProjectile(ObjectTracker *tracker, ObjectWrap *parent) {
+void CreateProjectile(objTracker *tracker, objWrap *parent) {
 
-    ObjectWrap *projectile = malloc(sizeof(ObjectWrap));
+    objWrap *projectile = malloc(sizeof(objWrap));
     projectile[0] = InitWrap();
     if (AddWrapToList(tracker, projectile)) {
         errno = 0;
@@ -222,7 +222,7 @@ void CreateProjectile(ObjectTracker *tracker, ObjectWrap *parent) {
         return;
     }
 
-    ObjectStruct *objPtr = malloc(sizeof(ObjectStruct));
+    object *objPtr = malloc(sizeof(object));
     objPtr[0] = InitObject(
         InitShape(PROJECTILE_SHAPE_POINTS,
                   sizeof(PROJECTILE_SHAPE_POINTS) / sizeof(Vector2),
@@ -249,17 +249,17 @@ void CreateProjectile(ObjectTracker *tracker, ObjectWrap *parent) {
 
 }
 
-void DeleteObjWrap(ObjectWrap *wrap) {
+void DeleteObjWrap(objWrap *wrap) {
     DeleteObjectStruct(wrap->objPtr);
     free((void *)wrap);
 }
 
-void DeleteTrackedObject(ObjectTracker *tracker, unsigned long index) {
+void DeleteTrackedObject(objTracker *tracker, unsigned long index) {
     DeleteObjWrap((void *)tracker->objList[index]);
     tracker->objList[index] = 0;
 }
 
-void DeleteTracker(ObjectTracker *tracker) {
+void DeleteTracker(objTracker *tracker) {
     if ( !tracker ) return;
     CleanupMemory(tracker);
     for ( unsigned long i = 0; i < tracker->objListLen; i++ ) {

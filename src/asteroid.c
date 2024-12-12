@@ -12,8 +12,8 @@
 #include "objecthandler.h"
 #include "structs.h"
 
-ObjectWrap *AsteroidSafeSpawn(ObjectTracker *tracker) {
-    ObjectWrap *wrap = CreateAsteroid(
+objWrap *AsteroidSafeSpawn(objTracker *tracker) {
+    objWrap *wrap = CreateAsteroid(
         tracker,
         (Vector2){ 0, 0 },
         (Vector2){0, 0},
@@ -72,11 +72,11 @@ ObjectWrap *AsteroidSafeSpawn(ObjectTracker *tracker) {
 // * Adding it into the tracked list
 // * Giving values to anything that needs them
 // Returnes a ready to use object, that needs no tweaks to work.
-ObjectWrap *CreateAsteroid(ObjectTracker *tracker, Vector2 initPosition,
+objWrap *CreateAsteroid(objTracker *tracker, Vector2 initPosition,
                            Vector2 initSpeed, float constRotationSpeed,
                            float size) {
 
-    ObjectWrap *asteroid = malloc(sizeof(ObjectWrap));
+    objWrap *asteroid = malloc(sizeof(objWrap));
     asteroid[0] = InitWrap();
     asteroid[0].objectType = ASTEROID;
     if (AddWrapToList(tracker, asteroid)) {
@@ -122,7 +122,7 @@ Vector2 *GenerateAsteroidShape(void) {
     return CornerList;
 }
 
-int Separate(ObjectTracker *tracker, ObjectWrap *parent) {
+int Separate(objTracker *tracker, objWrap *parent) {
 
     const float separationAddsSpeed = 50;
 
@@ -138,13 +138,13 @@ int Separate(ObjectTracker *tracker, ObjectWrap *parent) {
         return 0;
     }
 
-    ObjectWrap *asteroidLeft = CreateAsteroid(
+    objWrap *asteroidLeft = CreateAsteroid(
         tracker,
         (Vector2){ parent->objPtr->position.x, parent->objPtr->position.y },
         (Vector2){ parent->objPtr->speed.x, parent->objPtr->speed.y },
         -parent->objPtr->rotateSpeed,
         1);
-    ObjectWrap *asteroidRight = CreateAsteroid(
+    objWrap *asteroidRight = CreateAsteroid(
         tracker,
         (Vector2){ parent->objPtr->position.x, parent->objPtr->position.y },
         (Vector2){ parent->objPtr->speed.x, parent->objPtr->speed.y },
