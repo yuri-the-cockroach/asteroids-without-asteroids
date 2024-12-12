@@ -55,7 +55,7 @@ int main(int argc, char **argv) {
     // Handle the interseption of signals
     signal(SIGINT, SigIntHandler);
     signal(SIGTERM, SigIntHandler);
-    signal(SIGSEGV, SigSegvHandel);
+    // signal(SIGSEGV, SigSegvHandel);
 
     StateMachine();
     fclose(LOG_FILE_PTR);
