@@ -10,6 +10,7 @@
 #include "logger.h"
 #include "objectlogic.h"
 #include "structs.h"
+
 #ifdef BENCHMARKING
     #include "benchmarking.h"
 #endif // BENCHMARKING
@@ -85,14 +86,9 @@ void RunActionList(objTracker *tracker) {
 void UpdateObj(objTracker *tracker, unsigned long index) {
 
     objWrap *wrap = tracker->objList[index];
-    long start = 0;
 
-    #ifdef BENCHMARKING
-        if ( BENCHRUNNING ) start = GetTimeMicS();
-        if ( wrap->collider.isCollidable)
-            FastFindCollisions(tracker, index);
-        if ( BENCHRUNNING ) BENCH_COLLIDER_TIME += (GetTimeMicS() - start);
-    #endif
+    BENCH(if ( wrap->collider.isCollidable)
+        FastFindCollisions(tracker, index);, "Search for collisions")
 
     if (wrap->isRotatableByGame) {
         RotateObject(wrap, (wrap->objPtr->rotateSpeed));
