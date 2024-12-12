@@ -8,6 +8,33 @@
 
 #define UNUSED(x) (void)(x)
 
+#pragma GCC diagnostic ignored "-Wunused-macros"
+#define BENCH(a, str) a
+
+#ifdef BENCHMARKING
+
+#pragma GCC diagnostic ignored "-Wmacro-redefined"
+#define BENCH(a, str) \
+{ \
+    long start = 0; \
+    BenchStart(&start);\
+    a                   \
+    BenchEnd(&start, str);\
+}
+#endif
+
+#pragma GCC diagnostic ignored "-Wunused-macros"
+#define DEBUG(a) a
+
+#ifdef BENCHMARKING
+
+#pragma GCC diagnostic ignored "-Wmacro-redefined"
+#define DEBUG(a) \
+a
+#endif
+
+
+
 // Clap float from min to max
 // I hate this code
 // but it's good in assembly
