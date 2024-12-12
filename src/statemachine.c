@@ -39,10 +39,8 @@ void RunConfig(void) {
 
 int StateMachine(void) {
     #ifdef BENCHMARKING
-    long timerStartTotalCycle = 0;
-    long timerWorldRender = 0;
-    long timerScreenRender = 0;
-    // long timerStartKeys = 0;
+        long timerStartTotalCycle = 0;
+        // long timerStartKeys = 0;
     #endif // BENCHMARKING
 
     objTracker *tracker = NULL;
@@ -85,13 +83,13 @@ int StateMachine(void) {
 
             case RUNNING: {
 
-                LOG(BENCH, "%s", "<--- Started frame cycle --->");
                 #ifdef BENCHMARKING
+                    LOG(BENCH, "%s", "<--- Started frame cycle --->");
                     BenchStart(&timerStartTotalCycle);
                 #endif // BENCHMARKING
 
-                SPEED_PREV = tracker->playerPtr->objPtr->speed;
                 #ifdef DEBUGGING
+                    SPEED_PREV = tracker->playerPtr->objPtr->speed;
                     DebugingKeyHandler(tracker);
                     if (!DEBUG_PAUSE) {
                         SpawnAsteroidOnTime(tracker);
@@ -109,24 +107,9 @@ int StateMachine(void) {
                 ShipControlls(tracker);
 
                 // Logic
-
-
-
                 // Rendering
-
-                #ifdef BENCHMARKING
-                    BenchStart(&timerWorldRender);
-                    RunWorldRender(tracker);
-                    BenchEnd(&timerWorldRender, "World Renderer");
-                    BenchStart(&timerScreenRender);
-                    RunScreenRender(tracker);
-                    BenchEnd(&timerScreenRender, "Screen Renderer");
-                    BenchEnd(&timerStartTotalCycle, "Total cycle");
-                    LOG(BENCH, "%s", "<--- Ended frame cycle --->\n");
-                #else
-                    RunWorldRender(tracker);
-                    RunScreenRender(tracker);
-                #endif // BENCHMARKING
+                BENCH(RunWorldRender(tracker);, "World Renderer")
+                BENCH(RunScreenRender(tracker);, "Screen Renderer")
 
                 break;
             }
