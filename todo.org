@@ -21,6 +21,18 @@ Currentrly doing:
   - [X] Make game world bigger
   - [X] Automatic asteroid spawn based on the difficulty and time alive
 
+- [ ] Sounds
+  - [ ] Asteroid hit
+  - [ ] Player shot
+  - [ ] Player moving
+  - [ ] Player hit
+
+- [ ] Visual effects
+  - [ ] Asteroid hit
+  - [ ] Player shot
+  - [ ] Player moving
+  - [ ] Player hit
+
 - [-] Collisions
   - [X] Base system implementation
   - [X] Faster collision algorithm
