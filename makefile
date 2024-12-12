@@ -133,8 +133,8 @@ main: makefile main.c src/structs.h
 run: main
 	./main -lc 2 -lf 7
 clean:
-	if [ -s object-files ]; then rm object-files/*.o; fi
-	if [ -s shared ]; then rm shared/*.so; fi
+	if [[ -e object-files && -s object-files ]]; then rm object-files/*.o; fi
+	if [[ -e shared && -s shared ]]; then rm shared/*.so; fi
 	if [ -e main ]; then rm main; fi
 
 debug:
