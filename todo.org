@@ -2,11 +2,11 @@
 
 Currentrly doing:
 
-- [-] Menues
+- [X] Menues
   - [X] Start Screen
   - [X] Pause
   - [X] Game-over screen
-  - [ ] Difficulty choosing
+  - [X] Difficulty choosing
 
 
 - [X] Rendering
@@ -40,7 +40,7 @@ Currentrly doing:
 
 - [X] Base logging system
 
-- [ ] Review the code and do a refactor
+- [-] Review the code and do a refactor
   - [ ] main.c
   - [ ] src/asteroid.c
   - [ ] src/asteroid.h
@@ -52,8 +52,8 @@ Currentrly doing:
   - [ ] src/gamelogic.h
   - [ ] src/logger.c
   - [ ] src/logger.h
-  - [ ] src/menulogic.c
-  - [ ] src/menulogic.h
+  - [X] src/menulogic.c
+  - [X] src/menulogic.h
   - [ ] src/objecthandler.c
   - [ ] src/objecthandler.h
   - [ ] src/objectlogic.c
