@@ -268,6 +268,12 @@ void RunScreenRender(objTracker *tracker) {
                     "Acceleration: %f",
                     object->speed.y - SPEED_PREV.y);
 
+    DebugDisplayText((Vector2){ 20, 150 },
+                    18,
+                    WHITE,
+                    "Cur Difficulty: %d",
+                    CUR_DIFFICULTY);
+
     DebugDisplayText((Vector2){ 20, 20 },
                     18,
                     WHITE,
@@ -283,8 +289,7 @@ void RunScreenRender(objTracker *tracker) {
     DrawFPS(0, 0);
 }
 
-void RunMenuRender(struct menuParent *menu, const char *restrict title,
-                   int subTitleLinesNum, ...) {
+void RunMenuRender(const menuParent *menu, int menuHighlighted, const char *restrict title, int subTitleLinesNum, ...) {
     const int titleFontSize = 42;
     const int fontSize = 32;
     int start = SCREEN_HEIGHT / 2 - menu->optionListLen * fontSize / 2;
@@ -318,7 +323,7 @@ void RunMenuRender(struct menuParent *menu, const char *restrict title,
     va_end(argptr);
 
     for (int i = 0; i < menu->optionListLen; i++) {
-        if (i == menu->selected) {
+        if (i == menuHighlighted) {
             DrawText(menu->optionList[i].name,
                      (SCREEN_WIDTH - MeasureText(menu->optionList[i].name, fontSize)) /
                          2,

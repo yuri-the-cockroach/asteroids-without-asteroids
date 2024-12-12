@@ -62,8 +62,8 @@ int StateMachine(void) {
             }
 
             case MAIN_MENU: {
-                MenuControlls(&mainMenu);
-                RunMenuRender(&mainMenu, "ASTEROIDS WITHOUT ASTEROIDS", 0);
+                curMenu = MenuControlls(curMenu, &menuHighlighted);
+                RunMenuRender(curMenu, menuHighlighted, "ASTEROIDS WITHOUT ASTEROIDS", 0);
                 break;
             }
 
@@ -78,8 +78,8 @@ int StateMachine(void) {
             case GAME_OVER: {
                 char msg[128] = "";
                 sprintf(msg, "Your score: %d", tracker->playerScore);
-                MenuControlls(&pauseMenu);
-                RunMenuRender(&pauseMenu, "GAME OVER", 1, msg);
+                MenuControlls(curMenu, &menuHighlighted);
+                RunMenuRender(curMenu, menuHighlighted, "GAME OVER", 1, msg);
                 break;
             }
 
@@ -138,14 +138,15 @@ int StateMachine(void) {
                 #endif // DEBUGGING
 
                 // Controlls
+                curMenu = &refPauseMenu;
                 PlayerRuntimeControlls(tracker);
-                MenuControlls(&pauseMenu);
+                MenuControlls(curMenu, &menuHighlighted);
 
                 // Rendering
                 RunWorldRender(tracker);
                 RunScreenRender(tracker);
 
-                RunMenuRender(&pauseMenu, "GAME PAUSED", 0);
+                RunMenuRender(curMenu, menuHighlighted, "GAME PAUSED", 0);
                 break;
             }
 
@@ -155,9 +156,11 @@ int StateMachine(void) {
             }
 
             case CLEANUP: {
+                curMenu = &refMainMenu;
                 DeleteTracker(tracker);
                 tracker = 0;
                 if ( NEXT_STATE == NOOP ) GAME_STATE = EXIT;
+                GAME_TIME_PASSED = 0;
                 GAME_STATE = NEXT_STATE;
                 NEXT_STATE = NOOP;
                 break;

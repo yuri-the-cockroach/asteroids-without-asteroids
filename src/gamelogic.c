@@ -172,24 +172,30 @@ void ShipControlls(objTracker *tracker) {
     }
 }
 
-void MenuControlls(struct menuParent *menu) {
+const menuParent *MenuControlls(const menuParent *menu, int *menuHighlighted) {
     if (IsKeyPressed('W')) {
-        menu->selected =
-            RollOverInt((menu->selected - 1), 0, menu->optionListLen - 1);
-        LOG(DEBUG, "Menu->selected == %d", menu->selected);
+        *menuHighlighted =
+            RollOverInt((*menuHighlighted - 1), 0, menu->optionListLen - 1);
+        LOG(DEBUG, "*menuHighlighted == %d", *menuHighlighted);
     }
 
     if (IsKeyPressed('S')) {
-        menu->selected =
-            RollOverInt((menu->selected + 1), 0, menu->optionListLen - 1);
-        LOG(DEBUG, "Menu->selected == %d", menu->selected);
+        *menuHighlighted =
+            RollOverInt((*menuHighlighted + 1), 0, menu->optionListLen - 1);
+        LOG(DEBUG, "*menuHighlighted == %d", *menuHighlighted);
     }
 
-    if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE))
-        SelectCurrent(menu);
+    if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)) {
+
+        const int selected = *menuHighlighted;
+        *menuHighlighted = 0;
+        return SelectCurrent(menu, selected);
+    }
+
+    return menu;
 }
 
-void PlayerRuntimeControlls(ObjectTracker *tracker) {
+void PlayerRuntimeControlls(objTracker *tracker) {
 
     if (IsKeyPressed('C'))
         CAMERA_FOLLOW = !CAMERA_FOLLOW;
