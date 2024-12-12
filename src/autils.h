@@ -24,14 +24,12 @@
 #endif
 
 #pragma GCC diagnostic ignored "-Wunused-macros"
-#define DEBUG(a) a
 
-#ifdef BENCHMARKING
-
+#define DEBUG(a)
+#ifdef DEBUGGING
 #pragma GCC diagnostic ignored "-Wmacro-redefined"
-#define DEBUG(a) \
-a
-#endif
+#define DEBUG(a) a
+#endif // DEBUGGING
 
 
 
