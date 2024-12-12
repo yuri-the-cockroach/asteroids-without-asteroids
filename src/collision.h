@@ -16,9 +16,6 @@ void SortListByX(objTracker *tracker);
 // An algorithm that shoud in theory be a lot faster
 void FastFindCollisions(objTracker *tracker, unsigned long index);
 
-// Collision checking
-void FindCollisions(objTracker *tracker, objWrap *wrap);
-
 // Changes object's rotation taking it's mass into account
 void ApplyMassBasedRandRotation(objWrap *wrap);
 
@@ -32,24 +29,6 @@ void Bounce(objTracker *tracker, objWrap *first, objWrap *second);
 void GetShot(objTracker *tracker, objWrap *first, objWrap *second);
 
 collider InitCollider(float sizeMult, void (*ActionOnCollision)(objTracker *tracker, objWrap *first, objWrap *second));
-
-// Push to the end of list
-// Return value can be -1 unable to push
-int Push(collider *parent, objWrap *wrap);
-
-// Find the entry in the list
-// Return value can be -1 if not found
-int FindInList(collider *parent, objWrap *wrap);
-
-// Pop entry from the list
-// Return value CAN BE NULL if not found
-objWrap* Pop(collider *parent, int index);
-
-// Clear the list
-int ClearList(collider *parent);
-
-// Clean all the lists
-int CleanupLists(objTracker *tracker);
 
 int UpdateCollider(objWrap *wrap);
 

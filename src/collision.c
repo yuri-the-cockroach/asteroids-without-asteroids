@@ -255,15 +255,6 @@ collider InitCollider(float sizeMult,
     };
 }
 
-int CleanupLists(objTracker *tracker) {
-    for (unsigned long i = 0; i < tracker->objListLen; i++) {
-        if (!tracker->objList[i])
-            continue;
-        ClearList(&tracker->objList[i]->collider);
-    }
-    return 0;
-}
-
 int UpdateCollider(objWrap *wrap) {
 
     float leftMostPoint = 10000;

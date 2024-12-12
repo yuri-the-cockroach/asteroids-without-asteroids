@@ -25,9 +25,6 @@ object InitObject(shape shape, Vector2 initPosition,
                         Vector2 initSpeed,
                         float rotSpeed);
 
-// Free the ShapeStruct and cleanup
-void DeleteShapeStruct(shape *self);
-
 // Free the ObjectStruct and cleanup
 void DeleteObjectStruct(object *self);
 
