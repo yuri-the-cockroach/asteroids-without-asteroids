@@ -42,15 +42,22 @@ export LIBS+= -lasteroid
 
 # Define these to enable debugging and benchmarking respectively
 
+# SANITIZE will be read from user env
+ifdef SANITIZE
+export SANITIZER += -fno-omit-frame-pointer
+export SANITIZER += -fsanitize=address
+export SANITIZER += -fsanitize-address-use-after-return=always
+endif # SANITIZE
+
 # DEBUGGING will be read from user env
-ifdef DEBUGGING
+ifdef DEBUG
 export DEBUGGING = -DDEBUGGING
 export LIBS += -lvisdebugger
 export OPTIMIZE = -O0 -g3 # Overrides previous optimization options
 endif # DEBUGGING
 
 # BENCHMARKING will be read from user env
-ifdef BENCHMARKING
+ifdef BENCH
 export BENCHMARKING = -DBENCHMARKING
 export LIBS+= -lbenchmarking
 endif # BENCHMARKING
@@ -140,9 +147,4 @@ clean:
 debug:
 	gdb -i=mi main
 
-sanitize: export SANITIZER += -fno-omit-frame-pointer
-sanitize: export SANITIZER += -fsanitize=address
-sanitize: export SANITIZER += -fsanitize-address-use-after-return=always
-
-sanitize: clean all
 # end
