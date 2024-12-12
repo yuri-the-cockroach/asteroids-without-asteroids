@@ -41,15 +41,17 @@ export LIBS+= -lmenulogic
 export LIBS+= -lasteroid
 
 # Define these to enable debugging and benchmarking respectively
-export DEBUGGING = -DDEBUGGING
-export BENCHMARKING = -DBENCHMARKING
 
+# DEBUGGING will be read from user env
 ifdef DEBUGGING
+export DEBUGGING = -DDEBUGGING
 export LIBS += -lvisdebugger
 export OPTIMIZE = -O0 -g3 # Overrides previous optimization options
 endif # DEBUGGING
 
+# BENCHMARKING will be read from user env
 ifdef BENCHMARKING
+export BENCHMARKING = -DBENCHMARKING
 export LIBS+= -lbenchmarking
 endif # BENCHMARKING
 
