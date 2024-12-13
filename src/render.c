@@ -239,7 +239,8 @@ void RunScreenRender(objTracker *tracker) {
     tracker->playerCamera.offset.x = (float)SCREEN_WIDTH / 2;
     tracker->playerCamera.offset.y = (float)SCREEN_HEIGHT / 2;
 
-    DisplayText((Vector2){ 20, 50 },
+    if ( tracker->playerPtr )
+        DisplayText((Vector2){ 20, 50 },
                 24,
                 RED,
                 "LIVES LEFT: %d",
@@ -261,6 +262,7 @@ void RunScreenRender(objTracker *tracker) {
     #endif // BENCHMARKING
 
     #ifdef DEBUGGING
+    if ( tracker->playerPtr ) {
     object *object = tracker->playerPtr->objPtr;
 
     DebugDisplayText((Vector2){ 20, 110 },
@@ -274,6 +276,8 @@ void RunScreenRender(objTracker *tracker) {
                     WHITE,
                     "Acceleration: %f",
                     object->speed.y - SPEED_PREV.y);
+
+    }
 
     DebugDisplayText((Vector2){ 20, 150 },
                     18,

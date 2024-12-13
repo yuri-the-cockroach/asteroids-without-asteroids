@@ -181,6 +181,8 @@ void DebugingKeyHandler(objTracker *tracker) {
 #endif // DEBUGGING
 
 void ShipControlls(objTracker *tracker) {
+
+    if ( !tracker->playerPtr ) return;
     if (IsKeyDown('W'))
         OnPlayerAccellerate(tracker->playerPtr->objPtr, PLAYER_MOVE_SPEED);
     if (IsKeyDown('S'))
@@ -223,7 +225,7 @@ const menuParent *MenuControlls(const menuParent *menu, int *menuHighlighted) {
 
 void PlayerRuntimeControlls(objTracker *tracker) {
 
-    if (IsKeyPressed('C'))
+    if (tracker->playerPtr && IsKeyPressed('C'))
         CAMERA_FOLLOW = !CAMERA_FOLLOW;
 
     if (IsKeyPressed(KEY_ESCAPE)) {
@@ -246,7 +248,7 @@ void PlayerRuntimeControlls(objTracker *tracker) {
             mouseDelta.y / tracker->playerCamera.zoom;
     }
 
-    if (CAMERA_FOLLOW) {
+    if (tracker->playerPtr && CAMERA_FOLLOW) {
         tracker->playerCamera.target.x = tracker->playerPtr->objPtr->position.x;
         tracker->playerCamera.target.y = tracker->playerPtr->objPtr->position.y;
     }

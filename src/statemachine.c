@@ -88,19 +88,14 @@ int StateMachine(void) {
                     BenchStart(&timerStartTotalCycle);
                 #endif // BENCHMARKING
 
-                #ifdef DEBUGGING
-                    SPEED_PREV = tracker->playerPtr->objPtr->speed;
+                    if (tracker->playerPtr)
+                        SPEED_PREV = tracker->playerPtr->objPtr->speed;
                     DebugingKeyHandler(tracker);
-                    if (!DEBUG_PAUSE) {
-                        SpawnAsteroidOnTime(tracker);
+                    DEBUG(if (!DEBUG_PAUSE) {)
+                        if (tracker->playerPtr) SpawnAsteroidOnTime(tracker);
                         RunActionList(tracker);
                         GAME_TIME_PASSED += GetFrameTime();
-                    }
-                #else
-                    SpawnAsteroidOnTime(tracker);
-                    RunActionList(tracker);
-                    GAME_TIME_PASSED += GetFrameTime();
-                #endif // DEBUGGING
+                    DEBUG(})
 
                 // Controlls
                 PlayerRuntimeControlls(tracker);
