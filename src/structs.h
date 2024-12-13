@@ -148,6 +148,7 @@ static const float ASTEROID_HEIGHT_VARIATION = 15;
 
 // Debugging vars
 # ifdef DEBUGGING
+    extern objWrap *lastDragged;
     extern Vector2 SPEED_PREV;
     extern bool DEBUG_PAUSE;
     extern bool VISUAL_DEBUG;
