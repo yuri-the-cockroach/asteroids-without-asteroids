@@ -32,6 +32,11 @@ void TriggerMainMenu(void *args) {
     NEXT_STATE = MAIN_MENU;
 }
 
+void TriggerTesting(void *args) {
+    UNUSED(args);
+    GAME_STATE = TESTING;
+}
+
 void TriggerExitGame(void *args) {
     UNUSED(args);
     GAME_STATE = CLEANUP;

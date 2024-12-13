@@ -19,6 +19,7 @@ void TriggerExitGame(void *args);
 void TriggerMainMenu(void *args);
 
 void TriggerRestart(void *args);
+void TriggerTesting(void *args);
 
 // Get the entry from the top of the stack without removing it from the stack
 
