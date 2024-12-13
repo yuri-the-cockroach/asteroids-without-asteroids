@@ -60,9 +60,10 @@ objWrap *AsteroidSafeSpawn(objTracker *tracker) {
 
     Vector2 astPos = wrap->objPtr->position;
     float gamma = atan2f(playerPos.y - astPos.y, playerPos.x - astPos.x);
+    if ( !tracker->playerPtr ) gamma = GetRandomFloat(0, PI);
     wrap->objPtr->speed = (Vector2){
-         GetRandomFloat(-20, 20) + cosf(gamma) * ( GetRandomFloat(20, 100) ),
-         GetRandomFloat(-20, 20) + sinf(gamma) * ( GetRandomFloat(20, 100) )
+         cosf(gamma) * ( GetRandomFloat(-500, 500) ),
+         sinf(gamma) * ( GetRandomFloat(-500, 500) )
     };
     return wrap;
 }
