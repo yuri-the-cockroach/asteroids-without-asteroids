@@ -16,6 +16,9 @@ void SortListByX(objTracker *tracker);
 // An algorithm that shoud in theory be a lot faster
 void FastFindCollisions(objTracker *tracker, unsigned long index);
 
+// Find an object that ocupies pos
+objWrap *FindCollisionPos(objTracker *tracker, Vector2 pos);
+
 // Changes object's rotation taking it's mass into account
 void ApplyMassBasedRandRotation(objWrap *wrap);
 
