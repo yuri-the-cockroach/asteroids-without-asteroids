@@ -61,7 +61,13 @@ int StateMachine(void) {
 
             case MAIN_MENU: {
                 curMenu = MenuControlls(curMenu, &menuHighlighted);
-                RunMenuRender(curMenu, menuHighlighted, "ASTEROIDS WITHOUT ASTEROIDS", 0);
+                RunMenuRender(curMenu, menuHighlighted, 0);
+                break;
+            }
+
+            case TESTING: {
+                tracker = InitTracker();
+                GAME_STATE = RUNNING;
                 break;
             }
 

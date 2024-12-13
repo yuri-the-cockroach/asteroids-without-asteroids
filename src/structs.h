@@ -38,7 +38,8 @@ enum game_state {
     START_NEW = 2,
     GAME_OVER = 3,
     RUNNING   = 4,
-    PAUSE     = 5,
+    TESTING   = 5,
+    PAUSE     = 6,
     EXIT      = -1,
     CLEANUP   = -2,
     NOOP      = -255
