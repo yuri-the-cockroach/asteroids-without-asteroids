@@ -1,4 +1,5 @@
 #include <raylib.h>
+#include <string.h>
 
 #include "gamelogic.h"
 #include "asteroid.h"
@@ -213,8 +214,13 @@ const menuParent *MenuControlls(const menuParent *menu, int *menuHighlighted) {
         LOG(DEBUG, "*menuHighlighted == %d", *menuHighlighted);
     }
 
-    if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)) {
+    // strcmp result is inverted, because reasons I guess...
+    if (IsKeyPressed(KEY_ESCAPE) && !strcmp(menu->name, refDifficultyMenu.name)) {
+        *menuHighlighted = 0;
+        return &refMainMenu;
+    }
 
+    if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)) {
         const int selected = *menuHighlighted;
         *menuHighlighted = 0;
         return SelectCurrent(menu, selected);
