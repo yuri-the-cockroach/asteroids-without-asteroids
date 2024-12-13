@@ -181,10 +181,6 @@ void RunWorldRender(objTracker *tracker) {
                   (Color){ 18, 18, 18, 255 });
     DrawGrid2D(200, (Color){ 38, 38, 38, 255 });
 
-    if (tracker->objListLen == 0) {
-        LOG(TRACE, "%s", "Object list is empty. Not rendering anything");
-        return;
-    }
 
     Vector2 screenStart = {
         tracker->playerCamera.target.x - tracker->playerCamera.offset.x / tracker->playerCamera.zoom,
