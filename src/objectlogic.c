@@ -14,6 +14,8 @@
 // BOUNCEBACK_MAX_FORCE
 
 void UpdateObjectPos(objWrap *wrap) {
+    const float PUSHBACK_STEP = 1.f;
+    const float MAX_PUSHBACK_SPEED = 200.f;
     float frameTime = GetFrameTime();
     Vector2 adjustedSpeed = { wrap->objPtr->speed.x * frameTime,
                               wrap->objPtr->speed.y * frameTime };
@@ -35,17 +37,34 @@ void UpdateObjectPos(objWrap *wrap) {
     }
 
 
-    if (wrap->objPtr->position.x + wrap->collider.collider.x < WORLD_POS_MIN_X && wrap->objPtr->speed.x < 0)
-        wrap->objPtr->speed.x *= -1;
+    if (wrap->objPtr->position.x + wrap->collider.collider.x <= WORLD_POS_MIN_X ) {
+        wrap->objPtr->speed.x *= wrap->objPtr->speed.x < 0 ? -1 : 1;
+        // if (wrap->objPtr->position.x + wrap->collider.collider.x + wrap->collider.collider.width < WORLD_POS_MIN_X)
+            wrap->objPtr->speed.x += wrap->objPtr->speed.x < MAX_PUSHBACK_SPEED ? PUSHBACK_STEP : 0 ;
 
-    if (wrap->objPtr->position.y + wrap->collider.collider.y < WORLD_POS_MIN_Y && wrap->objPtr->speed.y < 0)
-        wrap->objPtr->speed.y *= -1;
+    }
 
-    if (wrap->objPtr->position.x > WORLD_POS_MAX_X - (wrap->collider.collider.x + wrap->collider.collider.height) && wrap->objPtr->speed.x > 0)
-        wrap->objPtr->speed.x *= -1;
 
-    if (wrap->objPtr->position.y > WORLD_POS_MAX_Y - (wrap->collider.collider.y + wrap->collider.collider.height) && wrap->objPtr->speed.y > 0)
-        wrap->objPtr->speed.y *= -1;
+    if (wrap->objPtr->position.y + wrap->collider.collider.y <= WORLD_POS_MIN_Y) {
+        wrap->objPtr->speed.y *= wrap->objPtr->speed.y < 0 ? -1 : 1;
+        // if (wrap->objPtr->position.y + wrap->collider.collider.y + wrap->collider.collider.height < WORLD_POS_MIN_Y)
+            wrap->objPtr->speed.y += wrap->objPtr->speed.y < MAX_PUSHBACK_SPEED  ? PUSHBACK_STEP : 0 ;
+    }
+
+    if (wrap->objPtr->position.x >= WORLD_POS_MAX_X - (wrap->collider.collider.x + wrap->collider.collider.width) ) {
+        wrap->objPtr->speed.x *= wrap->objPtr->speed.x > 0 ? -1 : 1;
+        // if (wrap->objPtr->position.x - wrap->collider.collider.x > WORLD_POS_MAX_X)
+            wrap->objPtr->speed.x += wrap->objPtr->speed.x > -MAX_PUSHBACK_SPEED ? -PUSHBACK_STEP : 0 ;
+
+    }
+
+    if (wrap->objPtr->position.y >= WORLD_POS_MAX_Y - (wrap->collider.collider.y + wrap->collider.collider.height)) {
+        wrap->objPtr->speed.y *= wrap->objPtr->speed.y > 0 ? -1 : 1;
+        // if (wrap->objPtr->position.y - wrap->collider.collider.y  > WORLD_POS_MAX_Y)
+            wrap->objPtr->speed.y += wrap->objPtr->speed.y > -MAX_PUSHBACK_SPEED ? -PUSHBACK_STEP : 0 ;
+    }
+
+
 
     adjustedSpeed =
         (Vector2){ wrap->objPtr->speed.x * frameTime, wrap->objPtr->speed.y * frameTime };
