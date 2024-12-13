@@ -83,7 +83,7 @@ int StateMachine(void) {
                 char msg[128] = "";
                 sprintf(msg, "Your score: %d", tracker->playerScore);
                 MenuControlls(curMenu, &menuHighlighted);
-                RunMenuRender(curMenu, menuHighlighted, "GAME OVER", 1, msg);
+                RunMenuRender(curMenu, menuHighlighted, 1, msg);
                 break;
             }
 
@@ -130,7 +130,7 @@ int StateMachine(void) {
                 RunWorldRender(tracker);
                 RunScreenRender(tracker);
 
-                RunMenuRender(curMenu, menuHighlighted, "GAME PAUSED", 0);
+                RunMenuRender(curMenu, menuHighlighted, 0);
                 break;
             }
 
