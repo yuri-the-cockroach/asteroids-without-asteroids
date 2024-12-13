@@ -222,6 +222,17 @@ void RunWorldRender(objTracker *tracker) {
     }
     LOG(TRACE, "Drawing %d objects", DrawingObjCount);
 
+    // Highlight cursor position
+    #ifdef DEBUGGING
+    if ( VISUAL_DEBUG ) {
+        Vector2 cursorPos = (Vector2){
+        (GetMousePosition().x - tracker->playerCamera.offset.x) / tracker->playerCamera.zoom + tracker->playerCamera.target.x ,
+        (GetMousePosition().y - tracker->playerCamera.offset.y) / tracker->playerCamera.zoom + tracker->playerCamera.target.y
+        };
+        int rectSize = 20;
+        DrawRectangle((int)cursorPos.x - rectSize / 2, (int)cursorPos.y - rectSize / 2, rectSize, rectSize, RED);
+    }
+    #endif
     EndMode2D();
 }
 

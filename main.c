@@ -23,6 +23,7 @@ float NEXT_ASTEROID_SPAWN = 0;
 float GAME_TIME_PASSED = 0;
 
 #ifdef DEBUGGING
+    objWrap *lastDragged = NULL;
     Vector2 SPEED_PREV = {0, 0};
     bool GDB_BREAK = false;
     bool DEBUG_PAUSE = false;

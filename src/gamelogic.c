@@ -32,6 +32,29 @@ void OnPlayerAccellerate(object *object, float speed) {
 #ifdef DEBUGGING
 void DebugingKeyHandler(objTracker *tracker) {
 
+    // Allows to drag asteroids
+    Vector2 cursorPos = (Vector2){
+            (GetMousePosition().x - tracker->playerCamera.offset.x) / tracker->playerCamera.zoom + tracker->playerCamera.target.x ,
+            (GetMousePosition().y - tracker->playerCamera.offset.y) / tracker->playerCamera.zoom + tracker->playerCamera.target.y
+    };
+
+    objWrap *some = NULL;
+    if (IsMouseButtonDown(0) && ((some = FindCollisionPos(tracker, cursorPos)) || lastDragged)) {
+        if ( some ) {
+            lastDragged = some;
+        }
+        some = !some && lastDragged ? lastDragged : some;
+
+        some->objPtr->position.x = cursorPos.x;
+        some->objPtr->position.y = cursorPos.y;
+    }
+
+    if (lastDragged && !IsMouseButtonDown(0)) {
+        lastDragged->objPtr->speed = (Vector2){GetMouseDelta().x / GetFrameTime(), GetMouseDelta().y / GetFrameTime()};
+
+        lastDragged = NULL;
+    } // End of dragging
+
     if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_C)) {
         LOG(DEBUG, "%s", "CTRL and C is pressed");
         GAME_STATE = EXIT;
