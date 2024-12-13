@@ -266,6 +266,7 @@ struct menu_option_struct {
 };
 
 struct menu_parent_struct {
+    const char *restrict name;
     int optionListLen;
     struct menu_option_struct *optionList;
 };
