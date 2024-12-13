@@ -30,6 +30,38 @@ bool FindAnyCollision(objTracker *tracker, objWrap *first) {
     return false;
 }
 
+objWrap *FindCollisionPos(objTracker *tracker, Vector2 pos) {
+    if (tracker->objListLen < 1)
+        return NULL;
+
+    for (unsigned int j = 0; j < tracker->objListLen; j++) {
+        objWrap *second = tracker->objList[j];
+        if (tracker->objList[j] == NULL)
+            continue;
+
+        if (!second->collider.isCollidable)
+            continue;
+
+
+        Vector2 secondStart = {
+            second->objPtr->position.x + second->collider.collider.x,
+            second->objPtr->position.y + second->collider.collider.y
+        };
+        Vector2 secondEnd = { second->objPtr->position.x +
+                                second->collider.collider.x +
+                                second->collider.collider.width,
+                            second->objPtr->position.y +
+                                second->collider.collider.y +
+                                second->collider.collider.height };
+
+        if ((pos.x < secondEnd.x && secondStart.x < pos.x) &&
+            (pos.y < secondEnd.y && secondStart.y < pos.y))
+            return second;
+    }
+    return NULL;
+}
+
+
 void SortListByX(objTracker *tracker) {
     unsigned long i = 1;
     unsigned long gotToPos = 0;
