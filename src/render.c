@@ -300,7 +300,7 @@ void RunScreenRender(objTracker *tracker) {
     DrawFPS(0, 0);
 }
 
-void RunMenuRender(const menuParent *menu, int menuHighlighted, const char *restrict title, int subTitleLinesNum, ...) {
+void RunMenuRender(const menuParent *menu, int menuHighlighted, int subTitleLinesNum, ...) {
     const int titleFontSize = 42;
     const int fontSize = 32;
     int start = SCREEN_HEIGHT / 2 - menu->optionListLen * fontSize / 2;
@@ -310,13 +310,13 @@ void RunMenuRender(const menuParent *menu, int menuHighlighted, const char *rest
     SCREEN_HEIGHT = GetScreenHeight();
 
     DrawRectangle(SCREEN_WIDTH / 3,
-                  start / 2,
+                  SCREEN_HEIGHT / 4,
                   SCREEN_WIDTH / 3,
                   SCREEN_HEIGHT / 2,
                   (Color){ 38, 38, 38, 190 });
 
-    DrawText(title,
-             (SCREEN_WIDTH - MeasureText(title, titleFontSize)) / 2,
+    DrawText(menu->name,
+             (SCREEN_WIDTH - MeasureText(menu->name, titleFontSize)) / 2,
              titlePos,
              titleFontSize,
              WHITE);

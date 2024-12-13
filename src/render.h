@@ -21,7 +21,7 @@ void DrawGrid2D( int dist, Color color);
 
 void RunScreenRender(objTracker *tracker);
 void RunWorldRender(objTracker *tracker);
-void RunMenuRender(const menuParent *menu, int menuHighlighted, const char *restrict title, int subTitleLinesNum, ...);
+void RunMenuRender(const menuParent *menu, int menuHighlighted, int subTitleLinesNum, ...);
 
 void DrawRectLineNotFucked(int x, int y, int width, int height, Color color);
 
