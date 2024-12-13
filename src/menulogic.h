@@ -44,23 +44,27 @@ static struct menu_option_struct constPauseMenuList[] = {
 
 // Actuall menus
 static const menuParent refPauseMenu = (menuParent){
-    sizeof(constPauseMenuList) / sizeof(menuOption),
-    constPauseMenuList
+    .name          = "PAUSE",
+    .optionListLen = sizeof(constPauseMenuList) / sizeof(menuOption),
+    .optionList    = constPauseMenuList
 };
 
 static const menuParent refDifficultyMenu = (menuParent){
-    sizeof(constDifficultyMenuList) / sizeof(menuOption),
-    constDifficultyMenuList
+    .name          = "DIFFICULTY",
+    .optionListLen = sizeof(constDifficultyMenuList) / sizeof(menuOption),
+    .optionList    = constDifficultyMenuList
 };
 
 
 static struct menu_option_struct constMainMenuList[] = {
     (menuOption){ "START GAME", SUBMENU,  (const void*)&refDifficultyMenu},
+    (menuOption){ "TESTING", FUNCTION,  &(menuFunctionWrap){*TriggerTesting, NULL} },
     (menuOption){ "EXIT", FUNCTION, &(menuFunctionWrap){*TriggerExitGame, NULL} }
 };
 
 static const  menuParent refMainMenu = (menuParent){
-    sizeof(constMainMenuList) / sizeof(menuOption),
-    constMainMenuList
+    .name          = "ASTEROIDS WITHOUT ASTEROIDS",
+    .optionListLen = sizeof(constMainMenuList) / sizeof(menuOption),
+    .optionList    = constMainMenuList
 };
 #endif // MENULOGIC_H_
