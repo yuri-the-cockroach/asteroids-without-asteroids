@@ -56,6 +56,10 @@ export LIBS += -lvisdebugger
 export OPTIMIZE = -O0 -g3 # Overrides previous optimization options
 endif # DEBUGGING
 
+ifndef OPTIMIZE
+export OPTIMIZE=-O2 -g0
+endif
+
 # BENCHMARKING will be read from user env
 ifdef BENCH
 export BENCHMARKING = -DBENCHMARKING
