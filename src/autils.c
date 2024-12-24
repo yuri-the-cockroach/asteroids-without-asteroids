@@ -150,3 +150,33 @@ int GetStartUpArguments(int argc, char **argv) {
     }
     return 0;
 }
+
+void RunConfig(void) {
+    SetTraceLogLevel(LOG_ERROR);
+    setlocale(LC_NUMERIC, "en_US.UTF-8");
+#ifdef BENCHMARKING
+    BENCH_LOG_FILE_PTR = fopen(BENCH_LOG_FILE_NAME, "w");
+    LOG(DEBUG,
+        "%s",
+        "Compiled with benchmarking support.\nBenchmarking is enabled");
+#endif
+
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "asteroids without asteroids");
+
+    SetWindowPosition(1, 1);
+    SetWindowMinSize(640, 480);
+    SetWindowMaxSize(8192, 8192);
+
+    SetTargetFPS(FPS_TARGET);
+    CreateLogFile();
+}
+
+void RunCleanup(void) {
+    CloseWindow();
+    fclose(LOG_FILE_PTR);
+
+#ifdef BENCHMARKING
+    if (BENCH_LOG_FILE_PTR) fclose(BENCH_LOG_FILE_PTR);
+#endif
+}

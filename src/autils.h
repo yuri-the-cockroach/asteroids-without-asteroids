@@ -74,4 +74,10 @@ int CreateLogFile(void);
 
 int GetStartUpArguments(int argc, char **argv);
 
+// Initializes needed config
+void RunConfig(void);
+
+// Cleansup everthing created with `RunConfig()`
+void RunCleanup(void);
+
 #endif // UTILS_H_

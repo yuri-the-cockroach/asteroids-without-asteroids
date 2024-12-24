@@ -26,10 +26,5 @@ int main(int argc, char **argv) {
     // signal(SIGSEGV, SigSegvHandel);
 
     StateMachine();
-    fclose(LOG_FILE_PTR);
-
-    #ifdef BENCHMARKING
-    if (BENCH_LOG_FILE_PTR) fclose(BENCH_LOG_FILE_PTR);
-    #endif
     return 0;
 }
