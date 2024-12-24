@@ -1,12 +1,13 @@
 #include "visdebugger.h"
 #include "autils.h"
 
-#pragma GCC diagnostic ignored "-Wformat-nonliteral" // Ignore, because format is const char *restrict, so it's not an issue
+#pragma GCC diagnostic ignored \
+    "-Wformat-nonliteral" // Ignore, because format is const char *restrict, so
+                          // it's not an issue
 
 void DebugDisplayText(Vector2 pos, int fontSize, Color color,
                       const char *restrict format, ...) {
-    if (!VISUAL_DEBUG)
-        return;
+    if (!VISUAL_DEBUG) return;
 
     char messageString[1024] = "";
 
@@ -25,8 +26,7 @@ void DebugDisplayText(Vector2 pos, int fontSize, Color color,
     // by counting format specifiers in a format string
     do {
         current = format[i];
-        if (current == '%')
-            argcount++;
+        if (current == '%') argcount++;
         i++;
     } while (current != '\0');
 
