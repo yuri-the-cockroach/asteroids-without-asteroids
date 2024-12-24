@@ -36,106 +36,107 @@ int StateMachine(void) {
         ClearBackground(BLACK);
 
         switch (GAME_STATE) {
-            case INIT: {
-                GAME_STATE = MAIN_MENU;
-                break;
-            }
+        case INIT: {
+            GAME_STATE = MAIN_MENU;
+            break;
+        }
 
-            case MAIN_MENU: {
-                curMenu = MenuControlls(curMenu, &menuHighlighted);
-                RunMenuRender(curMenu, menuHighlighted, 0);
-                break;
-            }
+        case MAIN_MENU: {
+            curMenu = MenuControlls(curMenu, &menuHighlighted);
+            RunMenuRender(curMenu, menuHighlighted, 0);
+            break;
+        }
 
-            case TESTING: {
-                tracker = InitTracker();
-                GAME_STATE = RUNNING;
-                break;
-            }
+        case TESTING: {
+            tracker    = InitTracker();
+            GAME_STATE = RUNNING;
+            break;
+        }
 
-            case START_NEW: {
+        case START_NEW: {
 
-                tracker = InitTracker();
-                NewGame(tracker);
-                GAME_STATE = RUNNING;
-                break;
-            }
+            tracker = InitTracker();
+            NewGame(tracker);
+            GAME_STATE = RUNNING;
+            break;
+        }
 
-            case GAME_OVER: {
-                char msg[128] = "";
-                sprintf(msg, "Your score: %d", tracker->playerScore);
-                MenuControlls(curMenu, &menuHighlighted);
-                RunMenuRender(curMenu, menuHighlighted, 1, msg);
-                break;
-            }
+        case GAME_OVER: {
+            char msg[128] = "";
+            sprintf(msg, "Your score: %d", tracker->playerScore);
+            MenuControlls(curMenu, &menuHighlighted);
+            RunMenuRender(curMenu, menuHighlighted, 1, msg);
+            break;
+        }
 
-            case RUNNING: {
+        case RUNNING: {
 
-                #ifdef BENCHMARKING
-                    LOG(BENCH, "%s", "<--- Started frame cycle --->");
-                    BenchStart(&timerStartTotalCycle);
-                #endif // BENCHMARKING
+#ifdef BENCHMARKING
+            LOG(BENCH, "%s", "<--- Started frame cycle --->");
+            BenchStart(&timerStartTotalCycle);
+#endif // BENCHMARKING
 
-                    DEBUG(
-                        if (tracker->playerPtr)
-                            SPEED_PREV = tracker->playerPtr->objPtr->speed;
-                        DebugingKeyHandler(tracker);
-                    if (!DEBUG_PAUSE) {)
+            DEBUG(if (tracker->playerPtr) SPEED_PREV =
+                      tracker->playerPtr->objPtr->speed;
+                  DebugingKeyHandler(tracker);
+                  if (!DEBUG_PAUSE) {)
                         if (tracker->playerPtr) SpawnAsteroidOnTime(tracker);
-                        RunActionList(tracker);
-                        GAME_TIME_PASSED += GetFrameTime();
-                    DEBUG(})
+                      RunActionList(tracker);
+                      GAME_TIME_PASSED += GetFrameTime();
+                    DEBUG(
+                  })
 
-                // Controlls
-                PlayerRuntimeControlls(tracker);
-                ShipControlls(tracker);
+            // Controlls
+            PlayerRuntimeControlls(tracker);
+            ShipControlls(tracker);
 
-                // Logic
-                // Rendering
-                BENCH(RunWorldRender(tracker);, "World Renderer")
-                BENCH(RunScreenRender(tracker);, "Screen Renderer")
+            // Logic
+            // Rendering
+            RunWorldRender(tracker);
+            RunScreenRender(tracker);
 
-                break;
-            }
+            break;
+        }
 
-            case PAUSE: {
+        case PAUSE: {
 
-                #ifdef DEBUGGING
-                    DebugingKeyHandler(tracker);
-                #endif // DEBUGGING
+#ifdef DEBUGGING
+            DebugingKeyHandler(tracker);
+#endif // DEBUGGING
 
-                // Controlls
-                curMenu = &refPauseMenu;
-                PlayerRuntimeControlls(tracker);
-                MenuControlls(curMenu, &menuHighlighted);
+            // Controlls
+            curMenu = &refPauseMenu;
+            PlayerRuntimeControlls(tracker);
+            MenuControlls(curMenu, &menuHighlighted);
 
-                // Rendering
-                RunWorldRender(tracker);
-                RunScreenRender(tracker);
+            // Rendering
+            RunWorldRender(tracker);
+            RunScreenRender(tracker);
 
-                RunMenuRender(curMenu, menuHighlighted, 0);
-                break;
-            }
+            RunMenuRender(curMenu, menuHighlighted, 0);
+            break;
+        }
 
-            case EXIT: {
-                CloseWindow();
-                return 0;
-            }
+        case EXIT: {
+            CloseWindow();
+            return 0;
+        }
 
-            case CLEANUP: {
-                curMenu = &refMainMenu;
-                DeleteTracker(tracker);
-                tracker = 0;
-                if ( NEXT_STATE == NOOP ) GAME_STATE = EXIT;
-                GAME_TIME_PASSED = 0;
-                GAME_STATE = NEXT_STATE;
-                NEXT_STATE = NOOP;
-                break;
-            }
+        case CLEANUP: {
+            curMenu = &refMainMenu;
+            DeleteTracker(tracker);
+            tracker = 0;
+            if (NEXT_STATE == NOOP) GAME_STATE = EXIT;
+            GAME_TIME_PASSED = 0;
+            GAME_STATE       = NEXT_STATE;
+            NEXT_STATE       = NOOP;
+            break;
+        }
 
-            case NOOP: {
-                err(-1, "Game is stuck in noop! This state is not supposed to be used");
-            }
+        case NOOP: {
+            err(-1,
+                "Game is stuck in noop! This state is not supposed to be used");
+        }
         }
 
         EndDrawing();
