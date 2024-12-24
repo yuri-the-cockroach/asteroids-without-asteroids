@@ -95,9 +95,14 @@ all:
 
 ifdef DEBUG
 	mold -run make shared/libvisdebugger.so
-endif # DEBUGGING
+endif # DEBUG
+
+ifdef BENCH
+	mold -run make benchmark
+endif
 
 	mold -run make main
+	mold -run make unit-tests
 
 shared/libmenulogic.so: makefile src/menulogic.h src/menulogic.c src/structs.h
 	$(call buildLib,menulogic)
@@ -141,17 +146,37 @@ shared/libasteroid.so: makefile src/asteroid.h src/asteroid.c src/structs.h
 shared/libbenchmarking.so: makefile src/benchmarking.h src/benchmarking.c src/structs.h
 	$(call buildLib,benchmarking)
 
+unit-tests: run-unit-tests.c makefile src/unit-tests.c src/unit-tests.h src/structs.h
+	bear -- clang $(WARN) $(NOWARN) -std=c23 -ferror-limit=0 -rpath shared $(OPTIMIZE) $(SANITIZE) $(DEBUGGING) $(BENCHMARKING) -o unit-tests run-unit-tests.c src/unit-tests.c -Isrc -Lshared $(LIBS)
+
 main: makefile main.c src/structs.h
-	clang $(WARNINGS) -std=c23 -ferror-limit=0 -rpath shared $(OPTIMIZE) $(SANITIZER) $(DEBUGGING) $(BENCHMARKING) -o main main.c -Isrc -Lshared $(LIBS)
+	bear -- clang $(WARN) $(NOWARN) -std=c23 -ferror-limit=0 -rpath shared $(OPTIMIZE) $(SANITIZE) $(DEBUGGING) $(BENCHMARKING) -o main main.c -Isrc -Lshared $(LIBS)
+
+benchmark: benchmark.c makefile src/structs.h
+	bear -- clang $(WARN) $(NOWARN) -std=c23 -ferror-limit=0 -rpath shared $(OPTIMIZE) $(SANITIZE) $(DEBUGGING) $(BENCHMARKING) -o benchmark benchmark.c -Isrc -Lshared $(LIBS)
 
 # -lc level for consol debug output
 # -lf level for file debug output
+
+run-unit: unit-tests
+	./unit-tests -lc 7 -lf 7
+
 run: main
 	./main -lc 2 -lf 7
+
+run-bench: benchmark
+	./benchmark -lc 4 -lf 7
+
+run-prof: main
+	gprofng collect app -O test.er ./main
+	gprofng display text -fsummary test.er
+
 clean:
-	if [[ -e object-files && -s object-files ]]; then rm object-files/*.o; fi
+	if [[ -e object && -s object ]]; then rm object/*.o; fi
 	if [[ -e shared && -s shared ]]; then rm shared/*.so; fi
 	if [ -e main ]; then rm main; fi
+	if [ -e unit-tests ]; then rm unit-tests; fi
+	if [ -e benchmark ]; then rm benchmark; fi
 
 debug:
 	gdb -i=mi main
