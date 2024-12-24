@@ -20,16 +20,18 @@
 // -------------------- enums --------------------
 
 enum loglevel {
-    NOLOG   = 0,
-    FATAL   = 1,
-    ERROR   = 2,
-    WARNING = 3,
-    BENCH   = 4,
-    INFO    = 5,
-    FIXME   = 6,
-    DEBUG   = 7,
-    TRACE   = 8,
-    ALL     = 9
+    NOLOG     = 0,
+    FATAL     = 1,
+    ERROR     = 2,
+    WARNING   = 3,
+    BENCH     = 4,
+    INFO      = 5,
+    TEST_FAIL = 6,
+    TEST_PASS = 7,
+    FIXME     = 8,
+    DEBUG     = 9,
+    TRACE     = 10,
+    ALL       = 11,
 };
 
 enum game_state {
