@@ -93,7 +93,7 @@ all:
 		shared/libasteroid.so \
 		shared/libbenchmarking.so
 
-ifdef DEBUGGING
+ifdef DEBUG
 	mold -run make shared/libvisdebugger.so
 endif # DEBUGGING
 
