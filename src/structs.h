@@ -57,52 +57,29 @@ enum difficulty {
     DOFH            = 10
 };
 
-enum menuOptionType {
-    DUMMY    = -1,
-    SUBMENU  = 1,
-    FUNCTION = 2
+enum menuOptionType { DUMMY = -1, SUBMENU = 1, FUNCTION = 2 };
+
+static const char *loglvlToString[12] = { "NOLOG",
+                                          "\033[1;31mFATAL\033[0;37m",
+                                          "\033[0;31mERROR\033[0;37m",
+                                          "\033[1;33mWARNING\033[0;37m",
+                                          "\033[0;33mBENCH\033[0;37m",
+                                          "\033[0;32mINFO\033[0;37m",
+                                          "\033[1;31mTEST FAIL\033[0;37m",
+                                          "\033[0;32mTEST PASS\033[0;37m",
+                                          "\033[0;34mFIXME\033[0;37m",
+                                          "\033[1;35mDEBUG\033[0;37m",
+                                          "\033[0;35mTRACE\033[0;37m",
+                                          "ALL" };
+
+static const char *loglvlToStringNoColor[12] = {
+    "NOLOG",     "FATAL",     "ERROR", "WARNING", "BENCH", "INFO",
+    "TEST FAIL", "TEST PASS", "FIXME", "DEBUG",   "TRACE", "ALL"
 };
 
-static const char *loglvlToString[10] = {
-    "NOLOG",
-    "\033[1;31mFATAL\033[0;37m",
-    "\033[0;31mERROR\033[0;37m",
-    "\033[1;33mWARNING\033[0;37m",
-    "\033[0;32mBENCH\033[0;37m",
-    "\033[0;32mINFO\033[0;37m",
-    "\033[0;34mFIXME\033[0;37m",
-    "\033[1;35mDEBUG\033[0;37m",
-    "\033[0;35mTRACE\033[0;37m",
-    "ALL"
-};
+enum request { IGNORE = 0, UPDATE = 1, SEPARATE = 2, CREATE = 3, DELETE = -1 };
 
-static const char *loglvlToStringNoColor[10] = {
-    "NOLOG",
-    "FATAL",
-    "ERROR",
-    "WARNING",
-    "BENCH",
-    "INFO",
-    "FIXME",
-    "DEBUG",
-    "TRACE",
-    "ALL"
-};
-
-enum request {
-    IGNORE   = 0,
-    UPDATE   = 1,
-    SEPARATE = 2,
-    CREATE   = 3,
-    DELETE   = -1
-};
-
-enum type {
-    NOTYPE     = 0,
-    ASTEROID   = 1,
-    PROJECTILE = 2,
-    PLAYER     = 3
-};
+enum type { NOTYPE = 0, ASTEROID = 1, PROJECTILE = 2, PLAYER = 3 };
 
 // -------------------- typedefs --------------------
 
