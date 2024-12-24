@@ -1,8 +1,8 @@
 // system includes
+#include <errno.h>
 #include <math.h>
 #include <raylib.h>
 #include <stdlib.h>
-#include <errno.h>
 
 // local includes
 #include "asteroid.h"
@@ -13,14 +13,13 @@
 #include "structs.h"
 
 objWrap *AsteroidSafeSpawn(objTracker *tracker) {
-    objWrap *wrap = CreateAsteroid(
-        tracker,
-        (Vector2){ 0, 0 },
-        (Vector2){0, 0},
-        GetRandomFloat(-3, 3),
-        GetRandomFloat(1, 3));
+    objWrap *wrap = CreateAsteroid(tracker,
+                                   (Vector2){ 0, 0 },
+                                   (Vector2){ 0, 0 },
+                                   GetRandomFloat(-3, 3),
+                                   GetRandomFloat(1, 3));
 
-    if ( !wrap ) {
+    if (!wrap) {
         LOG(WARNING, "%s", "Cannot create an asteroid, got a NULL pointer");
         return NULL;
     }
@@ -32,7 +31,7 @@ objWrap *AsteroidSafeSpawn(objTracker *tracker) {
     float minY = WORLD_POS_MIN_Y;
     float maxY = WORLD_POS_MAX_Y;
 
-    if ( tracker->playerPtr ) {
+    if (tracker->playerPtr) {
         playerPos = tracker->playerPtr->objPtr->position;
         minX = ClampFloat(playerPos.x - 3000, WORLD_POS_MIN_X, WORLD_POS_MAX_X);
         maxX = ClampFloat(playerPos.x + 3000, WORLD_POS_MIN_X, WORLD_POS_MAX_X);
@@ -44,27 +43,29 @@ objWrap *AsteroidSafeSpawn(objTracker *tracker) {
     int retry = 5;
 
     do {
-        wrap->objPtr->position = (Vector2){ GetRandomFloat(minX, maxX),
-                            GetRandomFloat(minY, maxY)};
-        if (  !FindAnyCollision(tracker, wrap) && !(fabsf(wrap->objPtr->position.x - playerPos.x) < 400 || fabsf(wrap->objPtr->position.y - playerPos.y) < 400) )
+        wrap->objPtr->position =
+            (Vector2){ GetRandomFloat(minX, maxX), GetRandomFloat(minY, maxY) };
+        if (!FindAnyCollision(tracker, wrap) &&
+            !(fabsf(wrap->objPtr->position.x - playerPos.x) < 400 ||
+              fabsf(wrap->objPtr->position.y - playerPos.y) < 400))
             complete = true;
-        // This abomination will just check if the wrap closer than 200u or further than 1000u to
-        // the player
+        // This abomination will just check if the wrap closer than 200u or
+        // further than 1000u to the player
         retry--;
     } while (!complete && retry);
 
-    if ( !complete ) {
+    if (!complete) {
         wrap->request = DELETE;
         return NULL;
     }
 
     Vector2 astPos = wrap->objPtr->position;
     float gamma = atan2f(playerPos.y - astPos.y, playerPos.x - astPos.x);
-    if ( !tracker->playerPtr ) gamma = GetRandomFloat(0, PI);
-    wrap->objPtr->speed = (Vector2){
-         cosf(gamma) * ( GetRandomFloat(-500, 500) ),
-         sinf(gamma) * ( GetRandomFloat(-500, 500) )
-    };
+    if (!tracker->playerPtr)
+        gamma = GetRandomFloat(0, PI);
+    wrap->objPtr->speed =
+        (Vector2){ cosf(gamma) * (GetRandomFloat(-500, 500)),
+                   sinf(gamma) * (GetRandomFloat(-500, 500)) };
     return wrap;
 }
 
@@ -74,8 +75,8 @@ objWrap *AsteroidSafeSpawn(objTracker *tracker) {
 // * Giving values to anything that needs them
 // Returnes a ready to use object, that needs no tweaks to work.
 objWrap *CreateAsteroid(objTracker *tracker, Vector2 initPosition,
-                           Vector2 initSpeed, float constRotationSpeed,
-                           float size) {
+                        Vector2 initSpeed, float constRotationSpeed,
+                        float size) {
 
     objWrap *asteroid = malloc(sizeof(objWrap));
     asteroid[0] = InitWrap();
@@ -89,11 +90,10 @@ objWrap *CreateAsteroid(objTracker *tracker, Vector2 initPosition,
 
     object *objPtr = malloc(sizeof(object));
     Vector2 *tempPoints = GenerateAsteroidShape();
-    objPtr[0] = InitObject(
-        InitShape(tempPoints, ASTEROID_CORNERS_COUNT, size),
-        initPosition,
-        initSpeed,
-        constRotationSpeed);
+    objPtr[0] = InitObject(InitShape(tempPoints, ASTEROID_CORNERS_COUNT, size),
+                           initPosition,
+                           initSpeed,
+                           constRotationSpeed);
     free(tempPoints);
 
     asteroid->objectType = ASTEROID;
@@ -109,7 +109,8 @@ objWrap *CreateAsteroid(objTracker *tracker, Vector2 initPosition,
 }
 
 Vector2 *GenerateAsteroidShape(void) {
-    Vector2 *CornerList = (Vector2 *)calloc(ASTEROID_CORNERS_COUNT, sizeof(Vector2));
+    Vector2 *CornerList =
+        (Vector2 *)calloc(ASTEROID_CORNERS_COUNT, sizeof(Vector2));
     for (unsigned long i = 0; i < ASTEROID_CORNERS_COUNT; i++) {
         CornerList[i] = (Vector2){
             (50 + GetRandomFloat(-ASTEROID_HEIGHT_VARIATION,
@@ -167,11 +168,19 @@ int Separate(objTracker *tracker, objWrap *parent) {
     asteroidLeft->objPtr->heading = parent->objPtr->heading;
     asteroidRight->objPtr->heading = parent->objPtr->heading;
 
-    asteroidLeft->objPtr->position.x -= sinf(parent->objPtr->heading) * (parent->collider.collider.x + parent->collider.collider.width);
-    asteroidLeft->objPtr->position.y -= cosf(parent->objPtr->heading) * (parent->collider.collider.y + parent->collider.collider.height);
+    asteroidLeft->objPtr->position.x -=
+        sinf(parent->objPtr->heading) *
+        (parent->collider.collider.x + parent->collider.collider.width);
+    asteroidLeft->objPtr->position.y -=
+        cosf(parent->objPtr->heading) *
+        (parent->collider.collider.y + parent->collider.collider.height);
 
-    asteroidRight->objPtr->position.x += sinf(parent->objPtr->heading) * (parent->collider.collider.x + parent->collider.collider.width);
-    asteroidRight->objPtr->position.y += cosf(parent->objPtr->heading) * (parent->collider.collider.y + parent->collider.collider.height);
+    asteroidRight->objPtr->position.x +=
+        sinf(parent->objPtr->heading) *
+        (parent->collider.collider.x + parent->collider.collider.width);
+    asteroidRight->objPtr->position.y +=
+        cosf(parent->objPtr->heading) *
+        (parent->collider.collider.y + parent->collider.collider.height);
 
     asteroidLeft->objPtr->speed.x -=
         separationAddsSpeed * sinf(parent->objPtr->heading);
