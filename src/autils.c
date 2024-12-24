@@ -9,14 +9,11 @@
 #include "structs.h"
 
 int fGetSign(float f) {
-    union {float f; int i;} fi;
-    fi.f = f;
-    return (fi.i >> (sizeof(float) * 8 - 1)) ? -1 : 1;
+    int *ptr = (int *)(void *)&f;
+    return *ptr >> 31 | 1;
 }
 
-int GetSign(int i) {
-    return (i >> (sizeof(int) * 8 - 1)) ? -1 : 1;
-}
+int GetSign(int i) { return i >> 31 | 1; }
 
 float GetRandomFloat(float min, float max) {
     return (float)(GetRandomValue((int)(min * 1000), (int)(max * 1000))) / 1000;
