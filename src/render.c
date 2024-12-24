@@ -3,10 +3,13 @@
 #include <stdlib.h>
 
 // local includes
+#include "autils.h"
 #include "render.h"
 #include "structs.h"
-#include "autils.h"
 
+#ifdef DEBUGGING
+    #include "visdebugger.h"
+#endif
 
 void DisplayText(Vector2 pos, int fontSize, Color color,
                  const char *restrict format, ...) {
@@ -23,8 +26,7 @@ void DisplayText(Vector2 pos, int fontSize, Color color,
     // by counting format specifiers in a format string
     do {
         current = format[i];
-        if (current == '%')
-            argcount++;
+        if (current == '%') argcount++;
         i++;
     } while (current != '\0');
 
@@ -48,7 +50,7 @@ void DrawRectLineNotFucked(int x, int y, int width, int height, Color color) {
 
 void DrawObject(objWrap *wrap) {
 
-    #ifdef DEBUGGING
+#ifdef DEBUGGING
     if (VISUAL_DEBUG)
         DrawRectangleLines(
             (int)(wrap->collider.collider.x + wrap->objPtr->position.x),
@@ -85,14 +87,15 @@ void DrawObject(objWrap *wrap) {
                 wrap->objPtr->shape.points[i].y);
         }
     }
-    #endif // DEBUGGING
+#endif // DEBUGGING
 
     if (wrap->objPtr->shape.arrayLength == 0) {
         LOG(WARNING, "%s", "Attempting to draw an empty shape");
     }
 
     unsigned int prevPoint = 0;
-    for (unsigned int curPoint = 1; curPoint < wrap->objPtr->shape.arrayLength; curPoint++) {
+    for (unsigned int curPoint = 1; curPoint < wrap->objPtr->shape.arrayLength;
+         curPoint++) {
         DrawLineEx(
             (Vector2){ // Draw from x/y
                        wrap->objPtr->shape.points[prevPoint].x +
@@ -181,132 +184,138 @@ void RunWorldRender(objTracker *tracker) {
                   (Color){ 18, 18, 18, 255 });
     DrawGrid2D(200, (Color){ 38, 38, 38, 255 });
 
-
     Vector2 screenStart = {
-        tracker->playerCamera.target.x - tracker->playerCamera.offset.x / tracker->playerCamera.zoom,
-        tracker->playerCamera.target.y - tracker->playerCamera.offset.y / tracker->playerCamera.zoom
+        tracker->playerCamera.target.x -
+            tracker->playerCamera.offset.x / tracker->playerCamera.zoom,
+        tracker->playerCamera.target.y -
+            tracker->playerCamera.offset.y / tracker->playerCamera.zoom
     };
 
-    Vector2 screenEnd = { screenStart.x + (float)SCREEN_WIDTH / tracker->playerCamera.zoom,
-                          screenStart.y + (float)SCREEN_HEIGHT / tracker->playerCamera.zoom};
-
-    int DrawingObjCount = 0;
+    Vector2 screenEnd = {
+        screenStart.x + (float)SCREEN_WIDTH / tracker->playerCamera.zoom,
+        screenStart.y + (float)SCREEN_HEIGHT / tracker->playerCamera.zoom
+    };
+    objWrap *current;
+    // int DrawingObjCount = 0;
     for (unsigned int i = 0; i < tracker->objListLen; i++) {
-        objWrap *current = tracker->objList[i];
+        current = tracker->objList[i];
 
-        if (!current || !current->draw || current->request != UPDATE)
-            continue;
+        if (!current || !current->draw || current->request != UPDATE) continue;
 
         Vector2 colliderStart = {
             current->objPtr->position.x + current->collider.collider.x,
             current->objPtr->position.y + current->collider.collider.y
         };
-        Vector2 colliderEnd = {
-            current->objPtr->position.x + current->collider.collider.x + current->collider.collider.width,
-            current->objPtr->position.y + current->collider.collider.y + current->collider.collider.height
-        };
+        Vector2 colliderEnd = { current->objPtr->position.x +
+                                    current->collider.collider.x +
+                                    current->collider.collider.width,
+                                current->objPtr->position.y +
+                                    current->collider.collider.y +
+                                    current->collider.collider.height };
 
-        if ( colliderEnd.x < screenStart.x ||
-             screenEnd.x < colliderStart.x ||
-             colliderEnd.y < screenStart.y ||
-             screenEnd.y < colliderStart.y )
+        if (colliderEnd.x < screenStart.x || screenEnd.x < colliderStart.x ||
+            colliderEnd.y < screenStart.y || screenEnd.y < colliderStart.y)
             continue;
 
         DrawObject(tracker->objList[i]);
 
-        DrawingObjCount++;
+        // DrawingObjCount++;
     }
-    LOG(TRACE, "Drawing %d objects", DrawingObjCount);
+    // LOG(TRACE, "Drawing %d objects", DrawingObjCount);
 
-    // Highlight cursor position
-    #ifdef DEBUGGING
-    if ( VISUAL_DEBUG ) {
-        Vector2 cursorPos = (Vector2){
-        (GetMousePosition().x - tracker->playerCamera.offset.x) / tracker->playerCamera.zoom + tracker->playerCamera.target.x ,
-        (GetMousePosition().y - tracker->playerCamera.offset.y) / tracker->playerCamera.zoom + tracker->playerCamera.target.y
-        };
+// Highlight cursor position
+#ifdef DEBUGGING
+    if (VISUAL_DEBUG) {
+        Vector2 cursorPos =
+            (Vector2){ (GetMousePosition().x - tracker->playerCamera.offset.x) /
+                               tracker->playerCamera.zoom +
+                           tracker->playerCamera.target.x,
+                       (GetMousePosition().y - tracker->playerCamera.offset.y) /
+                               tracker->playerCamera.zoom +
+                           tracker->playerCamera.target.y };
         int rectSize = 20;
-        DrawRectangle((int)cursorPos.x - rectSize / 2, (int)cursorPos.y - rectSize / 2, rectSize, rectSize, RED);
+        DrawRectangle((int)cursorPos.x - rectSize / 2,
+                      (int)cursorPos.y - rectSize / 2,
+                      rectSize,
+                      rectSize,
+                      RED);
     }
-    #endif
+#endif
     EndMode2D();
 }
 
 void RunScreenRender(objTracker *tracker) {
 
-    SCREEN_WIDTH = GetScreenWidth();
-    SCREEN_HEIGHT = GetScreenHeight();
+    SCREEN_WIDTH                   = GetScreenWidth();
+    SCREEN_HEIGHT                  = GetScreenHeight();
     tracker->playerCamera.offset.x = (float)SCREEN_WIDTH / 2;
     tracker->playerCamera.offset.y = (float)SCREEN_HEIGHT / 2;
 
-    if ( tracker->playerPtr )
+    if (tracker->playerPtr)
         DisplayText((Vector2){ 20, 50 },
-                24,
-                RED,
-                "LIVES LEFT: %d",
-                tracker->playerPtr->livesLeft);
+                    24,
+                    RED,
+                    "LIVES LEFT: %d",
+                    tracker->playerPtr->livesLeft);
     DisplayText((Vector2){ 20, 78 },
                 20,
                 WHITE,
                 "PLAYER SCORE: %d",
                 tracker->playerScore);
 
-    #ifdef BENCHMARKING
-        if (BENCHRUNNING)
-            DisplayText((Vector2){ (float)SCREEN_WIDTH / 2 -
-                                    (float)(MeasureText("BENCHMARKING", 36)),
-                                40 },
-                        36,
-                        RED,
-                        "BENCHMARKING");
-    #endif // BENCHMARKING
+#ifdef BENCHMARKING
+    if (BENCHRUNNING)
+        DisplayText((Vector2){ (float)SCREEN_WIDTH / 2 -
+                                   (float)(MeasureText("BENCHMARKING", 36)),
+                               40 },
+                    36,
+                    RED,
+                    "BENCHMARKING");
+#endif // BENCHMARKING
 
-    #ifdef DEBUGGING
-    if ( tracker->playerPtr ) {
-    object *object = tracker->playerPtr->objPtr;
+#ifdef DEBUGGING
+    if (tracker->playerPtr) {
+        object *object = tracker->playerPtr->objPtr;
 
-    DebugDisplayText((Vector2){ 20, 110 },
-                    18,
-                    WHITE,
-                    "Acceleration: %f",
-                    object->speed.x - SPEED_PREV.x);
+        DebugDisplayText((Vector2){ 20, 110 },
+                         18,
+                         WHITE,
+                         "Acceleration: %f",
+                         object->speed.x - SPEED_PREV.x);
 
-    DebugDisplayText((Vector2){ 20, 130 },
-                    18,
-                    WHITE,
-                    "Acceleration: %f",
-                    object->speed.y - SPEED_PREV.y);
-
+        DebugDisplayText((Vector2){ 20, 130 },
+                         18,
+                         WHITE,
+                         "Acceleration: %f",
+                         object->speed.y - SPEED_PREV.y);
     }
 
-    DebugDisplayText((Vector2){ 20, 150 },
-                    18,
-                    WHITE,
-                    "Cur Difficulty: %d",
-                    CUR_DIFFICULTY);
+    DebugDisplayText(
+        (Vector2){ 20, 150 }, 18, WHITE, "Cur Difficulty: %d", CUR_DIFFICULTY);
 
     DebugDisplayText((Vector2){ 20, 20 },
-                    18,
-                    WHITE,
-                    "Length of the list: %lu",
-                    tracker->objListLen);
+                     18,
+                     WHITE,
+                     "Length of the list: %lu",
+                     tracker->objListLen);
 
     DebugDisplayText((Vector2){ 20, 32 },
-                    18,
-                    WHITE,
-                    "Time untill next asteroid: %f",
-                    NEXT_ASTEROID_SPAWN - GAME_TIME_PASSED);
-    #endif // DEBUGGING
+                     18,
+                     WHITE,
+                     "Time untill next asteroid: %f",
+                     NEXT_ASTEROID_SPAWN - GAME_TIME_PASSED);
+#endif // DEBUGGING
     DrawFPS(0, 0);
 }
 
-void RunMenuRender(const menuParent *menu, int menuHighlighted, int subTitleLinesNum, ...) {
+void RunMenuRender(const menuParent *menu, int menuHighlighted,
+                   int subTitleLinesNum, ...) {
     const int titleFontSize = 42;
-    const int fontSize = 32;
-    int start = SCREEN_HEIGHT / 2 - menu->optionListLen * fontSize / 2;
+    const int fontSize      = 32;
+    int start    = SCREEN_HEIGHT / 2 - menu->optionListLen * fontSize / 2;
     int titlePos = 100;
 
-    SCREEN_WIDTH = GetScreenWidth();
+    SCREEN_WIDTH  = GetScreenWidth();
     SCREEN_HEIGHT = GetScreenHeight();
 
     DrawRectangle(SCREEN_WIDTH / 3,
@@ -336,7 +345,8 @@ void RunMenuRender(const menuParent *menu, int menuHighlighted, int subTitleLine
     for (int i = 0; i < menu->optionListLen; i++) {
         if (i == menuHighlighted) {
             DrawText(menu->optionList[i].name,
-                     (SCREEN_WIDTH - MeasureText(menu->optionList[i].name, fontSize)) /
+                     (SCREEN_WIDTH -
+                      MeasureText(menu->optionList[i].name, fontSize)) /
                          2,
                      start + fontSize * i,
                      fontSize,
