@@ -11,8 +11,8 @@
 // Include
 #include <err.h>
 // StdThingings
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 
 // Local Headers
@@ -92,11 +92,11 @@ typedef struct menu_function_wrap_struct menuFunctionWrap;
 typedef struct menu_parent_struct menuParent;
 typedef struct menu_option_struct menuOption;
 
-
 // -------------------- CONSTANTS --------------------
 // -------------------- Physics constants --------------------
 
-static const float ELASTICITY_FACTOR = 0.5; // How much energy object recives back on bouce
+static const float ELASTICITY_FACTOR =
+    0.5; // How much energy object recives back on bouce
 
 static const int WORLD_POS_MIN_X = 0;
 static const int WORLD_POS_MAX_X = 10000;
@@ -105,34 +105,34 @@ static const int WORLD_POS_MIN_Y = 0;
 static const int WORLD_POS_MAX_Y = 10000;
 
 static const int SOFT_MAX_ASTEROIDS = 1000;
-static const int MAX_OBJECT_COUNT = 1024;
+static const int MAX_OBJECT_COUNT   = 1024;
 
 // player related
-static const int RATE_OF_FIRE = 5;
-static const int PROJECTILE_SPEED = 20;
-static const float PROJECTILE_SIZE = 0.1f;
+static const int RATE_OF_FIRE          = 5;
+static const int PROJECTILE_SPEED      = 20;
+static const float PROJECTILE_SIZE     = 0.1f;
 static const int PLAYER_ROTATION_SPEED = 5;
-static const int PLAYER_MOVE_SPEED = 20;
-static const int BASE_ROTATE = 5;
+static const int PLAYER_MOVE_SPEED     = 20;
+static const int BASE_ROTATE           = 5;
 
 static const enum loglevel DEFAULT_LOG_LEVEL = WARNING;
 
 static const int MAX_MENU_STACK_SIZE = 32;
 
-static const long ASTEROID_SPAWN_DELAY = 10;
+static const long ASTEROID_SPAWN_DELAY            = 10;
 static const unsigned long ASTEROID_CORNERS_COUNT = 20;
-static const float ASTEROID_HEIGHT_VARIATION = 15;
+static const float ASTEROID_HEIGHT_VARIATION      = 15;
 
 // Externally defined dynamic global variables
 
 // Debugging vars
-# ifdef DEBUGGING
-    extern objWrap *lastDragged;
-    extern Vector2 SPEED_PREV;
-    extern bool DEBUG_PAUSE;
-    extern bool VISUAL_DEBUG;
-    extern bool VISUAL_DEBUG_SHOW_POINTS;
-    extern bool GDB_BREAK;
+#ifdef DEBUGGING
+extern objWrap *lastDragged;
+extern Vector2 SPEED_PREV;
+extern bool DEBUG_PAUSE;
+extern bool VISUAL_DEBUG;
+extern bool VISUAL_DEBUG_SHOW_POINTS;
+extern bool GDB_BREAK;
 #endif // DEBUGGING
 
 // Logging vars
@@ -145,12 +145,12 @@ extern FILE *LOG_FILE_PTR;
 
 // Benchmarking
 #ifdef BENCHMARKING
-    extern bool BENCHRUNNING;
-    extern long BENCH_COLLIDER_TIME;
-    extern FILE *BENCH_LOG_FILE_PTR;
+extern bool BENCHRUNNING;
+extern long BENCH_COLLIDER_TIME;
+extern FILE *BENCH_LOG_FILE_PTR;
 
-    static const char *restrict BENCH_LOG_FILE_NAME = "asteroids-benchlog.log";
-    static const int SAMPLES = 1024;
+static const char *restrict BENCH_LOG_FILE_NAME = "asteroids-benchlog.log";
+static const int SAMPLES                        = 1024;
 #endif // BENCHMARKING
 
 // Game flow related
@@ -206,10 +206,11 @@ struct object_struct {
 };
 
 struct collider_struct {
-    bool isCollidable;   // True if object's collision is enabled
+    bool isCollidable; // True if object's collision is enabled
     Rectangle collider;
     float mass;
-    void (*ActionOnCollision)(objTracker *tracker, objWrap *first, objWrap *second);
+    void (*ActionOnCollision)(objTracker *tracker, objWrap *first,
+                              objWrap *second);
 };
 
 struct object_wrap_struct {
@@ -219,7 +220,7 @@ struct object_wrap_struct {
     bool updatePosition;    // True if object's position needs to be updated
     bool draw;              // True if object needs to be drawn
     bool isRotatableByGame; // Constant rotation speed, if needed. Ignored if 0
-    object *objPtr;   // Pointer to the actuall object that is governed
+    object *objPtr;         // Pointer to the actuall object that is governed
 
     collider collider;
     int livesLeft;
