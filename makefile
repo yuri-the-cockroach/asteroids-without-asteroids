@@ -70,12 +70,14 @@ export LIBS+= -lbenchmarking
 endif # BENCHMARKING
 
 define buildLib
-    clang  $(WARNINGS) $(OPTIMIZE) $(SANITIZER) $(DEBUGGING) $(BENCHMARKING) -std=c23 -fPIC -ferror-limit=0 -I src/ -o object-files/$1.o -c src/$1.c
-    clang  $(WARNINGS) $(OPTIMIZE) $(SANITIZER) $(DEBUGGING) $(BENCHMARKING) -std=c23 -fPIC -ferror-limit=0 -shared -o shared/lib$1.so object-files/$1.o
+    clang $(WARN) $(NOWARN) $(OPTIMIZE) $(SANITIZE) $(DEBUGGING) $(BENCHMARKING) -std=c23 -fPIC -ferror-limit=0 -o object/$1.o -c src/$1.c
+    clang $(WARN) $(NOWARN) $(OPTIMIZE) $(SANITIZE) $(DEBUGGING) $(BENCHMARKING) -std=c23 -fPIC -ferror-limit=0 -shared -o shared/lib$1.so object/$1.o
 endef
 
+endif #DEFINES
+
 all:
-	if [[ ! -e object-files ]]; then mkdir object-files; fi
+	if [[ ! -e object ]]; then mkdir object; fi
 	if [[ ! -e shared ]]; then mkdir shared; fi
 	mold -run make -j $(nproc) \
 		shared/liblogger.so \
