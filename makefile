@@ -3,59 +3,62 @@
 #
 # @file
 # @version 0.1
+ifndef DEFINES
 
 export GLFW_LINUX_ENABLE_X11=FALSE
 export GLFW_LINUX_ENABLE_WAYLAND=TRUE
 
-export WARNINGS += -Wall
-export WARNINGS += -Wextra
-export WARNINGS += -Weverything
-export WARNINGS += -Wno-unsafe-buffer-usage
-export WARNINGS += -Wno-declaration-after-statement
-export WARNINGS += -Wno-missing-noreturn
-export WARNINGS += -Wno-padded
-export WARNINGS += -Wno-switch-default
-export WARNINGS += -Wno-double-promotion
-export WARNINGS += -Wno-pre-c23-compat
+# WARN to SHOW
+export WARN += -Wall
+export WARN += -Wextra
+export WARN += -Weverything
 
-# Optimizations options (will be overriten if debugging is enabled)
-export OPTIMIZE=-O2 -g0
-
-export LIBS+= -lunwind
-export LIBS+= -llogger
-export LIBS+= -lautils
-export LIBS+= -lrender
-export LIBS+= -lobjectlogic
-export LIBS+= -lsyslogic
-export LIBS+= -lgamelogic
-export LIBS+= -lraylib
-export LIBS+= -lobjecthandler
-export LIBS+= -lm
-export LIBS+= -lpthread
-export LIBS+= -ldl
-export LIBS+= -lrt
-export LIBS+= -lglfw
-export LIBS+= -lcollision
-export LIBS+= -lstatemachine
-export LIBS+= -lmenulogic
-export LIBS+= -lasteroid
+# WARN to IGNORE
+export NOWARN += -Wno-unsafe-buffer-usage
+export NOWARN += -Wno-declaration-after-statement
+export NOWARN += -Wno-missing-noreturn
+export NOWARN += -Wno-padded
+export NOWARN += -Wno-switch-default
+export NOWARN += -Wno-double-promotion
+export NOWARN += -Wno-pre-c23-compat
+export NOWARN += -Wno-gnu-statement-expression-from-macro-expansion
+export LIBS += -lunwind
+export LIBS += -llogger
+export LIBS += -lautils
+export LIBS += -lrender
+export LIBS += -lobjectlogic
+export LIBS += -lsyslogic
+export LIBS += -lgamelogic
+export LIBS += -lraylib
+export LIBS += -lobjecthandler
+export LIBS += -lm
+export LIBS += -lpthread
+export LIBS += -ldl
+export LIBS += -lrt
+export LIBS += -lglfw
+export LIBS += -lcollision
+export LIBS += -lstatemachine
+export LIBS += -lmenulogic
+export LIBS += -lasteroid
 
 # Define these to enable debugging and benchmarking respectively
-
 # SANITIZE will be read from user env
 ifdef SANITIZE
-export SANITIZER += -fno-omit-frame-pointer
-export SANITIZER += -fsanitize=address
-export SANITIZER += -fsanitize-address-use-after-return=always
+export SANITIZE = -fsanitize=address -fsanitize-address-use-after-return=always -fno-omit-frame-pointer
 endif # SANITIZE
 
 # DEBUGGING will be read from user env
 ifdef DEBUG
 export DEBUGGING = -DDEBUGGING
 export LIBS += -lvisdebugger
-export OPTIMIZE = -O0 -g3 # Overrides previous optimization options
+
+ifndef OPTIMIZE
+export OPTIMIZE=-Og -g # Overrides previous optimization options
+endif # OPTIMIZE
+
 endif # DEBUGGING
 
+# Optimizations options (will be overriten if debugging is enabled or passed as env)
 ifndef OPTIMIZE
 export OPTIMIZE=-O2 -g0
 endif
