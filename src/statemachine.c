@@ -54,59 +54,37 @@ int StateMachine(void) {
             GAME_STATE = RUNNING;
             break;
         }
+        case START_NEW: {
             tracker    = InitTracker();
             mtDataWrap = InitMT(tracker);
             NewGame(tracker);
             GAME_STATE = RUNNING;
             break;
         }
-<<<<<<< variant A
-    case START_NEW: {
->>>>>>> variant B
-        tracker    = InitTracker();
-        mtDataWrap = InitMT(tracker);
-        NewGame(tracker);
-        GAME_STATE = RUNNING;
-        break;
-    }
-======= end
 
-        tracker = InitTracker();
-        NewGame(tracker);
-        GAME_STATE = RUNNING;
-        break;
-    }
+        case GAME_OVER: {
+            char msg[128] = "";
+            sprintf(msg, "Your score: %d", tracker->playerScore);
+            MenuControlls(curMenu, &menuHighlighted);
+            RunMenuRender(curMenu, menuHighlighted, 1, msg);
+            break;
+        }
 
-case GAME_OVER: {
-    char msg[128] = "";
-    sprintf(msg, "Your score: %d", tracker->playerScore);
-    MenuControlls(curMenu, &menuHighlighted);
-    RunMenuRender(curMenu, menuHighlighted, 1, msg);
-    break;
-}
+        case RUNNING: {
 
-case RUNNING: {
+            DEBUG(SPEED_PREV = tracker->playerPtr->objPtr->speed;
+                  DebugingKeyHandler(tracker);)
 
-<<<<<<< variant A
-    #ifdef BENCHMARKING
-    LOG(BENCH, "%s", "<--- Started frame cycle --->");
-    BenchStart(&timerStartTotalCycle);
-    #endif // BENCHMARKING
-    >>>>>>> variant B DEBUG(SPEED_PREV = tracker->playerPtr->objPtr->speed;
-                            DebugingKeyHandler(tracker);)
-
-                DEBUG(if (!DEBUG_PAUSE) {)
+            DEBUG(if (!DEBUG_PAUSE) {)
 
                 CollectThreads(mtDataWrap);
-                    SpawnAsteroidOnTime(tracker);
-                    RunActionList(tracker);
-                    RunThreads(mtDataWrap);
-                    GAME_TIME_PASSED += GetFrameTime();
+                SpawnAsteroidOnTime(tracker);
+                RunActionList(tracker);
+                RunThreads(mtDataWrap);
+                GAME_TIME_PASSED += GetFrameTime();
 
                 DEBUG(
-                })
-======= end
-
+            })
             DEBUG(if (tracker->playerPtr) SPEED_PREV =
                       tracker->playerPtr->objPtr->speed;
                   DebugingKeyHandler(tracker);
@@ -131,9 +109,9 @@ case RUNNING: {
 
         case PAUSE: {
 
-    #ifdef DEBUGGING
+#ifdef DEBUGGING
             DebugingKeyHandler(tracker);
-    #endif // DEBUGGING
+#endif // DEBUGGING
 
             // Controlls
             curMenu = &refPauseMenu;
@@ -148,30 +126,16 @@ case RUNNING: {
             break;
         }
 
-<<<<<<< variant A
         case EXIT: {
             CloseWindow();
             return 0;
         }
->>>>>>> variant B
-            case CLEANUP: {
-                curMenu = &refMainMenu;
-                DeleteTracker(tracker);
-                MTCleanupAndFree(mtDataWrap);
-                mtDataWrap = 0;
-                tracker = 0;
-                if ( NEXT_STATE == NOOP ) GAME_STATE = EXIT;
-                GAME_TIME_PASSED = 0;
-                GAME_STATE = NEXT_STATE;
-                NEXT_STATE = NOOP;
-                break;
-            }
-======= end
-
         case CLEANUP: {
             curMenu = &refMainMenu;
             DeleteTracker(tracker);
-            tracker = 0;
+            MTCleanupAndFree(mtDataWrap);
+            mtDataWrap = 0;
+            tracker    = 0;
             if (NEXT_STATE == NOOP) GAME_STATE = EXIT;
             GAME_TIME_PASSED = 0;
             GAME_STATE       = NEXT_STATE;
