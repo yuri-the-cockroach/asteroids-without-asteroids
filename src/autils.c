@@ -55,23 +55,23 @@ long GetTimeMicS(void) {
 }
 
 void CleanupMemory(objTracker *tracker) {
-    unsigned long i = 0;
-    unsigned long firstNull = MAX_OBJECT_COUNT;
+    unsigned long i           = 0;
+    unsigned long firstNull   = MAX_OBJECT_COUNT;
     unsigned long nullCounter = 0;
-    objWrap *current = 0;
+    objWrap *current          = 0;
 
-    while ( i < tracker->objListLen ) {
+    while (i < tracker->objListLen) {
         current = tracker->objList[i];
-        if ( !current ) {
+        if (!current) {
             firstNull = i < firstNull ? i : firstNull;
             nullCounter++;
         }
-        if ( current && firstNull < i) {
+        if (current && firstNull < i) {
             tracker->objList[firstNull] = current;
-            tracker->objList[i] = 0;
-            i = firstNull;
-            nullCounter = 0;
-            firstNull = MAX_OBJECT_COUNT;
+            tracker->objList[i]         = 0;
+            i                           = firstNull;
+            nullCounter                 = 0;
+            firstNull                   = MAX_OBJECT_COUNT;
         }
         i++;
     }
