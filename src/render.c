@@ -41,16 +41,7 @@ void DisplayText(Vector2 pos, int fontSize, Color color,
     DrawText(messageString, (int)pos.x, (int)pos.y, fontSize, color);
 }
 
-void DrawRectLineNotFucked(int x, int y, int width, int height, Color color) {
-    DrawLine(x, y, x + width, y, color);
-    DrawLine(x + width, y, x + width, y + height, color);
-    DrawLine(x + width, y + height, x, y + height, color);
-    DrawLine(x, y + height, x, y, color);
-    return;
-}
-
 void DrawObject(objWrap *wrap) {
-
 #ifdef DEBUGGING
     if (VISUAL_DEBUG)
         DrawRectangleLines(

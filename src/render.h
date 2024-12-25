@@ -21,7 +21,4 @@ void RunScreenRender(objTracker *tracker);
 void RunWorldRender(objTracker *tracker);
 void RunMenuRender(const menuParent *menu, int menuHighlighted,
                    int subTitleLinesNum, ...);
-
-void DrawRectLineNotFucked(int x, int y, int width, int height, Color color);
-
 #endif // RENDER_H_
