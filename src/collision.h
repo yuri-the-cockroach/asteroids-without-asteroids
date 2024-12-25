@@ -1,8 +1,8 @@
 #ifndef COLLISION_H_
 #define COLLISION_H_
 
-#include "structs.h"
 #include "logger.h"
+#include "structs.h"
 
 #define BOUCE_CONSTANT 100
 
@@ -47,7 +47,10 @@ void Bounce(objTracker *tracker, objWrap *first, objWrap *second);
 // If object callided with a projectile
 void GetShot(objTracker *tracker, objWrap *first, objWrap *second);
 
-collider InitCollider(float sizeMult, void (*ActionOnCollision)(objTracker *tracker, objWrap *first, objWrap *second));
+collider InitCollider(float sizeMult,
+                      void (*ActionOnCollision)(objTracker *tracker,
+                                                objWrap *first,
+                                                objWrap *second));
 
 int UpdateCollider(objWrap *wrap);
 

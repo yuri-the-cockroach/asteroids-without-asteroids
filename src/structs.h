@@ -190,7 +190,6 @@ static const Vector2 PROJECTILE_SHAPE_POINTS[] = {
 
 // -------------------- structs --------------------
 
-
 struct mt_data_wrap {
     pthread_t *threads;
     struct mt_init_struct *initStructList;
