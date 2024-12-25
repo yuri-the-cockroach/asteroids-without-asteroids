@@ -1,10 +1,130 @@
 // system includes
 #include <stdlib.h>
+#include <pthread.h>
+#include <immintrin.h>
+#include <errno.h>
 
 // local includes
 #include "collision.h"
 #include "autils.h"
 #include "structs.h"
+#include "logger.h"
+
+
+// void *EasyThreadAVX(void *arg) {
+//     long collisionCount = 0;
+//     struct mt_init_struct *init = (struct mt_init_struct*)arg;
+//     object **objList = init->list;
+//     init->result = CountCollisionsHackyAVXDos(objList, init->size, init->id, 24);
+//     return NULL;
+// }
+
+
+
+void *EasyThread(void *arg) {
+    objWrap *current, *next;
+
+    struct mt_init_struct *init = (struct mt_init_struct*)arg;
+    init->KeepRunning = true;
+    objTracker *tracker = init->tracker;
+
+    pthread_mutex_init(&init->threadMutex, NULL);
+    pthread_cond_init(&init->threadWakeupSignal, NULL);
+    pthread_mutex_lock(&init->threadMutex);
+
+    pthread_cond_wait(&init->threadWakeupSignal, &init->threadMutex);
+    do {
+        for (unsigned int i = init->id; i < tracker->objListLen; i += N_CPU_THREADS) {
+            current = tracker->objList[i];
+            for (unsigned int j = i + 1; j < tracker->objListLen; j++) {
+                next = tracker->objList[j];
+
+                if (tracker->objList[j] == NULL || current == next ||
+                    next->request != UPDATE || !next->collider.isCollidable)
+                    continue;
+
+                if ( current->objectType == next->objectType && current->objectType == PROJECTILE ) continue;
+
+                if (current->collider.collider.x + current->collider.collider.width <=
+                    next->collider.collider.x)
+                    break;
+
+                if (!CheckIfCollide(current, next))
+                    continue;
+
+                if (current->objectType > next->objectType) {
+                    current->collider.ActionOnCollision(tracker, current, next);
+                    continue;
+                }
+
+                next->collider.ActionOnCollision(tracker, next, current);
+            }
+        }
+        pthread_cond_wait(&init->threadWakeupSignal, &init->threadMutex);
+    } while (init->KeepRunning);
+    return NULL;
+}
+
+int CollectThreads(struct mt_data_wrap *dataWrap) {
+    for ( unsigned int i = 0; i < N_CPU_THREADS; i++ ) {
+        pthread_mutex_lock(&dataWrap->initStructList[i].threadMutex);
+        pthread_mutex_unlock(&dataWrap->initStructList[i].threadMutex);
+    }
+    return 0;
+}
+
+
+int MTCleanupAndFree(struct mt_data_wrap *dataWrap) {
+    if (!dataWrap) {
+        LOG(DEBUG, "%", "Null pointer was passed to be freed");
+        return 0;
+    }
+
+    for ( unsigned int i = 0; i < N_CPU_THREADS; i++ ) {
+        dataWrap->initStructList[i].KeepRunning = false;
+        pthread_cond_signal(&dataWrap->initStructList[i].threadWakeupSignal);
+    }
+
+    for ( unsigned int i = 0; i < N_CPU_THREADS; i++ ) {
+        pthread_join(dataWrap->threads[i], NULL);
+    }
+
+    free(dataWrap->initStructList);
+    free(dataWrap->threads);
+    free(dataWrap);
+    return 0;
+}
+
+int RunThreads(struct mt_data_wrap *dataWrap) {
+    for ( unsigned int i = 0; i < N_CPU_THREADS; i++ ) {
+        pthread_mutex_unlock(&dataWrap->initStructList[i].threadMutex);
+        int ret = pthread_cond_signal(&dataWrap->initStructList[i].threadWakeupSignal);
+        errno = ret ? ret : errno;
+    }
+    return errno;
+}
+
+struct mt_data_wrap *InitMT(objTracker *tracker) {
+
+    struct mt_data_wrap *dataWrap = calloc(1, sizeof(struct mt_data_wrap));
+    *dataWrap = (struct mt_data_wrap){
+        .threads = calloc((unsigned long)N_CPU_THREADS, sizeof(pthread_t)),
+        .initStructList = calloc((unsigned long)N_CPU_THREADS, sizeof(struct mt_init_struct)),
+    };
+
+    for (unsigned int i = 0; i < N_CPU_THREADS; i++ ) {
+        dataWrap->initStructList[i] = (struct mt_init_struct) {
+            .id = i,
+            .tracker = tracker
+        };
+        pthread_create(&dataWrap->threads[i], NULL, EasyThread, &dataWrap->initStructList[i]);
+    }
+
+    return dataWrap;
+}
+
+
+
 
 bool FindAnyCollision(objTracker *tracker, objWrap *first) {
     if (tracker->objListLen < 2)
@@ -83,43 +203,6 @@ void SortListByX(objTracker *tracker) {
         if (i > 1)
             i--;
     }
-}
-
-void FastFindCollisions(objTracker *tracker, unsigned long index) {
-    objWrap *current = tracker->objList[index];
-    if (tracker->objListLen < 2)
-        return;
-
-    if (!current)
-        return;
-
-    if (current->request == DELETE)
-        return;
-
-    objWrap *next;
-
-    for (unsigned long j = index + 1; j < tracker->objListLen; j++) {
-        next = tracker->objList[j];
-
-        if (tracker->objList[j] == NULL || current == next ||
-            next->request != UPDATE || !next->collider.isCollidable)
-            continue;
-
-        if (current->collider.collider.x + current->collider.collider.width <=
-            next->collider.collider.x)
-            break;
-        if (!CheckIfCollide(current, next))
-            continue;
-
-        if ( current->objectType == next->objectType && current->objectType == PROJECTILE ) continue;
-
-        if (current->objectType > next->objectType) {
-            current->collider.ActionOnCollision(tracker, current, next);
-            continue;
-        }
-        next->collider.ActionOnCollision(tracker, next, current);
-    }
-    return;
 }
 
 void ApplyMassBasedRandRotation(objWrap *wrap) {

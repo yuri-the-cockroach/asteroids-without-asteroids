@@ -190,6 +190,20 @@ static const Vector2 PROJECTILE_SHAPE_POINTS[] = {
 
 // -------------------- structs --------------------
 
+
+struct mt_data_wrap {
+    pthread_t *threads;
+    struct mt_init_struct *initStructList;
+};
+
+struct mt_init_struct {
+    pthread_mutex_t threadMutex;
+    pthread_cond_t threadWakeupSignal;
+    objTracker *tracker;
+    unsigned int id;
+    bool KeepRunning;
+};
+
 struct shape_struct {
     float sizeMult;
     unsigned int arrayLength;

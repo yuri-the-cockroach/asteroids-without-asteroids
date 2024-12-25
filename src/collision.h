@@ -6,6 +6,22 @@
 
 #define BOUCE_CONSTANT 100
 
+// Thread function that looks for collisions
+void *EasyThread(void *arg);
+
+// Run all threads for one cycle
+int RunThreads(struct mt_data_wrap *dataWrap);
+
+// Make sure that all threads are finished
+int CollectThreads(struct mt_data_wrap *dataWrap);
+
+// Cleanup after MT functions
+int MTCleanupAndFree(struct mt_data_wrap *dataWrap);
+
+// Create threads and prepare them for `RunThreads` func
+// return `struct mt_data_wrap` they are managed by
+struct mt_data_wrap *InitMT(objTracker *tracker);
+
 // Check anything collides with this object
 // Return either TRUE or FALSE
 bool FindAnyCollision(objTracker *tracker, objWrap *first);
