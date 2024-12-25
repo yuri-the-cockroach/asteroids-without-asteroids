@@ -25,7 +25,13 @@ float RollOverFloat(float d, float min, float max) {
     return t > max ? min : t;
 }
 
-// Rollover the number, if it gets over max or under min
+float fCutOff(float f, int n) {
+    if (n == 0) return (float)(int)f;
+    float mult = powf(10.f, (float)n);
+    int temp   = (int)(f * mult);
+    return (float)temp / mult;
+}
+
 int RollOverInt(int d, int min, int max) {
     const int t = d < min ? max : d;
     return t > max ? min : t;
