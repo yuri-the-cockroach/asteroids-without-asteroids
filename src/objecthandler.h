@@ -3,12 +3,6 @@
 
 #include "structs.h"
 
-#include "autils.h"
-#include "collision.h"
-#include "gamelogic.h"
-#include "objectlogic.h"
-#include "render.h"
-
 // Go through the list of tracked objects and call UpdateObj function on them
 void RunActionList(objTracker *tracker);
 
@@ -30,8 +24,7 @@ objWrap InitWrap(void);
 int AddWrapToList(objTracker *tracker, objWrap *wrap);
 
 // A wrapper funciton for AddWrapToList, to create a player
-void CreatePlayer(objTracker *tracker, Vector2 initPosition,
-                  float size);
+void CreatePlayer(objTracker *tracker, Vector2 initPosition, float size);
 
 // Creates a projectile that inherits from it's parent
 void CreateProjectile(objTracker *tracker, objWrap *parent);
@@ -44,6 +37,5 @@ void DeleteTrackedObject(objTracker *tracker, unsigned long index);
 
 // Deinit tracker and everything in it
 void DeleteTracker(objTracker *tracker);
-
 
 #endif // OBJECTHANDLER_H_
