@@ -1,45 +1,26 @@
 // system includes
-#include <stdlib.h>
 #include <errno.h>
+#include <stdlib.h>
 
 // local includes
-#include "objecthandler.h"
 #include "asteroid.h"
 #include "autils.h"
 #include "collision.h"
 #include "logger.h"
+#include "objecthandler.h"
 #include "objectlogic.h"
 #include "structs.h"
-
-#ifdef BENCHMARKING
-    #include "benchmarking.h"
-#endif // BENCHMARKING
 
 // Returns a list of objects that need to be drawn
 void RunActionList(objTracker *tracker) {
 
-#ifdef BENCHMARKING
-    long benchmarkStart = 0;
-    long sortCalledAt = 0;
-    BENCH_COLLIDER_TIME = 0;
-    LOG(BENCH, "%s", "<- Starting action list ->");
-
-    BenchStart(&benchmarkStart);
-    BenchStart(&sortCalledAt);
-#endif // BENCHMARKING
-
     SortListByX(tracker);
-
-#ifdef BENCHMARKING
-    BenchEnd(&sortCalledAt, "Sorter");
-#endif
 
     // Run through all the tracked objects
     for (unsigned long i = 0; i < tracker->objListLen; i++) {
 
         // Check if current object is NULLed (it really shouldn't be)
-        if (tracker->objList[i] == 0)
-            continue;
+        if (tracker->objList[i] == 0) continue;
         // If it is somehow NULL, then cleanup:
         // Check if there's any elements ahead at all. If not just decrement
         // the length of the list.
@@ -47,38 +28,29 @@ void RunActionList(objTracker *tracker) {
         objWrap *current = tracker->objList[i];
         switch (current->request) {
 
-            case CREATE:
-                current->request = UPDATE;
-                break;
+        case CREATE:
+            current->request = UPDATE;
+            break;
 
-            case DELETE: // Delete element from the list
-                DeleteTrackedObject(tracker, i);
-                break;
+        case DELETE: // Delete element from the list
+            DeleteTrackedObject(tracker, i);
+            break;
 
-            case SEPARATE:
-                Separate(tracker, tracker->objList[i]);
-                i--;
-                break;
+        case SEPARATE:
+            Separate(tracker, tracker->objList[i]);
+            i--;
+            break;
 
-            case UPDATE: // Call the updater function of the element
-            {
-                UpdateObj(tracker, i);
-                break;
-            }
+        case UPDATE: // Call the updater function of the element
+        {
+            UpdateObj(tracker, i);
+            break;
+        }
 
-            case IGNORE:
-                break;
+        case IGNORE:
+            break;
         }
     }
-
-    #ifdef BENCHMARKING
-        if (BENCHRUNNING) {
-            LOG(BENCH, "Collider took %ldus for %d objects", BENCH_COLLIDER_TIME, tracker->objListLen);
-            BENCH_COLLIDER_TIME = 0;
-        }
-
-        if (BENCHRUNNING) LOG(BENCH, "<- Action list finished in %ldus ->", GetTimeMicS() - benchmarkStart);
-    #endif
 
     CleanupMemory(tracker);
 }
@@ -87,27 +59,22 @@ void UpdateObj(objTracker *tracker, unsigned long index) {
 
     objWrap *wrap = tracker->objList[index];
 
-    BENCH(if ( wrap->collider.isCollidable)
-        FastFindCollisions(tracker, index);, "Search for collisions")
-
+    if (wrap->collider.isCollidable) FastFindCollisions(tracker, index);
     if (wrap->isRotatableByGame) {
         RotateObject(wrap, (wrap->objPtr->rotateSpeed));
     }
 
-    if (wrap->updatePosition)
-        UpdateObjectPos(wrap);
-
+    if (wrap->updatePosition) UpdateObjectPos(wrap);
 }
 
 objTracker *InitTracker(void) {
     objTracker *tracker = calloc(1, sizeof(objTracker));
-    tracker[0] = (objTracker){
-        NULL,
-        { 0 },
-        (objWrap **)calloc(MAX_OBJECT_COUNT, sizeof(objWrap*)),
-        0,
-        0
-    };
+    tracker[0] =
+        (objTracker){ NULL,
+                      { .zoom = 1 },
+                      (objWrap **)calloc(MAX_OBJECT_COUNT, sizeof(objWrap *)),
+                      0,
+                      0 };
     return tracker;
 }
 
@@ -119,12 +86,7 @@ objWrap InitWrap(void) {
         false,
         false,
         0,
-        {
-        false,
-        { 0, 0, 0, 0 },
-        0,
-        NULL
-        },
+        { false, { 0, 0, 0, 0 }, 0, NULL },
         0
     };
 }
