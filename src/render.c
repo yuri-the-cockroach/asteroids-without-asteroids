@@ -5,6 +5,7 @@
 // local includes
 #include "autils.h"
 #include "render.h"
+#include "rlgl.h"
 #include "structs.h"
 
 #ifdef DEBUGGING
@@ -93,41 +94,24 @@ void DrawObject(objWrap *wrap) {
         LOG(WARNING, "%s", "Attempting to draw an empty shape");
     }
 
-    unsigned int prevPoint = 0;
-    for (unsigned int curPoint = 1; curPoint < wrap->objPtr->shape.arrayLength;
-         curPoint++) {
-        DrawLineEx(
-            (Vector2){ // Draw from x/y
-                       wrap->objPtr->shape.points[prevPoint].x +
-                           wrap->objPtr->position.x,
-                       wrap->objPtr->shape.points[prevPoint].y +
-                           wrap->objPtr->position.y },
-            (Vector2){ // Draw to x/y
-                       wrap->objPtr->shape.points[curPoint].x +
-                           wrap->objPtr->position.x,
-                       wrap->objPtr->shape.points[curPoint].y +
-                           wrap->objPtr->position.y },
-            2.0,  // Thikness of the line
-            WHITE // Color of the line
-        );
-        prevPoint = curPoint;
-    }
+    // Texturing is only supported on RL_QUADS
+    rlBegin(RL_LINES);
+    rlColor4ub(RAYWHITE.r, RAYWHITE.g, RAYWHITE.b, RAYWHITE.a);
+    bool shouldEnd = false;
+    for (unsigned int i = 1; i <= wrap->objPtr->shape.arrayLength && !shouldEnd;
+         i++) {
+        rlVertex2f(
+            wrap->objPtr->shape.points[i - 1].x + wrap->objPtr->position.x,
+            wrap->objPtr->shape.points[i - 1].y + wrap->objPtr->position.y);
 
-    // Draw the final line to finish the form. I'm too lazy to do this less
-    // janky
-    DrawLineEx(
-        (Vector2){ // Draw from x/y
-                   wrap->objPtr->shape.points[0].x + wrap->objPtr->position.x,
-                   wrap->objPtr->shape.points[0].y + wrap->objPtr->position.y },
-        (Vector2){
-            // Draw to x/y
-            wrap->objPtr->shape.points[wrap->objPtr->shape.arrayLength - 1].x +
-                wrap->objPtr->position.x,
-            wrap->objPtr->shape.points[wrap->objPtr->shape.arrayLength - 1].y +
-                wrap->objPtr->position.y },
-        1.0,  // Thikness of the line
-        WHITE // Color of the line
-    );
+        if (i == wrap->objPtr->shape.arrayLength) {
+            i         = 0;
+            shouldEnd = true;
+        }
+        rlVertex2f(wrap->objPtr->shape.points[i].x + wrap->objPtr->position.x,
+                   wrap->objPtr->shape.points[i].y + wrap->objPtr->position.y);
+    }
+    rlEnd();
 }
 
 void DrawGrid2D(int dist, Color color) {
