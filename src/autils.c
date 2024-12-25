@@ -79,7 +79,7 @@ void CleanupMemory(objTracker *tracker) {
 }
 
 int CreateLogFile(void) {
-    time_t t = time(NULL);
+    time_t t           = time(NULL);
     struct tm timedate = *localtime(&t);
 
     struct stat statThingi;
@@ -108,7 +108,7 @@ int CreateLogFile(void) {
             timedate.tm_sec);
 
     LOG_FILE_PTR = fopen(LOG_FILE_NAME, "a");
-    errno = 0;
+    errno        = 0;
 
     return 0;
 }
@@ -116,8 +116,8 @@ int CreateLogFile(void) {
 int GetStartUpArguments(int argc, char **argv) {
     if (argc > 1) {
         for (int i = 1; i < argc; i++) {
-            if (!strcmp(argv[i], "-lc") || !strcmp(argv[i], "--loglevelconsole"))
-            {
+            if (!strcmp(argv[i], "-lc") ||
+                !strcmp(argv[i], "--loglevelconsole")) {
                 i++;
 
                 int newLogLevel = ClampInt(atoi(argv[i]), 0, 8);
@@ -132,9 +132,7 @@ int GetStartUpArguments(int argc, char **argv) {
                 }
             }
 
-
-            if (!strcmp(argv[i], "-lf") || !strcmp(argv[i], "--loglevelfile"))
-            {
+            if (!strcmp(argv[i], "-lf") || !strcmp(argv[i], "--loglevelfile")) {
                 i++;
 
                 int newLogLevel = ClampInt(atoi(argv[i]), 0, 8);
