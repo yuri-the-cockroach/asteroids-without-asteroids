@@ -1,8 +1,12 @@
 #ifndef BENCHMARKING_H_
 #define BENCHMARKING_H_
-#include "structs.h"
-#include "logger.h"
-#include "autils.h"
+
+#define BENCH(what, total)              \
+    ({                                  \
+        long start = GetTimeMicS();     \
+        what;                           \
+        total += GetTimeMicS() - start; \
+    })
 
 int BenchStart(long *timerStart);
 
