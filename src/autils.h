@@ -1,37 +1,34 @@
 #ifndef ASTEROIDSUTILS_H_
 #define ASTEROIDSUTILS_H_
 
-#include "structs.h"
 #include "logger.h"
-#include <time.h>
+#include "structs.h"
+#include <assert.h>
 #include <sys/stat.h>
 
+#pragma GCC diagnostic ignored "-Wunused-macros"
+
 #define UNUSED(x) (void)(x)
-
-#pragma GCC diagnostic ignored "-Wunused-macros"
-#define BENCH(a, str) a
-
-#ifdef BENCHMARKING
-
-#pragma GCC diagnostic ignored "-Wmacro-redefined"
-#define BENCH(a, str) \
-{ \
-    long start = 0; \
-    BenchStart(&start);\
-    a                   \
-    BenchEnd(&start, str);\
-}
-#endif
-
-#pragma GCC diagnostic ignored "-Wunused-macros"
-
 #define DEBUG(a)
+
 #ifdef DEBUGGING
-#pragma GCC diagnostic ignored "-Wmacro-redefined"
-#define DEBUG(a) a
+    #pragma GCC diagnostic ignored "-Wmacro-redefined"
+    #define DEBUG(a) a
 #endif // DEBUGGING
 
+#define ASSERT(pass_condition, format, ...)      \
+    ({                                           \
+        if (!pass_condition) {                   \
+            LOG(TEST_FAIL, format, __VA_ARGS__); \
+            assert(pass_condition);              \
+        }                                        \
+        LOG(TEST_PASS, format, __VA_ARGS__);     \
+    })
 
+// Cutoff decimal digits after `n` from a float,
+// Where `n` is a power of 10,
+// i.e. `fCutOff(10.4242f, 2)` -> `10.42f`
+float fCutOff(float f, int n);
 
 // Clap float from min to max
 // I hate this code
