@@ -1,47 +1,53 @@
 #include <raylib.h>
 #include <string.h>
 
-#include "gamelogic.h"
 #include "asteroid.h"
 #include "autils.h"
+#include "collision.h"
+#include "gamelogic.h"
+#include "menulogic.h"
 #include "structs.h"
 #include "visdebugger.h"
-#include "menulogic.h"
 
 void OnPlayerAccellerate(object *object, float speed) {
     float mult_x = 1;
     float mult_y = 1;
 
-    if ( fabsf(object->speed.x + speed) > fabsf(object->speed.x) ) {
+    if (fabsf(object->speed.x + speed) > fabsf(object->speed.x)) {
         mult_x = fabsf(object->speed.x / 500.f);
         mult_x = mult_x > 1 ? mult_x : 1;
     }
 
-    if ( fabsf(object->speed.y + speed) > fabsf(object->speed.y) ) {
+    if (fabsf(object->speed.y + speed) > fabsf(object->speed.y)) {
         mult_y = fabsf(object->speed.y / 500.f);
         mult_y = mult_y > 1 ? mult_y : 1;
     }
 
-    object->speed.x += (speed / mult_x) * GetFrameTime() * object->shape.points[0].x;
-    object->speed.y += (speed / mult_y) * GetFrameTime() * object->shape.points[0].y;
+    object->speed.x +=
+        (speed / mult_x) * GetFrameTime() * object->shape.points[0].x;
+    object->speed.y +=
+        (speed / mult_y) * GetFrameTime() * object->shape.points[0].y;
 
     // object->speed.x +=  object->shape.points[0].x * (speed * GetFrameTime());
     // object->speed.y += object->shape.points[0].y * (speed * GetFrameTime());
 }
 
-
 #ifdef DEBUGGING
 void DebugingKeyHandler(objTracker *tracker) {
 
     // Allows to drag asteroids
-    Vector2 cursorPos = (Vector2){
-            (GetMousePosition().x - tracker->playerCamera.offset.x) / tracker->playerCamera.zoom + tracker->playerCamera.target.x ,
-            (GetMousePosition().y - tracker->playerCamera.offset.y) / tracker->playerCamera.zoom + tracker->playerCamera.target.y
-    };
+    Vector2 cursorPos =
+        (Vector2){ (GetMousePosition().x - tracker->playerCamera.offset.x) /
+                           tracker->playerCamera.zoom +
+                       tracker->playerCamera.target.x,
+                   (GetMousePosition().y - tracker->playerCamera.offset.y) /
+                           tracker->playerCamera.zoom +
+                       tracker->playerCamera.target.y };
 
     objWrap *some = NULL;
-    if (IsMouseButtonDown(0) && ((some = FindCollisionPos(tracker, cursorPos)) || lastDragged)) {
-        if ( some ) {
+    if (IsMouseButtonDown(0) &&
+        ((some = FindCollisionPos(tracker, cursorPos)) || lastDragged)) {
+        if (some) {
             lastDragged = some;
         }
         some = !some && lastDragged ? lastDragged : some;
@@ -51,7 +57,9 @@ void DebugingKeyHandler(objTracker *tracker) {
     }
 
     if (lastDragged && !IsMouseButtonDown(0)) {
-        lastDragged->objPtr->speed = (Vector2){GetMouseDelta().x / GetFrameTime(), GetMouseDelta().y / GetFrameTime()};
+        lastDragged->objPtr->speed =
+            (Vector2){ GetMouseDelta().x / GetFrameTime(),
+                       GetMouseDelta().y / GetFrameTime() };
 
         lastDragged = NULL;
     } // End of dragging
@@ -69,7 +77,7 @@ void DebugingKeyHandler(objTracker *tracker) {
     if (IsKeyPressed('T')) {
         GDB_BREAK = !GDB_BREAK;
         printf("Breakpoint says hi\n");
-   }
+    }
     if (IsKeyPressed('V')) {
         VISUAL_DEBUG = !VISUAL_DEBUG;
     }
@@ -102,7 +110,6 @@ void DebugingKeyHandler(objTracker *tracker) {
 
         if (IsKeyPressed('3')) {
 
-
             CreateAsteroid(
                 tracker, (Vector2){ 300, 900 }, (Vector2){ -30, 0 }, 0, 4);
             CreateAsteroid(
@@ -134,8 +141,7 @@ void DebugingKeyHandler(objTracker *tracker) {
             }
         }
 
-
-        #ifdef BENCHMARKING
+#ifdef BENCHMARKING
         if (IsKeyPressed('B') && BENCH_LOG_FILE_PTR) {
             if (!BENCHRUNNING) {
                 BENCHRUNNING = true;
@@ -154,7 +160,7 @@ void DebugingKeyHandler(objTracker *tracker) {
                 }
             }
         }
-        #endif // BENCHMARKING
+#endif // BENCHMARKING
 
         if (IsKeyPressed('0')) {
             for (unsigned int i = 0; i < tracker->objListLen; i++) {
@@ -170,8 +176,7 @@ void DebugingKeyHandler(objTracker *tracker) {
 
         if (IsKeyPressed('-')) {
             if (tracker->objListLen > 1) {
-                objWrap *toDelete =
-                    tracker->objList[tracker->objListLen - 1];
+                objWrap *toDelete = tracker->objList[tracker->objListLen - 1];
                 if (toDelete == tracker->playerPtr)
                     toDelete = tracker->objList[tracker->objListLen - 2];
                 toDelete->request = DELETE;
@@ -183,7 +188,8 @@ void DebugingKeyHandler(objTracker *tracker) {
 
 void ShipControlls(objTracker *tracker) {
 
-    if ( !tracker->playerPtr ) return;
+    if (!tracker->playerPtr)
+        return;
     if (IsKeyDown('W'))
         OnPlayerAccellerate(tracker->playerPtr->objPtr, PLAYER_MOVE_SPEED);
     if (IsKeyDown('S'))
@@ -215,7 +221,8 @@ const menuParent *MenuControlls(const menuParent *menu, int *menuHighlighted) {
     }
 
     // strcmp result is inverted, because reasons I guess...
-    if (IsKeyPressed(KEY_ESCAPE) && !strcmp(menu->name, refDifficultyMenu.name)) {
+    if (IsKeyPressed(KEY_ESCAPE) &&
+        !strcmp(menu->name, refDifficultyMenu.name)) {
         *menuHighlighted = 0;
         return &refMainMenu;
     }
@@ -264,13 +271,20 @@ void PlayerRuntimeControlls(objTracker *tracker) {
 
 void NewGame(objTracker *tracker) {
     LAST_SHOT = 0;
-    CreatePlayer(tracker, (Vector2){ WORLD_POS_MAX_X / 2.f,WORLD_POS_MAX_Y / 2.f  }, 0.5);
+    CreatePlayer(tracker,
+                 (Vector2){ WORLD_POS_MAX_X / 2.f, WORLD_POS_MAX_Y / 2.f },
+                 0.5);
 }
 
 int SpawnAsteroidOnTime(objTracker *tracker) {
-    if (NEXT_ASTEROID_SPAWN >= GAME_TIME_PASSED) return 0;
+    if (NEXT_ASTEROID_SPAWN >= GAME_TIME_PASSED)
+        return 0;
     LAST_ASTEROID_SPAWN = GAME_TIME_PASSED;
-    NEXT_ASTEROID_SPAWN = LAST_ASTEROID_SPAWN + ((2.f / ( logf((float)tracker->playerScore / 100.f + 1.2f))) - 1);
-    if  (!AsteroidSafeSpawn(tracker)) return -1;
+    NEXT_ASTEROID_SPAWN =
+        LAST_ASTEROID_SPAWN +
+        ((2.f / (logf((float)tracker->playerScore / 100.f + 1.2f))) - 1);
+
+    if (!AsteroidSafeSpawn(tracker))
+        return -1;
     return 1;
 }
