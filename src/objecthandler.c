@@ -189,8 +189,7 @@ void CreateProjectile(objTracker *tracker, objWrap *parent) {
     projectile[0]       = InitWrap();
     if (AddWrapToList(tracker, projectile)) {
         errno = 0;
-        free(projectile); // TODO: Make a propper logger and call it
-                          // when something goes wrong
+        free(projectile);
         return;
     }
 
