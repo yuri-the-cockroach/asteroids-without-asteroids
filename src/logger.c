@@ -14,29 +14,27 @@ void Logger(const char *restrict inFile, const char *restrict inFunc,
 
     va_list argptr;
 
-    FILE *file = LOG_FILE_PTR;
-#ifdef BENCHMARKING
-    file = loglevel == BENCH ? BENCH_LOG_FILE_PTR : file;
-#endif
-
     // Count how many arguments we have
     // by counting format specifiers in a format string
 
     // Pass all the arguments to the vsprinf, which will fill it into the
     // message string. If argptr is 0, then it will just be ignored (hopefully)
-    va_start(argptr, 0);
-    vsprintf(messageString, format, argptr);
+    va_start(argptr);
+
+    const char *restrict format = va_arg(argptr, const char *restrict);
+    vsnprintf(messageString, 1024, format, argptr);
     va_end(argptr);
 
     struct timeval time = (struct timeval){ 0, 0 };
     gettimeofday(&time, 0);
     char formatedTime[64] = "";
-    sprintf(formatedTime,
-            "%.2ld-%.2ld-%.2ld.%ld",
-            (time.tv_sec / 3600 + 3) % 24,
-            time.tv_sec / 60 % 60,
-            time.tv_sec % 60,
-            time.tv_usec);
+    snprintf(formatedTime,
+             64,
+             "%.2ld-%.2ld-%.2ld.%ld",
+             (time.tv_sec / 3600 + 3) % 24,
+             time.tv_sec / 60 % 60,
+             time.tv_sec % 60,
+             time.tv_usec);
 
     // Actually print to stderr
     if (CURRENT_LOG_LEVEL_CONSOLE >= loglevel)
@@ -49,7 +47,7 @@ void Logger(const char *restrict inFile, const char *restrict inFunc,
                 onLine,
                 messageString);
 
-    fprintf(file,
+    fprintf(LOG_FILE_PTR,
             "[%s] %s %s->%s:%d %s\n",
             loglvlToStringNoColor[loglevel],
             formatedTime,
