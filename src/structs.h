@@ -11,6 +11,7 @@
 // Include
 #include <err.h>
 // StdThingings
+#include <pthread.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
