@@ -63,6 +63,8 @@ ifndef OPTIMIZE
 export OPTIMIZE=-O2 -g0
 endif
 
+export CFLAGS=-mavx2
+
 # BENCHMARKING will be read from user env
 ifdef BENCH
 export BENCHMARKING = -DBENCHMARKING
@@ -70,8 +72,8 @@ export LIBS+= -lbenchmarking
 endif # BENCHMARKING
 
 define buildLib
-    clang $(WARN) $(NOWARN) $(OPTIMIZE) $(SANITIZE) $(DEBUGGING) $(BENCHMARKING) -std=c23 -fPIC -ferror-limit=0 -o object/$1.o -c src/$1.c
-    clang $(WARN) $(NOWARN) $(OPTIMIZE) $(SANITIZE) $(DEBUGGING) $(BENCHMARKING) -std=c23 -fPIC -ferror-limit=0 -shared -o shared/lib$1.so object/$1.o
+    clang $(CFLAGS) $(WARN) $(NOWARN) $(OPTIMIZE) $(SANITIZE) $(DEBUGGING) $(BENCHMARKING) -std=c23 -fPIC -ferror-limit=0 -o object/$1.o -c src/$1.c
+    clang $(CFLAGS) $(WARN) $(NOWARN) $(OPTIMIZE) $(SANITIZE) $(DEBUGGING) $(BENCHMARKING) -std=c23 -fPIC -ferror-limit=0 -shared -o shared/lib$1.so object/$1.o
 endef
 
 endif #DEFINES
@@ -147,13 +149,13 @@ shared/libbenchmarking.so: makefile src/benchmarking.h src/benchmarking.c src/st
 	$(call buildLib,benchmarking)
 
 unit-tests: run-unit-tests.c makefile src/unit-tests.c src/unit-tests.h src/structs.h
-	bear -- clang $(WARN) $(NOWARN) -std=c23 -ferror-limit=0 -rpath shared $(OPTIMIZE) $(SANITIZE) $(DEBUGGING) $(BENCHMARKING) -o unit-tests run-unit-tests.c src/unit-tests.c -Isrc -Lshared $(LIBS)
+	bear -- clang $(CFLAGS) $(WARN) $(NOWARN) -std=c23 -ferror-limit=0 -rpath shared $(OPTIMIZE) $(SANITIZE) $(DEBUGGING) $(BENCHMARKING) -o unit-tests run-unit-tests.c src/unit-tests.c -Isrc -Lshared $(LIBS)
 
 main: makefile main.c src/structs.h
-	bear -- clang $(WARN) $(NOWARN) -std=c23 -ferror-limit=0 -rpath shared $(OPTIMIZE) $(SANITIZE) $(DEBUGGING) $(BENCHMARKING) -o main main.c -Isrc -Lshared $(LIBS)
+	bear -- clang $(CFLAGS) $(WARN) $(NOWARN) -std=c23 -ferror-limit=0 -rpath shared $(OPTIMIZE) $(SANITIZE) $(DEBUGGING) $(BENCHMARKING) -o main main.c -Isrc -Lshared $(LIBS)
 
 benchmark: benchmark.c makefile src/structs.h
-	bear -- clang $(WARN) $(NOWARN) -std=c23 -ferror-limit=0 -rpath shared $(OPTIMIZE) $(SANITIZE) $(DEBUGGING) $(BENCHMARKING) -o benchmark benchmark.c -Isrc -Lshared $(LIBS)
+	bear -- clang $(CFLAGS) $(WARN) $(NOWARN) -std=c23 -ferror-limit=0 -rpath shared $(OPTIMIZE) $(SANITIZE) $(DEBUGGING) $(BENCHMARKING) -o benchmark benchmark.c -Isrc -Lshared $(LIBS)
 
 # -lc level for consol debug output
 # -lf level for file debug output
