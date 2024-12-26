@@ -94,6 +94,8 @@ typedef struct menu_option_struct menuOption;
 // -------------------- CONSTANTS --------------------
 // -------------------- Physics constants --------------------
 
+#define MT_ENABLED
+
 static const float ELASTICITY_FACTOR =
     0.5; // How much energy object recives back on bouce
 
