@@ -59,7 +59,10 @@ void UpdateObj(objTracker *tracker, unsigned long index) {
 
     objWrap *wrap = tracker->objList[index];
 
+#ifndef MT_ENABLED
     if (wrap->collider.isCollidable) FastFindCollisions(tracker, index);
+#endif // MT_ENABLED
+
     if (wrap->isRotatableByGame) {
         RotateObject(wrap, (wrap->objPtr->rotateSpeed));
     }
