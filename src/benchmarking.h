@@ -8,6 +8,7 @@
         total += GetTimeMicS() - start; \
     })
 
+int BenchLog(...);
 int BenchStart(long *timerStart);
 
 int BenchEnd(long *timerStart, const char *restrict name);
