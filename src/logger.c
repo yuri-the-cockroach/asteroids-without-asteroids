@@ -4,8 +4,7 @@
 // This is an internal function.
 // It is ment to be used through LOG macro, that filles in most of the data
 void Logger(const char *restrict inFile, const char *restrict inFunc,
-            const int onLine, const enum loglevel loglevel,
-            const char *restrict format, ...) {
+            const int onLine, const enum loglevel loglevel, ...) {
 
     if (CURRENT_LOG_LEVEL_FILE < loglevel &&
         CURRENT_LOG_LEVEL_CONSOLE < loglevel)
