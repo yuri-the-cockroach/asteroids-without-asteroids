@@ -135,6 +135,8 @@ extern bool VISUAL_DEBUG_SHOW_POINTS;
 extern bool GDB_BREAK;
 #endif // DEBUGGING
 
+extern long N_CPU_THREADS;
+
 // Logging vars
 extern enum loglevel CURRENT_LOG_LEVEL_CONSOLE;
 extern enum loglevel CURRENT_LOG_LEVEL_FILE;
