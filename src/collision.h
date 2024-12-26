@@ -3,8 +3,19 @@
 
 #include "logger.h"
 #include "structs.h"
+#include <immintrin.h>
 
 #define BOUCE_CONSTANT 100
+
+static const __m256i_u shiftByVec = {
+    (31l << 32) + 31, (31l << 32) + 31, (31l << 32) + 31, (31l << 32) + 31
+};
+
+static const __m256i bitMaskVec = {
+    (1l << 32) + 1, (1l << 32) + 1, (1l << 32) + 1, (1l << 32) + 1
+};
+
+void *EasyThreadAVX(void *arg);
 
 // Thread function that looks for collisions
 void *EasyThread(void *arg);
