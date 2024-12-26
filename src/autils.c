@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 
 // local includes
 #include "autils.h"
@@ -154,6 +155,11 @@ int GetStartUpArguments(int argc, char **argv) {
 void RunConfig(void) {
     SetTraceLogLevel(LOG_ERROR);
     setlocale(LC_NUMERIC, "en_US.UTF-8");
+
+#ifdef MT_ENABLED
+    N_CPU_THREADS = sysconf(_SC_NPROCESSORS_ONLN);
+#endif // MT_ENABLED
+
 #ifdef BENCHMARKING
     BENCH_LOG_FILE_PTR = fopen(BENCH_LOG_FILE_NAME, "w");
     LOG(DEBUG,
