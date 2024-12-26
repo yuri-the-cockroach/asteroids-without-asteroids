@@ -6,6 +6,7 @@
 #include "src/asteroid.h"
 #include "src/autils.h"
 #include "src/benchmarking.h"
+#include "src/collision.h"
 #include "src/objecthandler.h"
 #include "src/render.h"
 #include "src/structs.h"
@@ -48,8 +49,13 @@ int main(int argc, char **argv) {
     }
 
     long total_action_list = 0, total_screen_render = 0, total_world_render = 0;
+    long total_mt_collect = 0, total_mt_run = 0;
     long total_frames = 0;
     SetTargetFPS(0);
+
+#ifdef MT_ENABLED
+    struct mt_data_wrap *mtDataWrap = InitMT(tracker);
+#endif // MT_ENABLED
 
     const float SCREEN_POS_X =
         ((float)SCREEN_WIDTH - (float)(MeasureText("TIME PASSED: 12.34", 24))) /
@@ -57,7 +63,13 @@ int main(int argc, char **argv) {
     while (GAME_TIME_PASSED < RUN_FOR && !WindowShouldClose()) {
         BeginDrawing();
         ClearBackground(BLACK);
+#ifdef MT_ENABLED
+        BENCH(CollectThreads(mtDataWrap), total_mt_collect);
+#endif // MT_ENABLED
         BENCH(RunActionList(tracker), total_action_list);
+#ifdef MT_ENABLED
+        BENCH(RunThreads(mtDataWrap), total_mt_run);
+#endif // MT_ENABLED
         BENCH(RunScreenRender(tracker), total_screen_render);
         BENCH(RunWorldRender(tracker), total_world_render);
         DisplayText((Vector2){ SCREEN_POS_X, 30 },
@@ -93,6 +105,9 @@ int main(int argc, char **argv) {
            total_world_render / total_frames);
     printf("============== END OF LOG ==============\n");
     DeleteTracker(tracker);
+#ifdef MT_ENABLED
+    MTCleanupAndFree(mtDataWrap);
+#endif // MT_ENABLED
     RunCleanup();
     return 0;
 }
