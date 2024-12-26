@@ -1,6 +1,7 @@
 #include <raylib.h>
 
 #include "asteroid.h"
+#include "collision.h"
 #include "gamelogic.h"
 #include "objecthandler.h"
 #include "render.h"
@@ -15,6 +16,10 @@ int TestCollision() {
     objWrap *asteroids[4];
 
     float small_speed = 90;
+
+#ifdef MT_ENABLED
+    struct mt_data_wrap *mtDataWrap = InitMT(tracker);
+#endif // MT_ENABLED
 
     tracker->playerCamera.zoom   = .5f;
     tracker->playerCamera.target = (Vector2){ 400, 700 };
@@ -32,7 +37,13 @@ int TestCollision() {
         BeginDrawing();
         ClearBackground(BLACK);
 
+#ifdef MT_ENABLED
+        CollectThreads(mtDataWrap);
+#endif // MT_ENABLED
         RunActionList(tracker);
+#ifdef MT_ENABLED
+        RunThreads(mtDataWrap);
+#endif // MT_ENABLED
         RunScreenRender(tracker);
         RunWorldRender(tracker);
         PlayerRuntimeControlls(tracker);
