@@ -152,7 +152,7 @@ extern bool BENCHRUNNING;
 extern long BENCH_COLLIDER_TIME;
 extern FILE *BENCH_LOG_FILE_PTR;
 
-static const char *restrict BENCH_LOG_FILE_NAME = "asteroids-benchlog.log";
+static const char *restrict BENCH_LOG_FILE_NAME = "logs/asteroids-benchlog.log";
 static const int SAMPLES                        = 1024;
 #endif // BENCHMARKING
 
