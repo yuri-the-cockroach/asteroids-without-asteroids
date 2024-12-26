@@ -24,14 +24,13 @@ enum loglevel {
     FATAL     = 1,
     ERROR     = 2,
     WARNING   = 3,
-    BENCH     = 4,
-    INFO      = 5,
-    TEST_FAIL = 6,
-    TEST_PASS = 7,
-    FIXME     = 8,
-    DEBUG     = 9,
-    TRACE     = 10,
-    ALL       = 11,
+    INFO      = 4,
+    TEST_FAIL = 5,
+    TEST_PASS = 6,
+    FIXME     = 7,
+    DEBUG     = 8,
+    TRACE     = 9,
+    ALL       = 10,
 };
 
 enum game_state {
@@ -63,7 +62,6 @@ static const char *loglvlToString[12] = { "NOLOG",
                                           "\033[1;31mFATAL\033[0;37m",
                                           "\033[0;31mERROR\033[0;37m",
                                           "\033[1;33mWARNING\033[0;37m",
-                                          "\033[0;33mBENCH\033[0;37m",
                                           "\033[0;32mINFO\033[0;37m",
                                           "\033[1;31mTEST FAIL\033[0;37m",
                                           "\033[0;32mTEST PASS\033[0;37m",
@@ -73,8 +71,8 @@ static const char *loglvlToString[12] = { "NOLOG",
                                           "ALL" };
 
 static const char *loglvlToStringNoColor[12] = {
-    "NOLOG",     "FATAL",     "ERROR", "WARNING", "BENCH", "INFO",
-    "TEST FAIL", "TEST PASS", "FIXME", "DEBUG",   "TRACE", "ALL"
+    "NOLOG",     "FATAL", "ERROR", "WARNING", "INFO", "TEST FAIL",
+    "TEST PASS", "FIXME", "DEBUG", "TRACE",   "ALL"
 };
 
 enum request { IGNORE = 0, UPDATE = 1, SEPARATE = 2, CREATE = 3, DELETE = -1 };
