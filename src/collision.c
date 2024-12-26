@@ -479,6 +479,43 @@ void GetShot(objTracker *tracker, objWrap *projectile, objWrap *victim) {
     }
 }
 
+void FastFindCollisions(objTracker *tracker, unsigned long index) {
+    objWrap *current = tracker->objList[index];
+    if (tracker->objListLen < 2) return;
+
+    if (!current) return;
+
+    if (current->request == DELETE) return;
+
+    objWrap *next;
+
+    for (unsigned long j = index + 1; j < tracker->objListLen; j++) {
+        next = tracker->objList[j];
+
+        if (tracker->objList[j] == NULL || current == next ||
+            next->request != UPDATE || !next->collider.isCollidable)
+            continue;
+
+        if (current->objPtr->position.x + current->collider.collider.x +
+                current->collider.collider.width <=
+            next->objPtr->position.x + next->collider.collider.x)
+            break;
+
+        if (!CheckIfCollide(current, next)) continue;
+
+        if (current->objectType == next->objectType &&
+            current->objectType == PROJECTILE)
+            continue;
+
+        if (current->objectType > next->objectType) {
+            current->collider.ActionOnCollision(tracker, current, next);
+            continue;
+        }
+        next->collider.ActionOnCollision(tracker, next, current);
+    }
+    return;
+}
+
 collider InitCollider(float sizeMult,
                       void (*ActionOnCollision)(objTracker *tracker,
                                                 objWrap *first,
