@@ -84,26 +84,35 @@ int main(int argc, char **argv) {
         total_frames++;
     }
 
-    printf("\n========== BENCHMARK FINISHED ==========\n");
-    printf("Rendered %'ld frames in %'f seconds\n",
-           total_frames,
-           GAME_TIME_PASSED);
+    BenchLog("=============== BENCHMARK STARTED ==============\n");
+    BenchLog("Rendered %'ld frames in %'f seconds\n",
+             total_frames,
+             GAME_TIME_PASSED);
 
-    printf("Average fps: %.0f\n", (float)total_frames / GAME_TIME_PASSED);
+    BenchLog("Average fps: %.0f\n", (float)total_frames / GAME_TIME_PASSED);
 
-    printf("Average frame time: %.2fms\n",
-           GAME_TIME_PASSED * 1000.f / (float)total_frames);
+    BenchLog("Average frame time: %.2fms\n",
+             GAME_TIME_PASSED * 1000.f / (float)total_frames);
 
-    printf("Action list took %'ldus total, %'ldus on average\n",
-           total_action_list,
-           total_action_list / total_frames);
-    printf("Screen render took %'ldus, %'ldus on average\n",
-           total_screen_render,
-           total_screen_render / total_frames);
-    printf("World render took %'ldus, %'ldus on average\n",
-           total_world_render,
-           total_world_render / total_frames);
-    printf("============== END OF LOG ==============\n");
+    BenchLog("Action list took %'ldus total, %'ldus on average\n",
+             total_action_list,
+             total_action_list / total_frames);
+
+    BenchLog("Mt collect took %'ldus total, %'ldus on average\n",
+             total_mt_collect,
+             total_mt_collect / total_frames);
+
+    BenchLog("Mt run took %'ldus total, %'ldus on average\n",
+             total_mt_run,
+             total_mt_run / total_frames);
+
+    BenchLog("Screen render took %'ldus, %'ldus on average\n",
+             total_screen_render,
+             total_screen_render / total_frames);
+    BenchLog("World render took %'ldus, %'ldus on average\n",
+             total_world_render,
+             total_world_render / total_frames);
+    BenchLog("============== BENCHMARK FINISHED ==============\n");
     DeleteTracker(tracker);
 #ifdef MT_ENABLED
     MTCleanupAndFree(mtDataWrap);
