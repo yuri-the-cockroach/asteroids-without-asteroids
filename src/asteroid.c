@@ -40,7 +40,7 @@ objWrap *AsteroidSafeSpawn(objTracker *tracker) {
     }
 
     bool complete = false;
-    int retry = 5;
+    int retry     = 5;
 
     do {
         wrap->objPtr->position =
@@ -60,9 +60,8 @@ objWrap *AsteroidSafeSpawn(objTracker *tracker) {
     }
 
     Vector2 astPos = wrap->objPtr->position;
-    float gamma = atan2f(playerPos.y - astPos.y, playerPos.x - astPos.x);
-    if (!tracker->playerPtr)
-        gamma = GetRandomFloat(0, PI);
+    float gamma    = atan2f(playerPos.y - astPos.y, playerPos.x - astPos.x);
+    if (!tracker->playerPtr) gamma = GetRandomFloat(0, PI);
     wrap->objPtr->speed =
         (Vector2){ cosf(gamma) * (GetRandomFloat(-500, 500)),
                    sinf(gamma) * (GetRandomFloat(-500, 500)) };
@@ -78,8 +77,8 @@ objWrap *CreateAsteroid(objTracker *tracker, Vector2 initPosition,
                         Vector2 initSpeed, float constRotationSpeed,
                         float size) {
 
-    objWrap *asteroid = malloc(sizeof(objWrap));
-    asteroid[0] = InitWrap();
+    objWrap *asteroid      = malloc(sizeof(objWrap));
+    asteroid[0]            = InitWrap();
     asteroid[0].objectType = ASTEROID;
     if (AddWrapToList(tracker, asteroid)) {
         errno = 0;
@@ -88,7 +87,7 @@ objWrap *CreateAsteroid(objTracker *tracker, Vector2 initPosition,
         return NULL;
     }
 
-    object *objPtr = malloc(sizeof(object));
+    object *objPtr      = malloc(sizeof(object));
     Vector2 *tempPoints = GenerateAsteroidShape();
     objPtr[0] = InitObject(InitShape(tempPoints, ASTEROID_CORNERS_COUNT, size),
                            initPosition,
@@ -162,10 +161,10 @@ int Separate(objTracker *tracker, objWrap *parent) {
         return -1;
     }
 
-    asteroidLeft->livesLeft = parent->livesLeft;
+    asteroidLeft->livesLeft  = parent->livesLeft;
     asteroidRight->livesLeft = parent->livesLeft;
 
-    asteroidLeft->objPtr->heading = parent->objPtr->heading;
+    asteroidLeft->objPtr->heading  = parent->objPtr->heading;
     asteroidRight->objPtr->heading = parent->objPtr->heading;
 
     asteroidLeft->objPtr->position.x -=
