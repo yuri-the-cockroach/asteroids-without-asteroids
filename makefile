@@ -93,18 +93,9 @@ all:
 		shared/libstatemachine.so \
 		shared/libmenulogic.so \
 		shared/libasteroid.so \
-		shared/libbenchmarking.so
-
-ifdef DEBUG
-	mold -run make shared/libvisdebugger.so
-endif # DEBUG
-
-ifdef BENCH
-	mold -run make benchmark
-endif
-
-	mold -run make main
-	mold -run make unit-tests
+		shared/libbenchmarking.so \
+		shared/libvisdebugger.so
+	mold -run make benchmark main unit-tests
 
 shared/libmenulogic.so: makefile src/menulogic.h src/menulogic.c src/structs.h
 	$(call buildLib,menulogic)
