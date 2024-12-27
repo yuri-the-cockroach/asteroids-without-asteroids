@@ -82,25 +82,23 @@ void UpdateObjectPos(objWrap *wrap) {
 }
 
 void RotateObject(objWrap *wrap, float rotateByDeg) {
-
     wrap->objPtr->heading += (rotateByDeg * GetFrameTime());
     wrap->objPtr->heading =
         RollOverFloat(wrap->objPtr->heading, 0.0f, PI * 2.0f);
+    float sin_heading = sinf(wrap->objPtr->heading);
+    float cos_heading = cosf(wrap->objPtr->heading);
     for (unsigned int current = 0; current < wrap->objPtr->shape.arrayLength;
          current++) {
         wrap->objPtr->shape.points[current].x =
-            wrap->objPtr->shape.refPoints[current].x *
-                cosf(wrap->objPtr->heading) -
-            wrap->objPtr->shape.refPoints[current].y *
-                sinf(wrap->objPtr->heading);
+            wrap->objPtr->shape.refPoints[current].x * cos_heading -
+            wrap->objPtr->shape.refPoints[current].y * sin_heading;
         wrap->objPtr->shape.points[current].y =
-            wrap->objPtr->shape.refPoints[current].x *
-                sinf(wrap->objPtr->heading) +
-            wrap->objPtr->shape.refPoints[current].y *
-                cosf(wrap->objPtr->heading);
+            wrap->objPtr->shape.refPoints[current].x * sin_heading +
+            wrap->objPtr->shape.refPoints[current].y * cos_heading;
     }
 
-    if (wrap->collider.isCollidable) UpdateCollider(wrap);
+    if (wrap->objectType == PLAYER && wrap->collider.isCollidable)
+        UpdateCollider(wrap);
 }
 
 Vector2 *ResizeShape(const Vector2 *vector, float size,
