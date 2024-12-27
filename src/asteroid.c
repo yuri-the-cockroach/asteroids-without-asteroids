@@ -95,15 +95,16 @@ objWrap *CreateAsteroid(objTracker *tracker, Vector2 initPosition,
                            constRotationSpeed);
     free(tempPoints);
 
-    asteroid->objectType = ASTEROID;
-    asteroid->request = CREATE;
-    asteroid->updatePosition = true;
-    asteroid->draw = true;
+    asteroid->objectType        = ASTEROID;
+    asteroid->request           = CREATE;
+    asteroid->updatePosition    = true;
+    asteroid->draw              = true;
     asteroid->isRotatableByGame = true;
-    asteroid->objPtr = objPtr;
+    asteroid->objPtr            = objPtr;
     asteroid->collider =
         InitCollider(0.85f * asteroid->objPtr->shape.sizeMult, *Bounce);
     asteroid->livesLeft = 2;
+    UpdateCollider(asteroid);
     return asteroid;
 }
 
