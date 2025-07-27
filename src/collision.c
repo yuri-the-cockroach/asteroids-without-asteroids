@@ -283,22 +283,32 @@ void FastFindCollisions(objTracker *tracker, unsigned long index) {
             !next->collider.isCollidable)
             continue;
 
+        pthread_mutex_lock(&next->mutex);
         if (current->objPtr->position.x + current->collider.collider.x +
                 current->collider.collider.width <
             next->objPtr->position.x + MAX_COLL_OFFSET) {
+            pthread_mutex_unlock(&next->mutex);
             break;
+        }
 
-        if (!CheckIfCollide(current, next)) continue;
+        if (!CheckIfCollide(current, next)) {
+            pthread_mutex_unlock(&next->mutex);
+            continue;
+        }
 
         if (current->objectType == next->objectType &&
-            current->objectType == PROJECTILE)
+            current->objectType == PROJECTILE) {
+            pthread_mutex_unlock(&next->mutex);
             continue;
+        }
 
         if (current->objectType > next->objectType) {
             current->collider.ActionOnCollision(tracker, current, next);
+            pthread_mutex_unlock(&next->mutex);
             continue;
         }
         next->collider.ActionOnCollision(tracker, next, current);
+        pthread_mutex_unlock(&next->mutex);
     }
     return;
 }
