@@ -54,7 +54,7 @@ export DEBUGGING = -DDEBUGGING
 export LIBS += -lvisdebugger
 
 ifndef OPTIMIZE
-export OPTIMIZE=-Og -g # Overrides previous optimization options
+export OPTIMIZE=-Og -ggdb3 # Overrides previous optimization options
 endif # OPTIMIZE
 
 endif # DEBUGGING
