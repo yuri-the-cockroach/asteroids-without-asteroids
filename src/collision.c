@@ -101,7 +101,6 @@ void ApplyMassBasedRandRotation(objWrap *wrap) {
 }
 
 void Bounce(objTracker *tracker, objWrap *first, objWrap *second) {
-
     UNUSED(tracker);
 
     Vector2 pos_delta =
@@ -155,7 +154,31 @@ void Bounce(objTracker *tracker, objWrap *first, objWrap *second) {
             "SPEEDS AFTER:\n First == %f\n Second == %f",
             first->objPtr->speed.y,
             second->objPtr->speed.y);
+    }
+    FixClipping(first, second);
+}
 
+void FixClipping(objWrap *first, objWrap *second) {
+    Vector2 pos_delta =
+        VecSubVec(second->objPtr->position, first->objPtr->position);
+
+    if (fabsf(fCutOff(pos_delta.x, 0)) >= fabsf(fCutOff(pos_delta.y, 0))) {
+        const objWrap *left =
+            first->objPtr->position.x < second->objPtr->position.x ? first
+                                                                   : second;
+        const objWrap *right = left == first ? second : first;
+
+        left->objPtr->speed.x -= 1;
+        right->objPtr->speed.x += 1;
+    }
+    if (fabsf(fCutOff(pos_delta.x, 0)) <= fabsf(fCutOff(pos_delta.y, 0))) {
+        const objWrap *above =
+            first->objPtr->position.y < second->objPtr->position.y ? first
+                                                                   : second;
+        const objWrap *below = above == first ? second : first;
+
+        above->objPtr->speed.y -= 5;
+        below->objPtr->speed.y += 5;
     }
 }
 
