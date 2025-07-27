@@ -79,7 +79,8 @@ int GetStartUpArguments(int argc, char **argv) {
                 !strcmp(argv[i], "--loglevelconsole")) {
                 i++;
 
-                int newLogLevel = ClampInt(atoi(argv[i]), 0, 8);
+                int newLogLevel =
+                    ClampInt(atoi(argv[i]), 0, sizeof(loglvlToStringNoColor));
                 if (newLogLevel) {
                     CURRENT_LOG_LEVEL_CONSOLE = (enum loglevel)newLogLevel;
                     continue;
@@ -94,7 +95,8 @@ int GetStartUpArguments(int argc, char **argv) {
             if (!strcmp(argv[i], "-lf") || !strcmp(argv[i], "--loglevelfile")) {
                 i++;
 
-                int newLogLevel = ClampInt(atoi(argv[i]), 0, 8);
+                int newLogLevel =
+                    ClampInt(atoi(argv[i]), 0, sizeof(loglvlToStringNoColor));
                 if (newLogLevel) {
                     CURRENT_LOG_LEVEL_FILE = (enum loglevel)newLogLevel;
                     continue;
