@@ -282,5 +282,8 @@ int SpawnAsteroidOnTime(objTracker *tracker) {
         ((2.f / (logf((float)tracker->playerScore / 100.f + 1.2f))) - 1);
 
     if (!AsteroidSafeSpawn(tracker)) return -1;
+    LOG(TRACE,
+        "Spawned a new asteroid. Currently %d spawned already",
+        tracker->objListLen);
     return 1;
 }
