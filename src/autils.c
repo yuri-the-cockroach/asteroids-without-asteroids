@@ -56,19 +56,20 @@ FILE *CreateLogFile(char *restrict file_name_ptr) {
         errno = 0;
     }
 
-    sprintf(LOG_FILE_NAME,
-            "logs/asteroids-%d-%02d-%02d_%02d-%02d-%02d.log",
-            timedate.tm_year + 1900,
-            timedate.tm_mon + 1,
-            timedate.tm_mday,
-            timedate.tm_hour,
-            timedate.tm_min,
-            timedate.tm_sec);
+    snprintf(file_name_ptr,
+             LOG_FILE_NAME_SIZE,
+             "logs/asteroids-%d-%02d-%02d_%02d-%02d-%02d.log",
+             timedate.tm_year + 1900,
+             timedate.tm_mon + 1,
+             timedate.tm_mday,
+             timedate.tm_hour,
+             timedate.tm_min,
+             timedate.tm_sec);
 
-    LOG_FILE_PTR = fopen(LOG_FILE_NAME, "a");
-    errno        = 0;
+    FILE *file_ptr = fopen(file_name_ptr, "a");
+    errno          = 0;
 
-    return 0;
+    return file_ptr;
 }
 
 int GetStartUpArguments(int argc, char **argv) {
