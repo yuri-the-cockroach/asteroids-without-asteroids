@@ -31,8 +31,6 @@ int StateMachine(void) {
         WORLD_POS_MIN_X,
         WORLD_POS_MAX_X);
 #ifdef BENCHMARKING
-    long timerStartTotalCycle = 0;
-    // long timerStartKeys = 0;
 #endif // BENCHMARKING
 
     objTracker *tracker = NULL;
