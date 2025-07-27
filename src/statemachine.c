@@ -135,7 +135,6 @@ int StateMachine(void) {
             MenuControlls(curMenu, &menuHighlighted);
 
             // Rendering
-            RunWorldRender(tracker);
             RunScreenRender(tracker);
 
             RunMenuRender(curMenu, menuHighlighted, 0);
