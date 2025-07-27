@@ -23,6 +23,7 @@ export NOWARN += -Wno-switch-default
 export NOWARN += -Wno-double-promotion
 export NOWARN += -Wno-pre-c23-compat
 export NOWARN += -Wno-gnu-statement-expression-from-macro-expansion
+export NOWARN += -Wno-c++98-compat
 export LIBS += -lunwind
 export LIBS += -llogger
 export LIBS += -lautils
