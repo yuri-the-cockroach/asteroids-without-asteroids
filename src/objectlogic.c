@@ -9,6 +9,7 @@
 #include "collision.h"
 #include "objectlogic.h"
 #include "structs.h"
+#include "vector-math.h"
 
 // This will be adjusted by frametime, so it can be more than
 // BOUNCEBACK_MAX_FORCE
@@ -16,14 +17,17 @@
 void UpdateObjectPos(objWrap *wrap) {
     const float PUSHBACK_STEP      = 1.f;
     const float MAX_PUSHBACK_SPEED = 200.f;
-    float frameTime                = GetFrameTime();
-    Vector2 adjustedSpeed          = { wrap->objPtr->speed.x * frameTime,
-                                       wrap->objPtr->speed.y * frameTime };
+    Vector2 speed                  = wrap->objPtr->speed;
+    Vector2 position               = wrap->objPtr->position;
+    Vector2 colStart = { wrap->collider.collider.x, wrap->collider.collider.y };
+    colStart         = VecAddVec(position, colStart);
 
-    if (wrap->objectType == PLAYER) {
-        wrap->objPtr->speed.x *= 0.995f;
-        wrap->objPtr->speed.y *= 0.995f;
-    }
+    Vector2 colEnd        = { wrap->collider.collider.width,
+                              wrap->collider.collider.height };
+    colEnd                = VecAddVec(colStart, colEnd);
+    Vector2 adjustedSpeed = VecMulFloat(speed, LAST_FRAME_TIME);
+
+    if (wrap->objectType == PLAYER) speed = VecMulFloat(speed, 0.995f);
 
     if (wrap->objectType == PROJECTILE &&
         ((wrap->objPtr->position.x + wrap->collider.collider.x <
