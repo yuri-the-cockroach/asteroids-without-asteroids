@@ -210,13 +210,13 @@ void ShipControlls(objTracker *tracker) {
 const menuParent *MenuControlls(const menuParent *menu, int *menuHighlighted) {
     if (IsKeyPressed('W')) {
         *menuHighlighted =
-            RollOverInt((*menuHighlighted - 1), 0, menu->optionListLen - 1);
+            RollOver((*menuHighlighted - 1), 0, menu->optionListLen - 1);
         LOG(DEBUG, "*menuHighlighted == %d", *menuHighlighted);
     }
 
     if (IsKeyPressed('S')) {
         *menuHighlighted =
-            RollOverInt((*menuHighlighted + 1), 0, menu->optionListLen - 1);
+            RollOver((*menuHighlighted + 1), 0, menu->optionListLen - 1);
         LOG(DEBUG, "*menuHighlighted == %d", *menuHighlighted);
     }
 
