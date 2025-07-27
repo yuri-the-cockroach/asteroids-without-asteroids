@@ -104,22 +104,8 @@ void Bounce(objTracker *tracker, objWrap *first, objWrap *second) {
 
     UNUSED(tracker);
 
-    objWrap *left, *right;
-    objWrap *above, *below;
 
-    float frameTime = GetFrameTime();
 
-    // If A.x < B.x then A is left of B
-    left  = first->objPtr->position.x < second->objPtr->position.x
-                ? first
-                : second;                   // Find the left one
-    right = left == first ? second : first; // Set right to the other one
-
-    // If A.y < B.y then A is above of B
-    above = first->objPtr->position.y < second->objPtr->position.y
-                ? first
-                : second;                    // Find the above one
-    below = above == first ? second : first; // Set below to the other one
     {
 
         // I wasted 24 fucking hours trying to make this work
@@ -138,9 +124,6 @@ void Bounce(objTracker *tracker, objWrap *first, objWrap *second) {
             "SPEEDS AFTER:\n First == %f\n Second == %f",
             first->objPtr->speed.x,
             second->objPtr->speed.x);
-
-        left->objPtr->position.x -= BOUCE_CONSTANT * frameTime;
-        right->objPtr->position.x += BOUCE_CONSTANT * frameTime;
     }
 
     {
@@ -160,10 +143,7 @@ void Bounce(objTracker *tracker, objWrap *first, objWrap *second) {
             first->objPtr->speed.y,
             second->objPtr->speed.y);
 
-        above->objPtr->position.y -= BOUCE_CONSTANT * frameTime;
-        below->objPtr->position.y += BOUCE_CONSTANT * frameTime;
     }
-    return;
 }
 
 bool CheckIfCollide(objWrap *first, objWrap *second) {
