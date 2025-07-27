@@ -223,6 +223,7 @@ struct object_wrap_struct {
 
     collider collider;
     int livesLeft;
+    pthread_mutex_t mutex;
 };
 
 struct obj_tracker_struct {
