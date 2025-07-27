@@ -110,6 +110,8 @@ void RunWorldRender(objTracker *restrict tracker) {
     EndMode2D();
 }
 
+void DrawObject(objWrap *restrict wrap) {
+    if (!wrap) return;
 #ifdef DEBUGGING
     if (VISUAL_DEBUG)
         DrawRectangleLines(
@@ -123,9 +125,16 @@ void RunWorldRender(objTracker *restrict tracker) {
         (Vector2){ wrap->objPtr->position.x, wrap->objPtr->position.y + 50 },
         18,
         WHITE,
-        "Heading: %f\nIsCollidable: %d\nSpeed.x: %f\nSpeed.y: %f",
+        "Heading: %f\n"
+        "IsCollidable: %d\n"
+        "Pos.x: %f\n"
+        "Pos.y: %f\n"
+        "Speed.x: %f\n"
+        "Speed.y: %f",
         (double)wrap->objPtr->heading,
         wrap->collider.isCollidable,
+        (double)wrap->objPtr->position.x,
+        (double)wrap->objPtr->position.y,
         (double)wrap->objPtr->speed.x,
         (double)wrap->objPtr->speed.y);
 
@@ -151,143 +160,74 @@ void RunWorldRender(objTracker *restrict tracker) {
 
     if (wrap->objPtr->shape.arrayLength == 0) {
         LOG(WARNING, "%s", "Attempting to draw an empty shape");
+        return;
     }
 
     // Texturing is only supported on RL_QUADS
     rlBegin(RL_LINES);
     rlColor4ub(RAYWHITE.r, RAYWHITE.g, RAYWHITE.b, RAYWHITE.a);
-    bool shouldEnd = false;
-    for (unsigned int i = 1; i <= wrap->objPtr->shape.arrayLength && !shouldEnd;
-         i++) {
-        rlVertex2f(
-            wrap->objPtr->shape.points[i - 1].x + wrap->objPtr->position.x,
-            wrap->objPtr->shape.points[i - 1].y + wrap->objPtr->position.y);
+    int next;
+    Vector2 currentV, nextV;
+    nextV = VecAddVec(wrap->objPtr->shape.points[0], wrap->objPtr->position);
+    for (unsigned int i = 0; i < wrap->objPtr->shape.arrayLength; i++) {
+        next =
+            RollOver((int)i + 1, 0, (int)wrap->objPtr->shape.arrayLength - 1);
+        currentV = nextV;
+        nextV =
+            VecAddVec(wrap->objPtr->shape.points[next], wrap->objPtr->position);
 
-        if (i == wrap->objPtr->shape.arrayLength) {
-            i         = 0;
-            shouldEnd = true;
-        }
-        rlVertex2f(wrap->objPtr->shape.points[i].x + wrap->objPtr->position.x,
-                   wrap->objPtr->shape.points[i].y + wrap->objPtr->position.y);
+        rlVertex2f(currentV.x, currentV.y);
+        rlVertex2f(nextV.x, nextV.y);
     }
     rlEnd();
 }
 
 void DrawGrid2D(int dist, Color color) {
 
-    int shiftedCoord = abs(WORLD_POS_MIN_X) + abs(WORLD_POS_MAX_X);
+    int shiftedCoord = fabsf(WORLD_POS_MIN_X) + fabsf(WORLD_POS_MAX_X);
 
     dist = shiftedCoord % dist != 0 ? dist + (shiftedCoord % dist) : dist;
 
+    rlBegin(RL_LINES);
+    rlColor4ub(color.r, color.g, color.b, color.a);
     for (int current = 0; current < shiftedCoord; current += dist) {
-        DrawLine(WORLD_POS_MIN_X + current,
-                 WORLD_POS_MIN_Y,
-                 WORLD_POS_MIN_X + current,
-                 WORLD_POS_MAX_Y,
-                 color);
-        DrawLine(WORLD_POS_MIN_X,
-                 WORLD_POS_MIN_Y + current,
-                 WORLD_POS_MAX_X,
-                 WORLD_POS_MIN_Y + current,
-                 color);
+        rlVertex2f((float)(WORLD_POS_MIN_X + current), WORLD_POS_MIN_Y);
+
+        rlVertex2f((float)(WORLD_POS_MIN_X + current), WORLD_POS_MAX_Y);
+        rlVertex2f(WORLD_POS_MIN_X, (float)(WORLD_POS_MIN_Y + current));
+        rlVertex2f(WORLD_POS_MAX_X, (float)(WORLD_POS_MIN_Y + current));
     }
+    rlColor4ub(WHITE.r, WHITE.g, WHITE.b, WHITE.a);
 
-    DrawLine(WORLD_POS_MIN_X,
-             WORLD_POS_MIN_Y,
-             WORLD_POS_MIN_X,
-             WORLD_POS_MAX_Y,
-             WHITE);
-
-    DrawLine(WORLD_POS_MIN_X,
-             WORLD_POS_MAX_Y,
-             WORLD_POS_MAX_X,
-             WORLD_POS_MAX_Y,
-             WHITE);
-
-    DrawLine(WORLD_POS_MAX_X,
-             WORLD_POS_MAX_Y,
-             WORLD_POS_MAX_X,
-             WORLD_POS_MIN_Y,
-             WHITE);
-
-    DrawLine(WORLD_POS_MAX_X,
-             WORLD_POS_MIN_Y,
-             WORLD_POS_MIN_X,
-             WORLD_POS_MIN_Y,
-             WHITE);
+    rlVertex2f(WORLD_POS_MIN_X, WORLD_POS_MIN_Y);
+    rlVertex2f(WORLD_POS_MIN_X, WORLD_POS_MAX_Y);
+    rlVertex2f(WORLD_POS_MIN_X, WORLD_POS_MAX_Y);
+    rlVertex2f(WORLD_POS_MAX_X, WORLD_POS_MAX_Y);
+    rlVertex2f(WORLD_POS_MAX_X, WORLD_POS_MAX_Y);
+    rlVertex2f(WORLD_POS_MAX_X, WORLD_POS_MIN_Y);
+    rlVertex2f(WORLD_POS_MAX_X, WORLD_POS_MIN_Y);
+    rlVertex2f(WORLD_POS_MIN_X, WORLD_POS_MIN_Y);
+    rlEnd();
 }
 
-void RunWorldRender(objTracker *tracker) {
-    BeginMode2D(tracker->playerCamera);
+// LOG(TRACE, "Drawing %d objects", DrawingObjCount);
 
-    DrawRectangle(WORLD_POS_MIN_X,
-                  WORLD_POS_MIN_Y,
-                  abs(WORLD_POS_MIN_X) + abs(WORLD_POS_MAX_X),
-                  abs(WORLD_POS_MIN_Y) + abs(WORLD_POS_MAX_Y),
-                  (Color){ 18, 18, 18, 255 });
-    DrawGrid2D(200, (Color){ 38, 38, 38, 255 });
-
-    Vector2 screenStart = {
+void UpdateScreenBorder(objTracker *tracker) {
+    tracker->screenBorderWrap.screenStart = (Vector2){
         tracker->playerCamera.target.x -
             tracker->playerCamera.offset.x / tracker->playerCamera.zoom,
         tracker->playerCamera.target.y -
             tracker->playerCamera.offset.y / tracker->playerCamera.zoom
     };
 
-    Vector2 screenEnd = {
-        screenStart.x + (float)SCREEN_WIDTH / tracker->playerCamera.zoom,
-        screenStart.y + (float)SCREEN_HEIGHT / tracker->playerCamera.zoom
-    };
-    objWrap *current;
-    // int DrawingObjCount = 0;
-    for (unsigned int i = 0; i < tracker->objListLen; i++) {
-        current = tracker->objList[i];
-
-        if (!current || !current->draw || current->request != UPDATE) continue;
-
-        Vector2 colliderStart = {
-            current->objPtr->position.x + current->collider.collider.x,
-            current->objPtr->position.y + current->collider.collider.y
-        };
-        Vector2 colliderEnd = { current->objPtr->position.x +
-                                    current->collider.collider.x +
-                                    current->collider.collider.width,
-                                current->objPtr->position.y +
-                                    current->collider.collider.y +
-                                    current->collider.collider.height };
-
-        if (colliderEnd.x < screenStart.x || screenEnd.x < colliderStart.x ||
-            colliderEnd.y < screenStart.y || screenEnd.y < colliderStart.y)
-            continue;
-
-        DrawObject(tracker->objList[i]);
-
-        // DrawingObjCount++;
-    }
-    // LOG(TRACE, "Drawing %d objects", DrawingObjCount);
-
-// Highlight cursor position
-#ifdef DEBUGGING
-    if (VISUAL_DEBUG) {
-        Vector2 cursorPos =
-            (Vector2){ (GetMousePosition().x - tracker->playerCamera.offset.x) /
-                               tracker->playerCamera.zoom +
-                           tracker->playerCamera.target.x,
-                       (GetMousePosition().y - tracker->playerCamera.offset.y) /
-                               tracker->playerCamera.zoom +
-                           tracker->playerCamera.target.y };
-        int rectSize = 20;
-        DrawRectangle((int)cursorPos.x - rectSize / 2,
-                      (int)cursorPos.y - rectSize / 2,
-                      rectSize,
-                      rectSize,
-                      RED);
-    }
-#endif
-    EndMode2D();
+    tracker->screenBorderWrap.screenEnd =
+        (Vector2){ tracker->screenBorderWrap.screenStart.x +
+                       (float)SCREEN_WIDTH / tracker->playerCamera.zoom,
+                   tracker->screenBorderWrap.screenStart.y +
+                       (float)SCREEN_HEIGHT / tracker->playerCamera.zoom };
 }
 
-void RunScreenRender(objTracker *tracker) {
+void RunScreenRender(objTracker *restrict tracker) {
 
     SCREEN_WIDTH                   = GetScreenWidth();
     SCREEN_HEIGHT                  = GetScreenHeight();
