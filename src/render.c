@@ -41,7 +41,6 @@ void DisplayText(Vector2 pos, int fontSize, Color color,
     DrawText(messageString, (int)pos.x, (int)pos.y, fontSize, color);
 }
 
-void DrawObject(objWrap *wrap) {
 #ifdef DEBUGGING
     if (VISUAL_DEBUG)
         DrawRectangleLines(
