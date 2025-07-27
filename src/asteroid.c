@@ -33,36 +33,37 @@ objWrap *AsteroidSafeSpawn(objTracker *tracker) {
     }
 
     bool complete = false;
-    int retry     = 5;
 
+    const float radius =
+        MAX_ASTEROID_SIZE * ASTEROID_POINT_HIGHT + ASTEROID_HEIGHT_VARIATION;
     do {
-        wrap->objPtr->position =
-            (Vector2){ GetRandomFloat(minX, maxX), GetRandomFloat(minY, maxY) };
-        if (!FindAnyCollision(tracker, wrap) &&
-            !(fabsf(wrap->objPtr->position.x - playerPos.x) < 400 ||
-              fabsf(wrap->objPtr->position.y - playerPos.y) < 400))
-            complete = true;
+        wrap->objPtr->position.x += radius;
+        if (WORLD_POS_MAX_X < wrap->objPtr->position.x) {
+            wrap->objPtr->position.x = 0;
+            wrap->objPtr->position.y += radius;
+        }
+
         if (WORLD_POS_MAX_Y < wrap->objPtr->position.y) {
             LOG(ERROR, "Failed to find a spawn point for an asteroid!");
             return NULL;
         }
-        // This abomination will just check if the wrap closer than 200u or
-        // further than 1000u to the player
-        retry--;
-    } while (!complete && retry);
 
+        if (!FindAnyCollision(tracker, wrap)) complete = true;
+
+    } while (!complete);
     LAST_SPAWN_POS = wrap->objPtr->position;
     if (!complete) {
         wrap->request = DELETE;
         return NULL;
     }
 
-    Vector2 astPos = wrap->objPtr->position;
-    float gamma    = atan2f(playerPos.y - astPos.y, playerPos.x - astPos.x);
-    if (!tracker->playerPtr) gamma = GetRandomFloat(0, PI);
+    const float start_speed = 4000.f;
+    Vector2 astPos          = wrap->objPtr->position;
+    float gamma             = atan2f(astPos.y, astPos.x);
+    if (!tracker->playerPtr) gamma = GetRandomf(0, PI * 2);
     wrap->objPtr->speed =
-        (Vector2){ cosf(gamma) * (GetRandomFloat(-500, 500)),
-                   sinf(gamma) * (GetRandomFloat(-500, 500)) };
+        (Vector2){ cosf(gamma) * (GetRandomf(-start_speed, start_speed)),
+                   sinf(gamma) * (GetRandomf(-start_speed, start_speed)) };
     return wrap;
 }
 
@@ -111,11 +112,11 @@ Vector2 *GenerateAsteroidShape(void) {
         (Vector2 *)calloc(ASTEROID_CORNERS_COUNT, sizeof(Vector2));
     for (unsigned long i = 0; i < ASTEROID_CORNERS_COUNT; i++) {
         CornerList[i] = (Vector2){
-            (50 + GetRandomFloat(-ASTEROID_HEIGHT_VARIATION,
-                                 ASTEROID_HEIGHT_VARIATION)) *
+            (ASTEROID_POINT_HIGHT + GetRandomf(-ASTEROID_HEIGHT_VARIATION,
+                                               ASTEROID_HEIGHT_VARIATION)) *
                 sinf(PI / (ASTEROID_CORNERS_COUNT / 2.0f) * (float)i),
-            (50 + GetRandomFloat(-ASTEROID_HEIGHT_VARIATION,
-                                 ASTEROID_HEIGHT_VARIATION)) *
+            (ASTEROID_POINT_HIGHT + GetRandomf(-ASTEROID_HEIGHT_VARIATION,
+                                               ASTEROID_HEIGHT_VARIATION)) *
                 cosf(PI / (ASTEROID_CORNERS_COUNT / 2.0f) * (float)i)
         };
     }
