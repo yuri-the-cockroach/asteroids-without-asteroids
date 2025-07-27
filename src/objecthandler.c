@@ -191,14 +191,11 @@ void CreateProjectile(objTracker *tracker, objWrap *parent) {
         // I don't know why this works, but other approach
         // doesn't and at this point I don't care. Just don't
         // change it, keep it the way it is
-        (Vector2){ parent->objPtr->position.x +
-                            parent->objPtr->shape.points[0].x * 2.0f,
-                        parent->objPtr->position.y +
-                            parent->objPtr->shape.points[0].y * 2.0f },
-        (Vector2){ parent->objPtr->shape.points[0].x * PROJECTILE_SPEED +
-                            parent->objPtr->speed.x,
-                        parent->objPtr->shape.points[0].y * PROJECTILE_SPEED +
-                            parent->objPtr->speed.y },
+        VecAddVec(VecMulFloat(parent->objPtr->shape.points[0], 3.0f),
+                  parent->objPtr->position),
+        VecAddVec(
+            VecMulFloat(parent->objPtr->shape.points[0], PROJECTILE_SPEED),
+            parent->objPtr->speed),
         5);
 
     projectile[0] = InitWrap();
