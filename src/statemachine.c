@@ -99,7 +99,6 @@ int StateMachine(void) {
             DEBUG(if (!DEBUG_PAUSE)) {
                 RunThreads(mtDataWrap);
                 CollectThreads(mtDataWrap);
-                objWrap *current;
                 RunActionList(tracker);
                 GAME_TIME_PASSED += GetFrameTime();
             }
