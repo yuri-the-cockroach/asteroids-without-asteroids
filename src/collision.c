@@ -273,13 +273,9 @@ void GetShot(objTracker *tracker, objWrap *projectile, objWrap *victim) {
 void FastFindCollisions(objTracker *tracker, unsigned long index) {
     objWrap *current = tracker->objList[index];
     if (tracker->objListLen < 2) return;
-
-    if (!current) return;
-
-    if (current->request == DELETE) return;
+    if (!current || !current->objPtr || current->request == DELETE) return;
 
     objWrap *next;
-
     for (unsigned long j = index + 1; j < tracker->objListLen; j++) {
         next = tracker->objList[j];
 
