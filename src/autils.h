@@ -7,8 +7,6 @@
 #include <assert.h>
 #include <sys/stat.h>
 
-#pragma GCC diagnostic ignored "-Wunused-macros"
-
 #define UNUSED(x) (void)(x)
 #define DEBUG(a)
 
