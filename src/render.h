@@ -17,8 +17,8 @@ void DrawObject(objWrap *wrap);
 
 void DrawGrid2D(int dist, Color color);
 
-void RunScreenRender(objTracker *tracker);
-void RunWorldRender(objTracker *tracker);
-void RunMenuRender(const menuParent *menu, int menuHighlighted,
+void RunScreenRender(objTracker *restrict tracker);
+void RunWorldRender(objTracker *restrict tracker);
+void RunMenuRender(const menuParent *restrict menu, int menuHighlighted,
                    int subTitleLinesNum, ...);
 #endif // RENDER_H_
