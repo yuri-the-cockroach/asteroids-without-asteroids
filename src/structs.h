@@ -233,6 +233,9 @@ struct obj_tracker_struct {
     objWrap **objList;
     unsigned long objListLen;
     unsigned int playerScore;
+    struct {
+        Vector2 screenStart, screenEnd;
+    } screenBorderWrap;
 };
 
 struct menu_function_wrap_struct {
