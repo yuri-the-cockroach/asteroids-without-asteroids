@@ -15,6 +15,8 @@
 // BOUNCEBACK_MAX_FORCE
 
 void UpdateObjectPos(objWrap *wrap) {
+    if (!wrap) return;
+    pthread_mutex_lock(&wrap->mutex);
     const float PUSHBACK_STEP      = 1.f;
     const float MAX_PUSHBACK_SPEED = 200.f;
     Vector2 speed                  = wrap->objPtr->speed;
@@ -45,6 +47,7 @@ void UpdateObjectPos(objWrap *wrap) {
                                  wrap->collider.collider.height) &&
           wrap->objPtr->speed.y > 0))) {
         wrap->request = DELETE;
+        pthread_mutex_unlock(&wrap->mutex);
         return;
     }
 
@@ -83,6 +86,7 @@ void UpdateObjectPos(objWrap *wrap) {
 
     wrap->objPtr->position.x = wrap->objPtr->position.x + adjustedSpeed.x;
     wrap->objPtr->position.y = wrap->objPtr->position.y + adjustedSpeed.y;
+    pthread_mutex_unlock(&wrap->mutex);
 }
 
 void RotateObject(objWrap *wrap, float rotateByDeg) {
