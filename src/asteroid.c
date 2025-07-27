@@ -1,6 +1,7 @@
 // system includes
 #include "raylib.h"
 #include <errno.h>
+#include <error.h>
 #include <math.h>
 #include <stdlib.h>
 
@@ -12,6 +13,7 @@
 #include "objecthandler.h"
 #include "structs.h"
 #include "tracingtools.c"
+static Vector2 LAST_SPAWN_POS;
 
 objWrap *AsteroidSafeSpawn(objTracker *tracker) {
     if (!tracker) {
@@ -19,6 +21,7 @@ objWrap *AsteroidSafeSpawn(objTracker *tracker) {
         fatal(errno, 0, "Tracker pointer provided is invalid, bailing now...");
     }
     objWrap *wrap = CreateAsteroid(tracker,
+                                   LAST_SPAWN_POS,
                                    (Vector2){ 0, 0 },
                                    (Vector2){ 0, 0 },
                                    GetRandomFloat(-3, 3),
@@ -49,6 +52,7 @@ objWrap *AsteroidSafeSpawn(objTracker *tracker) {
         retry--;
     } while (!complete && retry);
 
+    LAST_SPAWN_POS = wrap->objPtr->position;
     if (!complete) {
         wrap->request = DELETE;
         return NULL;
