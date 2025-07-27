@@ -1,9 +1,9 @@
 #ifndef STRUCTS_H_
 #define STRUCTS_H_
 
-#include <raylib.h>
-#include <raymath.h>
-#include <rcamera.h>
+#include "raylib.h"
+#include "raymath.h"
+#include "rcamera.h"
 
 // Sys stuff
 #include <sys/time.h>

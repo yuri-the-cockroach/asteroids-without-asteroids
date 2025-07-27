@@ -1,6 +1,6 @@
 // system includes
+#include "raylib.h"
 #include <math.h>
-#include <raylib.h>
 #include <stdlib.h>
 #include <string.h>
 

@@ -11,7 +11,7 @@
     #include "benchmarking.h"
 #endif // BENCHMARKING
 
-#include <raylib.h>
+#include "raylib.h"
 #include <stdio.h>
 #include <time.h>
 
