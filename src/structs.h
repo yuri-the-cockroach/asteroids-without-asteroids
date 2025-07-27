@@ -114,7 +114,7 @@ extern const float WORLD_POS_MAX_X;
 
 extern const float WORLD_POS_MIN_Y;
 extern const float WORLD_POS_MAX_Y;
-
+extern const unsigned int ASTEROID_POINT_HIGHT;
 extern const float MAX_ASTEROID_SIZE;
 
 extern const unsigned int MAX_OBJECT_COUNT;
