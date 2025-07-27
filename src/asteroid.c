@@ -23,9 +23,8 @@ objWrap *AsteroidSafeSpawn(objTracker *tracker) {
     objWrap *wrap = CreateAsteroid(tracker,
                                    LAST_SPAWN_POS,
                                    (Vector2){ 0, 0 },
-                                   (Vector2){ 0, 0 },
-                                   GetRandomFloat(-3, 3),
-                                   GetRandomFloat(1, 3));
+                                   GetRandomf(-3, 3),
+                                   GetRandomf(1, MAX_ASTEROID_SIZE));
 
     if (!wrap) {
         fatal(EINVAL,
