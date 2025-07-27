@@ -145,6 +145,10 @@ clean:
 	if [ -e main ]; then rm main; fi
 	if [ -e unit-tests ]; then rm unit-tests; fi
 	if [ -e benchmark ]; then rm benchmark; fi
+	make link-raylib
+
+link-raylib:
+	ln -s ~/git/raylib/src/*.so* shared/
 
 debug:
 	gdb -i=mi main
