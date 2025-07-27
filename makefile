@@ -97,8 +97,6 @@ all:
 		shared/libstatemachine.so \
 		shared/libmenulogic.so \
 		shared/libasteroid.so \
-		shared/libbenchmarking.so \
-		shared/libvisdebugger.so
 	mold -run make benchmark main unit-tests
 
 shared/libmenulogic.so: makefile src/menulogic.h src/menulogic.c src/structs.h
@@ -112,6 +110,7 @@ shared/librender.so: makefile src/render.h src/render.c src/structs.h
 
 shared/liblogger.so: makefile src/logger.h src/logger.c src/structs.h
 	$(call buildLib,logger)
+		shared/libmt.so
 
 shared/libautils.so: makefile src/autils.h src/autils.c src/structs.h
 	$(call buildLib,autils)
