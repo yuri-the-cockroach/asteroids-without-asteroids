@@ -7,6 +7,7 @@
 #include "render.h"
 #include "rlgl.h"
 #include "structs.h"
+#include "vector-math.h"
 
 #ifdef DEBUGGING
     #include "visdebugger.h"
@@ -282,11 +283,12 @@ void RunScreenRender(objTracker *restrict tracker) {
                      "Length of the list: %lu",
                      tracker->objListLen);
 
-    DebugDisplayText((Vector2){ 20, 32 },
-                     18,
-                     WHITE,
-                     "Time untill next asteroid: %f",
-                     NEXT_ASTEROID_SPAWN - GAME_TIME_PASSED);
+    if (tracker->playerPtr)
+        DebugDisplayText((Vector2){ 20, 32 },
+                         18,
+                         WHITE,
+                         "Time untill next asteroid: %f",
+                         NEXT_ASTEROID_SPAWN - GAME_TIME_PASSED);
 #endif // DEBUGGING
     DrawFPS(0, 0);
 }
