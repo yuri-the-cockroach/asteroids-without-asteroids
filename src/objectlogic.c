@@ -72,11 +72,10 @@ void UpdateObjectPos(objWrap *wrap) {
 }
 
 void RotateObject(objWrap *wrap, float rotateByDeg) {
-    wrap->objPtr->heading += (rotateByDeg * GetFrameTime());
-    wrap->objPtr->heading =
-        RollOverFloat(wrap->objPtr->heading, 0.0f, PI * 2.0f);
-    float sin_heading = sinf(wrap->objPtr->heading);
-    float cos_heading = cosf(wrap->objPtr->heading);
+    wrap->objPtr->heading += (rotateByDeg * LAST_FRAME_TIME);
+    wrap->objPtr->heading = fRollOver(wrap->objPtr->heading, 0.0f, PI * 2.0f);
+    float sin_heading     = sinf(wrap->objPtr->heading);
+    float cos_heading     = cosf(wrap->objPtr->heading);
     for (unsigned int current = 0; current < wrap->objPtr->shape.arrayLength;
          current++) {
         wrap->objPtr->shape.points[current].x =
