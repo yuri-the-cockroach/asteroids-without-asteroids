@@ -109,6 +109,9 @@ int GetStartUpArguments(int argc, char **argv) {
             }
         }
     }
+    printf("Current log level set to %d for shell and %d for file\n",
+           CURRENT_LOG_LEVEL_CONSOLE,
+           CURRENT_LOG_LEVEL_FILE);
     return 0;
 }
 
