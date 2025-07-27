@@ -9,6 +9,7 @@
 #include "logger.h"
 #include "objecthandler.h"
 #include "objectlogic.h"
+#include "render.h"
 #include "structs.h"
 
 // Returns a list of objects that need to be drawn
