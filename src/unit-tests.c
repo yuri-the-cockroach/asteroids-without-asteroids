@@ -1,25 +1,106 @@
 #include "raylib.h"
 
 #include "asteroid.h"
+#include "autils.h"
 #include "collision.h"
 #include "gamelogic.h"
+#include "mt.h"
 #include "objecthandler.h"
 #include "render.h"
-#include "structs.h"
-#include "unit-tests.h"
 
 #pragma GCC diagnostic ignored "-Wfloat-equal"
 
-int TestCollision() {
+int TestSort() {
+
+    objTracker *tracker = InitTracker();
+
+    for (unsigned int i = 0; i < SOFT_MAX_ASTEROIDS - 1; i++) {
+        AsteroidSafeSpawn(tracker);
+    }
+    CleanupMemory(tracker);
+    SortListByX(tracker);
+    objWrap *prev, *current;
+    for (unsigned long i = 1; i < tracker->objListLen; i++) {
+        prev    = tracker->objList[i - 1];
+        current = tracker->objList[i];
+        ASSERT(prev->objPtr->position.x <= current->objPtr->position.x);
+    }
+    DeleteTracker(tracker);
+    return 0;
+}
+
+int TestCollisionAnother(int iter, int iter_count) {
     objTracker *tracker = InitTracker();
     GAME_TIME_PASSED    = 0;
     objWrap *asteroids[4];
+    DEBUG(VISUAL_DEBUG = true;)
+    const float duration = 1;
 
-    float small_speed = 90;
-
-#ifdef MT_ENABLED
     struct mt_data_wrap *mtDataWrap = InitMT(tracker);
-#endif // MT_ENABLED
+
+    tracker->playerCamera.zoom   = .5f;
+    tracker->playerCamera.target = (Vector2){ 400, 700 };
+    asteroids[0]                 = CreateAsteroid(
+        tracker, (Vector2){ 300, 300 }, (Vector2){ 120, 120 }, 0, 1);
+    asteroids[1] = CreateAsteroid(
+        tracker, (Vector2){ 550, 550 }, (Vector2){ -120, -120 }, 0, 2);
+
+    while (GAME_TIME_PASSED < duration && !WindowShouldClose()) {
+
+        BeginDrawing();
+        ClearBackground(BLACK);
+
+        CleanupMemory(tracker);
+        SortListByX(tracker);
+
+        DisplayText((Vector2){ 700, 20 },
+                    24,
+                    WHITE,
+                    "Time passed: %.2f\n"
+                    "Target time: %.2f\n"
+                    "Iteration %d/%d\n"
+                    "List size: %ld",
+                    GAME_TIME_PASSED,
+                    duration,
+                    iter + 1,
+                    iter_count,
+                    tracker->objListLen);
+
+        // RunActionList(tracker);
+
+        RunThreads(mtDataWrap);
+        CollectThreads(mtDataWrap);
+        for (unsigned long i = 0; i < tracker->objListLen; i++) {
+            UpdateObjectPos(tracker->objList[i]);
+        }
+        RunWorldRender(tracker);
+
+        RunScreenRender(tracker);
+        PlayerRuntimeControlls(tracker);
+
+        EndDrawing();
+        LAST_FRAME_TIME = GetFrameTime();
+        GAME_TIME_PASSED += LAST_FRAME_TIME;
+    }
+
+    ASSERT(fCutOff(asteroids[0]->objPtr->speed.x, 0) == -120);
+    ASSERT(fCutOff(asteroids[0]->objPtr->speed.y, 0) == -120);
+
+    DeleteTracker(tracker);
+    MTCleanupAndFree(mtDataWrap);
+
+    return 0;
+}
+
+int TestCollisionHorizontal(int iter, int iter_count) {
+    objTracker *tracker = InitTracker();
+    GAME_TIME_PASSED    = 0;
+    objWrap *asteroids[4];
+    DEBUG(VISUAL_DEBUG = true;)
+    const float duration = 1;
+    float small_speed    = 90;
+
+    struct mt_data_wrap *mtDataWrap = InitMT(tracker);
 
     tracker->playerCamera.zoom   = .5f;
     tracker->playerCamera.target = (Vector2){ 400, 700 };
