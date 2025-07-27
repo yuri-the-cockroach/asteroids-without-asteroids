@@ -24,6 +24,12 @@ enum game_state NEXT_STATE = NOOP;
 // Set default values for basic variables
 
 int StateMachine(void) {
+    LOG(DEBUG,
+        "<--- CURRENT CONFIG --->\n"
+        "WORLD_POS_MIN_X = %d\n"
+        "WORLD_POS_MAX_X = %d",
+        WORLD_POS_MIN_X,
+        WORLD_POS_MAX_X);
 #ifdef BENCHMARKING
     long timerStartTotalCycle = 0;
     // long timerStartKeys = 0;
@@ -42,7 +48,9 @@ int StateMachine(void) {
 
         switch (GAME_STATE) {
         case INIT: {
+            LOG(ALL, "Entered INIT state");
             GAME_STATE = MAIN_MENU;
+            LOG(ALL, "Exiting INIT state");
             break;
         }
 
@@ -87,6 +95,7 @@ int StateMachine(void) {
 
                 DEBUG(
             })
+            LOG(ALL, "Entered RUNNING state");
             DEBUG(if (tracker->playerPtr) SPEED_PREV =
                       tracker->playerPtr->objPtr->speed;
                   DebugingKeyHandler(tracker);
@@ -110,6 +119,7 @@ int StateMachine(void) {
             RunScreenRender(tracker);
 
             CleanupMemory(tracker);
+            LOG(ALL, "Exiting RUNNING state");
             break;
         }
 
