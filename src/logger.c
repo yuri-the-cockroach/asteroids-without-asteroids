@@ -31,7 +31,7 @@ void Logger(const char *restrict inFile, const char *restrict inFunc,
     char formatedTime[64] = "";
     snprintf(formatedTime,
              64,
-             "%.2ld-%.2ld-%.2ld.%ld",
+             "%.2ld:%.2ld:%.2ld,%'ld",
              (time.tv_sec / 3600 + 3) % 24,
              time.tv_sec / 60 % 60,
              time.tv_sec % 60,
