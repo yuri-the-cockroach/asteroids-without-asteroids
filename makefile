@@ -128,7 +128,7 @@ benchmark: benchmark.c makefile src/structs.h $(TARGETS)
 run-unit: unit-tests
 	./unit-tests -lc $(LOGSHELL) -lf $(LOGFILE)
 
-run: main $(TARGETS)
+run: main
 	./main -lc $(LOGSHELL) -lf $(LOGFILE)
 
 run-bench: benchmark
