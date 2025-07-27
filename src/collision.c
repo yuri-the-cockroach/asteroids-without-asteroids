@@ -10,6 +10,7 @@
 #include "collision.h"
 #include "logger.h"
 #include "structs.h"
+#include "vector-math.h"
 
 bool FindAnyCollision(objTracker *tracker, objWrap *first) {
     if (tracker->objListLen < 2) return false;
