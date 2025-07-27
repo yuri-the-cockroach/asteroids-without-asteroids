@@ -67,8 +67,9 @@ int StateMachine(void) {
             GAME_STATE = RUNNING;
             break;
         }
+
         case START_NEW: {
-            tracker = InitTracker();
+            tracker    = InitTracker();
             mtDataWrap = InitMT(tracker);
             NewGame(tracker);
             curMenu    = &refMainMenu;
