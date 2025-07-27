@@ -11,50 +11,6 @@
 #include "autils.h"
 #include "structs.h"
 
-int fGetSign(float f) {
-    int *ptr = (int *)(void *)&f;
-    return *ptr >> 31 | 1;
-}
-
-int GetSign(int i) { return i >> 31 | 1; }
-
-float GetRandomFloat(float min, float max) {
-    return (float)(GetRandomValue((int)(min * 1000), (int)(max * 1000))) / 1000;
-}
-
-float RollOverFloat(float d, float min, float max) {
-    const float t = d < min ? max : d;
-    return t > max ? min : t;
-}
-
-float fCutOff(float f, int n) {
-    if (n == 0) return (float)(int)f;
-    float mult = powf(10.f, (float)n);
-    int temp   = (int)(f * mult);
-    return (float)temp / mult;
-}
-
-int RollOverInt(int d, int min, int max) {
-    const int t = d < min ? max : d;
-    return t > max ? min : t;
-}
-
-float ClampFloat(float d, float min, float max) {
-    const float t = d < min ? min : d;
-    return t > max ? max : t;
-}
-
-int ClampInt(int d, int min, int max) {
-    const int t = d < min ? min : d;
-    return t > max ? max : t;
-}
-
-long GetTimeMicS(void) {
-    struct timeval tv = { 0, 0 };
-    gettimeofday(&tv, 0);
-    return tv.tv_sec * (long)1e6 + tv.tv_usec;
-}
-
 void CleanupMemory(objTracker *tracker) {
     unsigned long i           = 0;
     unsigned long firstNull   = MAX_OBJECT_COUNT;
