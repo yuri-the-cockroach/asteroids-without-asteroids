@@ -83,36 +83,26 @@ int StateMachine(void) {
         }
 
         case RUNNING: {
-
-            DEBUG(SPEED_PREV = tracker->playerPtr->objPtr->speed;
-                  DebugingKeyHandler(tracker);)
-
-            DEBUG(if (!DEBUG_PAUSE) {)
-
-                SpawnAsteroidOnTime(tracker);
-                RunActionList(tracker);
-                GAME_TIME_PASSED += GetFrameTime();
-
-                DEBUG(
-            })
             LOG(ALL, "Entered RUNNING state");
             DEBUG(if (tracker->playerPtr) SPEED_PREV =
                       tracker->playerPtr->objPtr->speed;
-                  DebugingKeyHandler(tracker);
-                  if (!DEBUG_PAUSE) {)
-                        if (tracker->playerPtr) SpawnAsteroidOnTime(tracker);
-                      RunActionList(tracker);
-                      GAME_TIME_PASSED += GetFrameTime();
-                    DEBUG(
-                  })
+                  DebugingKeyHandler(tracker);)
 
             // Controlls
             PlayerRuntimeControlls(tracker);
             ShipControlls(tracker);
 
+            SpawnAsteroidOnTime(tracker);
+            // RunActionList(tracker);
             SortListByX(tracker);
+            DEBUG(if (!DEBUG_PAUSE)) {
                 RunThreads(mtDataWrap);
                 CollectThreads(mtDataWrap);
+                objWrap *current;
+                RunActionList(tracker);
+                GAME_TIME_PASSED += GetFrameTime();
+            }
+
             // Logic
             // Rendering
             RunWorldRender(tracker);
