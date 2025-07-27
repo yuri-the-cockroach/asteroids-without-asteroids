@@ -13,7 +13,6 @@ LOGFILE?=9
 # WARN to SHOW
 export WARN += -Wall
 export WARN += -Wextra
-export WARN += -Weverything
 
 # WARN to IGNORE
 export NOWARN += -Wno-unsafe-buffer-usage
