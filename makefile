@@ -7,6 +7,8 @@ ifndef DEFINES
 
 export DISPLAY?=:0
 
+LOGSHELL?=5
+LOGFILE?=9
 
 # WARN to SHOW
 export WARN += -Wall
@@ -152,13 +154,13 @@ benchmark: benchmark.c makefile src/structs.h
 # -lf level for file debug output
 
 run-unit: unit-tests
-	./unit-tests -lc 7 -lf 7
+	./unit-tests -lc $(LOGSHELL) -lf $(LOGFILE)
 
 run: main
-	./main -lc 2 -lf 7
+	./main -lc $(LOGSHELL) -lf $(LOGFILE)
 
 run-bench: benchmark
-	./benchmark -lc 4 -lf 7
+	./benchmark -lc $(LOGSHELL) -lf $(LOGFILE)
 
 run-prof: main
 	gprofng collect app -O test.er ./main
