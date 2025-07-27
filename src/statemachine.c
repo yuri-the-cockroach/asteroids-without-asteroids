@@ -6,8 +6,10 @@
 #include "menulogic.h"
 #include "mt.h"
 #include "objecthandler.h"
+#include "objectlogic.h"
 #include "render.h"
 #include "structs.h"
+
 #ifdef BENCHMARKING
     #include "benchmarking.h"
 #endif // BENCHMARKING
