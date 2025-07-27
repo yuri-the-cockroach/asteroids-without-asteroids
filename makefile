@@ -43,6 +43,7 @@ export LIBS += -lstatemachine
 export LIBS += -lmenulogic
 export LIBS += -lasteroid
 
+export LIBS += -lmt
 # Define these to enable debugging and benchmarking respectively
 # SANITIZE will be read from user env
 ifdef SANITIZE
