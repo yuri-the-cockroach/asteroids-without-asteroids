@@ -42,13 +42,9 @@ export LIBS += -lcollision
 export LIBS += -lstatemachine
 export LIBS += -lmenulogic
 export LIBS += -lasteroid
-
 export LIBS += -lmt
 # Define these to enable debugging and benchmarking respectively
 # SANITIZE will be read from user env
-ifdef SANITIZE
-export SANITIZE = -fsanitize=address -fsanitize-address-use-after-return=always -fno-omit-frame-pointer
-endif # SANITIZE
 
 # DEBUGGING will be read from user env
 ifdef DEBUG
@@ -60,6 +56,10 @@ export OPTIMIZE=-Og -g # Overrides previous optimization options
 endif # OPTIMIZE
 
 endif # DEBUGGING
+
+ifdef SANITIZE
+export SANITIZE = -fsanitize=address -fsanitize-address-use-after-return=always -fno-omit-frame-pointer
+endif # SANITIZE
 
 # Optimizations options (will be overriten if debugging is enabled or passed as env)
 ifndef OPTIMIZE
