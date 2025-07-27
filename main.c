@@ -13,6 +13,7 @@ int main(int argc, char **argv) {
 
     // Handle the startup arguments
     RunConfig();
+    InitRaylib();
     GetStartUpArguments(argc, argv);
 
     CURRENT_LOG_LEVEL_FILE = CURRENT_LOG_LEVEL_FILE < CURRENT_LOG_LEVEL_CONSOLE
