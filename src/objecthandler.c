@@ -145,9 +145,7 @@ void CreatePlayer(objTracker *tracker, Vector2 initPosition, float size) {
 
     object *objPtr = malloc(sizeof(object));
     objPtr[0] =
-        InitObject(InitShape(PLAYER_SHAPE_POINTS,
-                             sizeof(PLAYER_SHAPE_POINTS) / sizeof(Vector2),
-                             size),
+        InitObject(InitShape(PLAYER_SHAPE_POINTS, PLAYER_SHAPE_SIZE, size),
                    initPosition,
                    (Vector2){ 0, 0 },
                    0);
@@ -186,9 +184,8 @@ void CreateProjectile(objTracker *tracker, objWrap *parent) {
 
     object *objPtr = malloc(sizeof(object));
     objPtr[0]      = InitObject(
-        InitShape(PROJECTILE_SHAPE_POINTS,
-                  sizeof(PROJECTILE_SHAPE_POINTS) / sizeof(Vector2),
-                  PROJECTILE_SIZE),
+        InitShape(
+            PROJECTILE_SHAPE_POINTS, PROJECTILE_SHAPE_SIZE, PROJECTILE_SIZE),
 
         // I don't know why this works, but other approach
         // doesn't and at this point I don't care. Just don't
