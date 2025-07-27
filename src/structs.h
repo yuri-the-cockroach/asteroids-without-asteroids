@@ -95,6 +95,7 @@ typedef struct menu_option_struct menuOption;
 // -------------------- Physics constants --------------------
 
 #define MT_ENABLED
+#define LOG_FILE_NAME_SIZE 64
 
 extern const float WORLD_POS_MIN_X;
 extern const float WORLD_POS_MAX_X;
