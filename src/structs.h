@@ -174,6 +174,7 @@ extern const Vector2 PLAYER_SHAPE_POINTS[];
 extern const int PROJECTILE_SHAPE_SIZE;
 extern const Vector2 PROJECTILE_SHAPE_POINTS[];
 
+extern const float MAX_COLL_OFFSET;
 
 // -------------------- structs --------------------
 
