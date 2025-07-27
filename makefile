@@ -5,6 +5,8 @@
 # @version 0.1
 ifndef DEFINES
 
+export DISPLAY?=:0
+
 
 # WARN to SHOW
 export WARN += -Wall
