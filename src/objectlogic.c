@@ -43,34 +43,24 @@ void UpdateObjectPos(objWrap *wrap) {
         return;
     }
 
-    if (wrap->objPtr->position.x + wrap->collider.collider.x <=
-        WORLD_POS_MIN_X) {
-        wrap->objPtr->speed.x *= wrap->objPtr->speed.x < 0 ? -1 : 1;
-        wrap->objPtr->speed.x +=
-            wrap->objPtr->speed.x < MAX_PUSHBACK_SPEED ? PUSHBACK_STEP : 0;
+    if (colStart.x <= WORLD_POS_MIN_X) {
+        speed.x *= speed.x < 0 ? -1 : 1;
+        speed.x += speed.x < MAX_PUSHBACK_SPEED ? PUSHBACK_STEP : 0;
     }
 
-    if (wrap->objPtr->position.y + wrap->collider.collider.y <=
-        WORLD_POS_MIN_Y) {
-        wrap->objPtr->speed.y *= wrap->objPtr->speed.y < 0 ? -1 : 1;
-        wrap->objPtr->speed.y +=
-            wrap->objPtr->speed.y < MAX_PUSHBACK_SPEED ? PUSHBACK_STEP : 0;
+    if (colStart.y <= WORLD_POS_MIN_Y) {
+        speed.y *= speed.y < 0 ? -1 : 1;
+        speed.y += speed.y < MAX_PUSHBACK_SPEED ? PUSHBACK_STEP : 0;
     }
 
-    if (wrap->objPtr->position.x >=
-        WORLD_POS_MAX_X -
-            (wrap->collider.collider.x + wrap->collider.collider.width)) {
-        wrap->objPtr->speed.x *= wrap->objPtr->speed.x > 0 ? -1 : 1;
-        wrap->objPtr->speed.x +=
-            wrap->objPtr->speed.x > -MAX_PUSHBACK_SPEED ? -PUSHBACK_STEP : 0;
+    if (colEnd.x >= WORLD_POS_MAX_X) {
+        speed.x *= speed.x > 0 ? -1 : 1;
+        speed.x += speed.x > -MAX_PUSHBACK_SPEED ? -PUSHBACK_STEP : 0;
     }
 
-    if (wrap->objPtr->position.y >=
-        WORLD_POS_MAX_Y -
-            (wrap->collider.collider.y + wrap->collider.collider.height)) {
-        wrap->objPtr->speed.y *= wrap->objPtr->speed.y > 0 ? -1 : 1;
-        wrap->objPtr->speed.y +=
-            wrap->objPtr->speed.y > -MAX_PUSHBACK_SPEED ? -PUSHBACK_STEP : 0;
+    if (colEnd.y >= WORLD_POS_MAX_Y) {
+        speed.y *= speed.y > 0 ? -1 : 1;
+        speed.y += speed.y > -MAX_PUSHBACK_SPEED ? -PUSHBACK_STEP : 0;
     }
 
     adjustedSpeed = (Vector2){ wrap->objPtr->speed.x * frameTime,
