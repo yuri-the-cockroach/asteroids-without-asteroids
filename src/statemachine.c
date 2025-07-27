@@ -4,6 +4,7 @@
 #include "gamelogic.h"
 #include "logger.h"
 #include "menulogic.h"
+#include "mt.h"
 #include "objecthandler.h"
 #include "render.h"
 #include "structs.h"
@@ -51,14 +52,13 @@ int StateMachine(void) {
 
         case TESTING: {
             tracker    = InitTracker();
+            mtDataWrap = InitMT(tracker);
             GAME_STATE = RUNNING;
             break;
         }
         case START_NEW: {
             tracker = InitTracker();
-#ifdef MT_ENABLED
             mtDataWrap = InitMT(tracker);
-#endif // MT_ENABLED
             NewGame(tracker);
             GAME_STATE = RUNNING;
             break;
@@ -79,14 +79,8 @@ int StateMachine(void) {
 
             DEBUG(if (!DEBUG_PAUSE) {)
 
-#ifdef MT_ENABLED
-                CollectThreads(mtDataWrap);
-#endif // MT_ENABLED
                 SpawnAsteroidOnTime(tracker);
                 RunActionList(tracker);
-#ifdef MT_ENABLED
-                RunThreads(mtDataWrap);
-#endif // MT_ENABLED
                 GAME_TIME_PASSED += GetFrameTime();
 
                 DEBUG(
@@ -106,6 +100,8 @@ int StateMachine(void) {
             ShipControlls(tracker);
 
             SortListByX(tracker);
+                RunThreads(mtDataWrap);
+                CollectThreads(mtDataWrap);
             // Logic
             // Rendering
             RunWorldRender(tracker);
@@ -138,12 +134,11 @@ int StateMachine(void) {
             CloseWindow();
             return 0;
         }
+
         case CLEANUP: {
             curMenu = &refMainMenu;
             DeleteTracker(tracker);
-#ifdef MT_ENABLED
             MTCleanupAndFree(mtDataWrap);
-#endif // MT_ENABLED
             mtDataWrap = 0;
             tracker    = 0;
             if (NEXT_STATE == NOOP) GAME_STATE = EXIT;
