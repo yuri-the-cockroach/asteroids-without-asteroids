@@ -279,13 +279,13 @@ void FastFindCollisions(objTracker *tracker, unsigned long index) {
     for (unsigned long j = index + 1; j < tracker->objListLen; j++) {
         next = tracker->objList[j];
 
-        if (tracker->objList[j] == NULL || current == next ||
-            next->request != UPDATE || !next->collider.isCollidable)
+        if (next == NULL || current == next || next->request != UPDATE ||
+            !next->collider.isCollidable)
             continue;
 
         if (current->objPtr->position.x + current->collider.collider.x +
-                current->collider.collider.width <=
-            next->objPtr->position.x + next->collider.collider.x)
+                current->collider.collider.width <
+            next->objPtr->position.x + MAX_COLL_OFFSET) {
             break;
 
         if (!CheckIfCollide(current, next)) continue;
