@@ -44,6 +44,7 @@ export LIBS += -lmenulogic
 export LIBS += -lasteroid
 export LIBS += -lmt
 export LIBS += -lunwind -ldw -lBlocksRuntime
+export STATIC
 # Define these to enable debugging and benchmarking respectively
 # SANITIZE will be read from user env
 
