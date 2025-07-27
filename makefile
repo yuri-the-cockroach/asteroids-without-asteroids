@@ -110,17 +110,16 @@ object:
 shared:
 	mkdir shared
 
-
 shared/lib%.so: src/%.c src/%.h makefile src/structs.h
 	clang $(CFLAGS) $(WARN) $(NOWARN) $(OPTIMIZE) $(SANITIZE) $(DEBUGGING) $(BENCHMARKING) -fPIC -ferror-limit=0 -shared -o $@ $<
 
-unit-tests: run-unit-tests.c makefile src/unit-tests.c src/structs.h
+unit-tests: run-unit-tests.c makefile src/unit-tests.c src/structs.h $(TARGETS)
 	bear -- clang $(CFLAGS) $(WARN) $(NOWARN) -ferror-limit=0 -rpath shared $(OPTIMIZE) $(SANITIZE) $(DEBUGGING) -o unit-tests $(STATIC) run-unit-tests.c -Isrc -Lshared $(LIBS)
 
 main: makefile main.c src/structs.h
 	bear -- clang $(CFLAGS) $(WARN) $(NOWARN) -ferror-limit=0 -rpath shared $(OPTIMIZE) $(SANITIZE) $(DEBUGGING) $(BENCHMARKING) -o main $(STATIC) main.c -Isrc -Lshared $(LIBS)
 
-benchmark: benchmark.c makefile src/structs.h
+benchmark: benchmark.c makefile src/structs.h $(TARGETS)
 	bear -- clang $(CFLAGS) $(WARN) $(NOWARN) -ferror-limit=0 -rpath shared $(OPTIMIZE) $(SANITIZE) $(DEBUGGING) $(BENCHMARKING) -o benchmark $(STATIC) benchmark.c -Isrc -Lshared $(LIBS) -lbenchmarking
 
 # -lc level for consol debug output
@@ -129,7 +128,7 @@ benchmark: benchmark.c makefile src/structs.h
 run-unit: unit-tests
 	./unit-tests -lc $(LOGSHELL) -lf $(LOGFILE)
 
-run: main
+run: main $(TARGETS)
 	./main -lc $(LOGSHELL) -lf $(LOGFILE)
 
 run-bench: benchmark
