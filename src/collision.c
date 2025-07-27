@@ -212,9 +212,14 @@ bool CheckIfCollide(objWrap *first, objWrap *second) {
     //
     // If they overlap in both axis, then they collide
     // Actuall logic
-    if ((firstStart.x < secondEnd.x && secondStart.x < firstEnd.x) &&
-        (firstStart.y < secondEnd.y && secondStart.y < firstEnd.y))
-        return true;
+    bool collide_x =
+        (firstStart.x <= secondEnd.x && secondStart.x <= firstEnd.x) ||
+        (firstStart.x >= secondEnd.x && secondStart.x >= firstEnd.x);
+    bool collide_y =
+        (firstStart.y <= secondEnd.y && secondStart.y <= firstEnd.y) ||
+        (firstStart.y >= secondEnd.y && secondStart.y >= firstEnd.y);
+
+    if (collide_x && collide_y) return true;
 
     return false;
 }
