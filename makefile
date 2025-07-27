@@ -136,8 +136,11 @@ run-bench: benchmark
 	./benchmark -lc $(LOGSHELL) -lf $(LOGFILE)
 
 run-prof: main
-	gprofng collect app -O test.er ./main
-	gprofng display text -fsummary test.er
+	perf record -F 100k -a -g -- ./main
+	perf script > out.perf
+	./stackcollapse.pl out.perf > out.folded
+	./flamegraph.pl out.folded > graph.svg
+	firefox graph.svg
 
 clean:
 	if [[ -e object && -s object ]]; then rm object/*; fi
