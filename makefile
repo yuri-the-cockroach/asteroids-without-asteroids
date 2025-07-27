@@ -116,7 +116,7 @@ shared/lib%.so: src/%.c src/%.h makefile src/structs.h
 unit-tests: run-unit-tests.c makefile src/unit-tests.c src/structs.h $(TARGETS)
 	bear -- clang $(CFLAGS) $(WARN) $(NOWARN) -ferror-limit=0 -rpath shared $(OPTIMIZE) $(SANITIZE) $(DEBUGGING) -o unit-tests $(STATIC) run-unit-tests.c -Isrc -Lshared $(LIBS)
 
-main: makefile main.c src/structs.h
+main: makefile main.c src/structs.h $(TARGETS)
 	bear -- clang $(CFLAGS) $(WARN) $(NOWARN) -ferror-limit=0 -rpath shared $(OPTIMIZE) $(SANITIZE) $(DEBUGGING) $(BENCHMARKING) -o main $(STATIC) main.c -Isrc -Lshared $(LIBS)
 
 benchmark: benchmark.c makefile src/structs.h $(TARGETS)

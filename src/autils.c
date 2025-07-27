@@ -123,23 +123,19 @@ void RunConfig(void) {
     LOG_FILE_PTR  = CreateLogFile(LOG_FILE_NAME);
 }
 
+void InitRaylib(void) {
 
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    // SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "asteroids without asteroids");
 
-    SetWindowPosition(1, 1);
+    // SetWindowPosition(1, 1);
     SetWindowMinSize(640, 480);
     SetWindowMaxSize(8192, 8192);
 
     SetTargetFPS(FPS_TARGET);
-    CreateLogFile();
 }
 
 void RunCleanup(void) {
     CloseWindow();
     fclose(LOG_FILE_PTR);
-
-#ifdef BENCHMARKING
-    if (BENCH_LOG_FILE_PTR) fclose(BENCH_LOG_FILE_PTR);
-#endif
 }
