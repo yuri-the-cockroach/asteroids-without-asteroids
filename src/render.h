@@ -8,8 +8,6 @@ void DisplayText(Vector2 pos, int fontSize, Color color,
                  const char *restrict format, ...);
 
 // Draws the object based on it's *object.shape.points* array
-void DrawObject(objWrap *wrap);
-
 void DrawGrid2D(int dist, Color color);
 
 void RunScreenRender(objTracker *restrict tracker);
