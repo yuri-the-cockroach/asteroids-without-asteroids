@@ -11,8 +11,13 @@
 #include "logger.h"
 #include "objecthandler.h"
 #include "structs.h"
+#include "tracingtools.c"
 
 objWrap *AsteroidSafeSpawn(objTracker *tracker) {
+    if (!tracker) {
+        errno = EINVAL;
+        fatal(errno, 0, "Tracker pointer provided is invalid, bailing now...");
+    }
     objWrap *wrap = CreateAsteroid(tracker,
                                    (Vector2){ 0, 0 },
                                    (Vector2){ 0, 0 },
@@ -20,23 +25,9 @@ objWrap *AsteroidSafeSpawn(objTracker *tracker) {
                                    GetRandomFloat(1, 3));
 
     if (!wrap) {
-        LOG(WARNING, "%s", "Cannot create an asteroid, got a NULL pointer");
-        return NULL;
-    }
-
-    Vector2 playerPos;
-
-    float minX = WORLD_POS_MIN_X;
-    float maxX = WORLD_POS_MAX_X;
-    float minY = WORLD_POS_MIN_Y;
-    float maxY = WORLD_POS_MAX_Y;
-
-    if (tracker->playerPtr) {
-        playerPos = tracker->playerPtr->objPtr->position;
-        minX = ClampFloat(playerPos.x - 3000, WORLD_POS_MIN_X, WORLD_POS_MAX_X);
-        maxX = ClampFloat(playerPos.x + 3000, WORLD_POS_MIN_X, WORLD_POS_MAX_X);
-        minY = ClampFloat(playerPos.y - 3000, WORLD_POS_MIN_Y, WORLD_POS_MAX_Y);
-        maxY = ClampFloat(playerPos.y + 3000, WORLD_POS_MIN_Y, WORLD_POS_MAX_Y);
+        fatal(EINVAL,
+              0,
+              "Cannot create an asteroid, got a NULL pointer") return NULL;
     }
 
     bool complete = false;
@@ -49,6 +40,10 @@ objWrap *AsteroidSafeSpawn(objTracker *tracker) {
             !(fabsf(wrap->objPtr->position.x - playerPos.x) < 400 ||
               fabsf(wrap->objPtr->position.y - playerPos.y) < 400))
             complete = true;
+        if (WORLD_POS_MAX_Y < wrap->objPtr->position.y) {
+            LOG(ERROR, "Failed to find a spawn point for an asteroid!");
+            return NULL;
+        }
         // This abomination will just check if the wrap closer than 200u or
         // further than 1000u to the player
         retry--;
