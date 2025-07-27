@@ -1,6 +1,7 @@
 #include "logger.h"
 #include "structs.h"
 
+#pragma GCC diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
 // This is an internal function.
 // It is ment to be used through LOG macro, that filles in most of the data
 void Logger(const char *restrict inFile, const char *restrict inFunc,
