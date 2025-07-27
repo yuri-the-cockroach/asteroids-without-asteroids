@@ -5,17 +5,17 @@
 // local includes
 #include "src/autils.h"
 #include "src/statemachine.h"
-#include "src/structs.h"
 #include "src/syslogic.h"
-#include "src/unit-tests.h"
 
 // static
 #include "src/structs.c"
+#include "src/unit-tests.c"
 
 int main(int argc, char **argv) {
     errno = 0;
 
     // Handle the startup arguments
+    FPS_TARGET = 0;
     RunConfig();
     GetStartUpArguments(argc, argv);
 
