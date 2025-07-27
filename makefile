@@ -5,8 +5,6 @@
 # @version 0.1
 ifndef DEFINES
 
-export GLFW_LINUX_ENABLE_X11=FALSE
-export GLFW_LINUX_ENABLE_WAYLAND=TRUE
 
 # WARN to SHOW
 export WARN += -Wall
