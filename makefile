@@ -140,8 +140,8 @@ run-prof: main
 	gprofng display text -fsummary test.er
 
 clean:
-	if [[ -e object && -s object ]]; then rm object/*.o; fi
-	if [[ -e shared && -s shared ]]; then rm shared/*.so; fi
+	if [[ -e object && -s object ]]; then rm object/*; fi
+	if [[ -e shared && -s shared ]]; then rm shared/*; fi
 	if [ -e main ]; then rm main; fi
 	if [ -e unit-tests ]; then rm unit-tests; fi
 	if [ -e benchmark ]; then rm benchmark; fi
