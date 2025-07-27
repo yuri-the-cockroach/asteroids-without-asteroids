@@ -59,22 +59,35 @@ enum difficulty {
 
 enum menuOptionType { DUMMY = -1, SUBMENU = 1, FUNCTION = 2 };
 
-static const char *loglvlToString[12] = { "NOLOG",
-                                          "\033[1;31mFATAL\033[0;37m",
-                                          "\033[0;31mERROR\033[0;37m",
-                                          "\033[1;33mWARNING\033[0;37m",
-                                          "\033[0;32mINFO\033[0;37m",
-                                          "\033[1;31mTEST FAIL\033[0;37m",
-                                          "\033[0;32mTEST PASS\033[0;37m",
-                                          "\033[0;34mFIXME\033[0;37m",
-                                          "\033[1;35mDEBUG\033[0;37m",
-                                          "\033[0;35mTRACE\033[0;37m",
-                                          "ALL" };
+#define TERM_GRAY       "30"
+#define TERM_RED        "31"
+#define TERM_GREEN      "32"
+#define TERM_YELLOW     "33"
+#define TERM_BLUE       "34"
+#define TERM_PURPLE     "35"
+#define TERM_CYAN       "36"
+#define TERM_WHITE      "37"
 
-static const char *loglvlToStringNoColor[12] = {
-    "NOLOG",     "FATAL", "ERROR", "WARNING", "INFO", "TEST FAIL",
-    "TEST PASS", "FIXME", "DEBUG", "TRACE",   "ALL"
-};
+#define TERM_NORMAL     "0"
+#define TERM_BOLD       "1"
+#define TERM_LIGHT      "2"
+#define TERM_UNDERLINED "4"
+#define TERM_BLINKING   "5"
+#define TERM_REVERSE    "7"
+
+#define TERM_TEXT_MOD(mod, color, text) \
+    "\033[" mod ";" color "m" text "\033[0;37m"
+
+extern const char *loglvlToString[12];
+
+// "\e[1;33mWARNING\e[0m",
+// "\e[0;32mINFO\e[0m",
+// "\e[1;31mTEST FAIL\e[0m",
+// "\e[0;32mTEST PASS\e[0m",
+// "\e[0;34mFIXME\e[0m",
+// "\e[1;35mDEBUG\e[0m",
+// "\e[0;35mTRACE\e[0m",
+extern const char *loglvlToStringNoColor[12];
 
 enum request { IGNORE = 0, UPDATE = 1, SEPARATE = 2, CREATE = 3, DELETE = -1 };
 
