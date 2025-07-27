@@ -68,7 +68,7 @@ ifndef OPTIMIZE
 export OPTIMIZE=-O2 -g0
 endif
 
-export CFLAGS=-mavx2
+export CFLAGS=-D_GNU_SOURCE -mavx2 -std=gnu23 -rdynamic -fblocks
 
 # BENCHMARKING will be read from user env
 ifdef BENCH
