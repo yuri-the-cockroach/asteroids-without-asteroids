@@ -32,21 +32,13 @@ void UpdateObjectPos(objWrap *wrap) {
     if (wrap->objectType == PLAYER) speed = VecMulFloat(speed, 0.995f);
 
     if (wrap->objectType == PROJECTILE &&
-        ((wrap->objPtr->position.x + wrap->collider.collider.x <
-              WORLD_POS_MIN_X &&
-          wrap->objPtr->speed.x < 0) ||
-         (wrap->objPtr->position.y + wrap->collider.collider.y <
-              WORLD_POS_MIN_Y &&
-          wrap->objPtr->speed.y < 0) ||
-         (wrap->objPtr->position.x >
-              WORLD_POS_MAX_X - (wrap->collider.collider.x +
-                                 wrap->collider.collider.height) &&
-          wrap->objPtr->speed.x > 0) ||
-         (wrap->objPtr->position.y >
-              WORLD_POS_MAX_Y - (wrap->collider.collider.y +
-                                 wrap->collider.collider.height) &&
-          wrap->objPtr->speed.y > 0))) {
-        wrap->request = DELETE;
+        ((colStart.x < WORLD_POS_MIN_X && speed.x < 0) ||
+         (colStart.y < WORLD_POS_MIN_Y && speed.y < 0) ||
+         (colEnd.x > WORLD_POS_MAX_X && speed.x > 0) ||
+         (colEnd.y > WORLD_POS_MAX_Y && speed.y > 0))) {
+        wrap->request          = DELETE;
+        wrap->objPtr->position = VecAddVec(position, adjustedSpeed);
+        wrap->objPtr->speed    = speed;
         pthread_mutex_unlock(&wrap->mutex);
         return;
     }
