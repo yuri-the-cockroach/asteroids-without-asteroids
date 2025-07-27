@@ -15,9 +15,6 @@
 
 // Returns a list of objects that need to be drawn
 void RunActionList(objTracker *tracker) {
-
-    SortListByX(tracker);
-
     // Run through all the tracked objects
     for (unsigned long i = 0; i < tracker->objListLen; i++) {
 
@@ -45,7 +42,7 @@ void RunActionList(objTracker *tracker) {
 
         case UPDATE: // Call the updater function of the element
         {
-            UpdateObj(tracker, i);
+            if (current->updatePosition) UpdateObjectPos(current);
             break;
         }
 
@@ -53,10 +50,6 @@ void RunActionList(objTracker *tracker) {
             break;
         }
     }
-
-    CleanupMemory(tracker);
-}
-
 }
 
 objTracker *InitTracker(void) {

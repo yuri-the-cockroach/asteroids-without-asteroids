@@ -105,11 +105,13 @@ int StateMachine(void) {
             PlayerRuntimeControlls(tracker);
             ShipControlls(tracker);
 
+            SortListByX(tracker);
             // Logic
             // Rendering
             RunWorldRender(tracker);
             RunScreenRender(tracker);
 
+            CleanupMemory(tracker);
             break;
         }
 
