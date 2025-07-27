@@ -73,7 +73,6 @@ export CFLAGS=-D_GNU_SOURCE -mavx2 -std=gnu23 -rdynamic -fblocks
 # BENCHMARKING will be read from user env
 ifdef BENCH
 export BENCHMARKING = -DBENCHMARKING
-export LIBS+= -lbenchmarking
 endif # BENCHMARKING
 
 define buildLib
