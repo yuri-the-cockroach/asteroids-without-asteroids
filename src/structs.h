@@ -96,38 +96,39 @@ typedef struct menu_option_struct menuOption;
 
 #define MT_ENABLED
 
-static const float ELASTICITY_FACTOR =
-    0.5; // How much energy object recives back on bouce
+extern const float WORLD_POS_MIN_X;
+extern const float WORLD_POS_MAX_X;
 
-static const int WORLD_POS_MIN_X = 0;
-static const int WORLD_POS_MAX_X = 10000;
+extern const float WORLD_POS_MIN_Y;
+extern const float WORLD_POS_MAX_Y;
 
-static const int WORLD_POS_MIN_Y = 0;
-static const int WORLD_POS_MAX_Y = 10000;
+extern const float MAX_ASTEROID_SIZE;
 
-static const int SOFT_MAX_ASTEROIDS = 1000;
-static const int MAX_OBJECT_COUNT   = 1024;
+extern const unsigned int MAX_OBJECT_COUNT;
+extern const unsigned int SOFT_MAX_ASTEROIDS;
 
 // player related
-static const int RATE_OF_FIRE          = 5;
-static const int PROJECTILE_SPEED      = 20;
-static const float PROJECTILE_SIZE     = 0.1f;
-static const int PLAYER_ROTATION_SPEED = 5;
-static const int PLAYER_MOVE_SPEED     = 20;
-static const int BASE_ROTATE           = 5;
+extern const int RATE_OF_FIRE;
+extern const float PROJECTILE_SPEED;
+extern const float PROJECTILE_SIZE;
+extern const int PLAYER_ROTATION_SPEED;
+extern const int PLAYER_MOVE_SPEED;
+extern const int BASE_ROTATE;
+extern const float BOUNCE_BACK_FACTOR;
 
-static const enum loglevel DEFAULT_LOG_LEVEL = WARNING;
+extern const enum loglevel DEFAULT_LOG_LEVEL;
 
-static const int MAX_MENU_STACK_SIZE = 32;
-
-static const long ASTEROID_SPAWN_DELAY            = 10;
-static const unsigned long ASTEROID_CORNERS_COUNT = 20;
-static const float ASTEROID_HEIGHT_VARIATION      = 15;
+extern const long ASTEROID_SPAWN_DELAY;
+extern const unsigned long ASTEROID_CORNERS_COUNT;
+extern const float ASTEROID_HEIGHT_VARIATION;
 
 // Externally defined dynamic global variables
 
+extern float LAST_FRAME_TIME;
+
 // Debugging vars
 #ifdef DEBUGGING
+extern int COLLISION_COUNT;
 extern objWrap *lastDragged;
 extern Vector2 SPEED_PREV;
 extern bool DEBUG_PAUSE;
