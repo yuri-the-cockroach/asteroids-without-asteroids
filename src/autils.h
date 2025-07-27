@@ -61,7 +61,7 @@ long GetTimeMicS(void) {
 void CleanupMemory(objTracker *tracker);
 
 // Rollover int, if it gets over max or under min
-int RollOverInt(int d, int min, int max);
+int RollOver(int d, int min, int max);
 
 // Rollover float, if it gets over max or under min
 float RollOverFloat(float d, float min, float max);
