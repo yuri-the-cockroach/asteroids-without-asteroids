@@ -104,7 +104,16 @@ void Bounce(objTracker *tracker, objWrap *first, objWrap *second) {
 
     UNUSED(tracker);
 
+    Vector2 pos_delta =
+        VecSubVec(second->objPtr->position, first->objPtr->position);
+    Vector2 speed_delta =
+        VecSubVec(second->objPtr->speed, first->objPtr->speed);
 
+    // If the signs match, that means that they're not going towards eachother,
+    // thus no point to bounce them
+    if (fGetSign(pos_delta.x) == fGetSign(speed_delta.x) &&
+        fGetSign(pos_delta.y) == fGetSign(speed_delta.y))
+        return;
 
     {
 
