@@ -63,11 +63,11 @@ void UpdateObjectPos(objWrap *wrap) {
         speed.y += speed.y > -MAX_PUSHBACK_SPEED ? -PUSHBACK_STEP : 0;
     }
 
-    adjustedSpeed = (Vector2){ wrap->objPtr->speed.x * frameTime,
-                               wrap->objPtr->speed.y * frameTime };
+    adjustedSpeed = VecMulFloat(speed, LAST_FRAME_TIME);
 
-    wrap->objPtr->position.x = wrap->objPtr->position.x + adjustedSpeed.x;
-    wrap->objPtr->position.y = wrap->objPtr->position.y + adjustedSpeed.y;
+    wrap->objPtr->position = VecAddVec(position, adjustedSpeed);
+    wrap->objPtr->speed    = speed;
+
     pthread_mutex_unlock(&wrap->mutex);
 }
 
