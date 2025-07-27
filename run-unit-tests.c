@@ -5,17 +5,17 @@
 // local includes
 #include "src/autils.h"
 #include "src/statemachine.h"
-#include "src/structs.h"
 #include "src/syslogic.h"
-#include "src/unit-tests.h"
 
 // static
 #include "src/structs.c"
+#include "src/unit-tests.c"
 
 int main(int argc, char **argv) {
     errno = 0;
 
     // Handle the startup arguments
+    FPS_TARGET = 0;
     RunConfig();
     GetStartUpArguments(argc, argv);
 
@@ -28,7 +28,18 @@ int main(int argc, char **argv) {
     signal(SIGTERM, SigIntHandler);
     // signal(SIGSEGV, SigSegvHandel);
 
-    TestCollision();
+    TestSort();
+
+    InitRaylib();
+    const int iter_max = 100;
+    for (int i = 0; i < iter_max; i++) {
+        TestBigUnit(i, iter_max);
+        // TestCollisionHorizontal(i, iter_max);
+        // TestCollisionVertical(i, iter_max);
+        // TestCollisionAnother(i, iter_max);
+        // TestCollisionCos(i, iter_max);
+    }
+    LOG(INFO, "All tests passed");
     fclose(LOG_FILE_PTR);
 
 #ifdef BENCHMARKING

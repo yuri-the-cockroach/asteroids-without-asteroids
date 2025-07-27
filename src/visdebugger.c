@@ -4,11 +4,12 @@
 #pragma GCC diagnostic ignored \
     "-Wformat-nonliteral" // Ignore, because format is const char *restrict, so
                           // it's not an issue
-
+#ifndef DEBUGGING
+    #error "Compiling visual debugger without debugging support!"
+#endif // !DEBUGGING
 void DebugDisplayText(Vector2 pos, int fontSize, Color color,
                       const char *restrict format, ...) {
     if (!VISUAL_DEBUG) return;
-
     char messageString[1024] = "";
 
     va_list argptr;

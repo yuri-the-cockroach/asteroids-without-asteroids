@@ -1,4 +1,4 @@
-#include <raylib.h>
+#include "raylib.h"
 #include <string.h>
 
 #include "asteroid.h"
@@ -24,12 +24,13 @@ void OnPlayerAccellerate(object *object, float speed) {
     }
 
     object->speed.x +=
-        (speed / mult_x) * GetFrameTime() * object->shape.points[0].x;
+        (speed / mult_x) * LAST_FRAME_TIME * object->shape.points[0].x;
     object->speed.y +=
-        (speed / mult_y) * GetFrameTime() * object->shape.points[0].y;
+        (speed / mult_y) * LAST_FRAME_TIME * object->shape.points[0].y;
 
-    // object->speed.x +=  object->shape.points[0].x * (speed * GetFrameTime());
-    // object->speed.y += object->shape.points[0].y * (speed * GetFrameTime());
+    // object->speed.x +=  object->shape.points[0].x * (speed *
+    // LAST_FRAME_TIME); object->speed.y += object->shape.points[0].y * (speed *
+    // LAST_FRAME_TIME);
 }
 
 #ifdef DEBUGGING
@@ -47,9 +48,7 @@ void DebugingKeyHandler(objTracker *tracker) {
     objWrap *some = NULL;
     if (IsMouseButtonDown(0) &&
         ((some = FindCollisionPos(tracker, cursorPos)) || lastDragged)) {
-        if (some) {
-            lastDragged = some;
-        }
+        if (some) { lastDragged = some; }
         some = !some && lastDragged ? lastDragged : some;
 
         some->objPtr->position.x = cursorPos.x;
@@ -58,8 +57,8 @@ void DebugingKeyHandler(objTracker *tracker) {
 
     if (lastDragged && !IsMouseButtonDown(0)) {
         lastDragged->objPtr->speed =
-            (Vector2){ GetMouseDelta().x / GetFrameTime(),
-                       GetMouseDelta().y / GetFrameTime() };
+            (Vector2){ GetMouseDelta().x / LAST_FRAME_TIME,
+                       GetMouseDelta().y / LAST_FRAME_TIME };
 
         lastDragged = NULL;
     } // End of dragging
@@ -78,29 +77,32 @@ void DebugingKeyHandler(objTracker *tracker) {
         GDB_BREAK = !GDB_BREAK;
         printf("Breakpoint says hi\n");
     }
-    if (IsKeyPressed('V')) {
-        VISUAL_DEBUG = !VISUAL_DEBUG;
-    }
+    if (IsKeyPressed('V')) { VISUAL_DEBUG = !VISUAL_DEBUG; }
 
     if (IsKeyPressed('O')) {
         tracker->objList[0]->objPtr->position = (Vector2){ 0, 0 };
-        tracker->objList[0]->objPtr->speed = (Vector2){ 0, 0 };
+        tracker->objList[0]->objPtr->speed    = (Vector2){ 0, 0 };
     }
 
     if (GAME_STATE == RUNNING) {
-        if (IsKeyPressed('P'))
-            DEBUG_PAUSE = !DEBUG_PAUSE;
+        if (IsKeyPressed('P')) DEBUG_PAUSE = !DEBUG_PAUSE;
         if (IsKeyPressed('1')) {
+            CreateAsteroid(
+                tracker, (Vector2){ 300, 600 }, (Vector2){ 0, 0 }, 0, 1);
+            CreateAsteroid(
+                tracker, (Vector2){ 500, 600 }, (Vector2){ -90, 0 }, 0, 1);
 
             CreateAsteroid(
-                tracker, (Vector2){ 200, 0 }, (Vector2){ 0, 0 }, 1, 1);
+                tracker, (Vector2){ 300, 900 }, (Vector2){ 90, 0 }, 0, 1);
+            CreateAsteroid(
+                tracker, (Vector2){ 500, 900 }, (Vector2){ 0, 0 }, 0, 1);
         }
 
         if (IsKeyPressed('2')) {
             CreateAsteroid(
-                tracker, (Vector2){ 300, 600 }, (Vector2){ 0, 0 }, 0, 2);
+                tracker, (Vector2){ 300, 600 }, (Vector2){ 0, 0 }, 0, 1);
             CreateAsteroid(
-                tracker, (Vector2){ 500, 600 }, (Vector2){ -90, 0 }, 0, 1);
+                tracker, (Vector2){ 500, 600 }, (Vector2){ -90, 0 }, 0, 2);
 
             CreateAsteroid(
                 tracker, (Vector2){ 300, 900 }, (Vector2){ 90, 0 }, 0, 1);
@@ -109,19 +111,22 @@ void DebugingKeyHandler(objTracker *tracker) {
         }
 
         if (IsKeyPressed('3')) {
-
             CreateAsteroid(
-                tracker, (Vector2){ 300, 900 }, (Vector2){ -30, 0 }, 0, 4);
+                tracker, (Vector2){ 600, 300 }, (Vector2){ 0, 0 }, 0, 2);
             CreateAsteroid(
-                tracker, (Vector2){ 600, 900 }, (Vector2){ -90, 0 }, 0, 1);
+                tracker, (Vector2){ 600, 500 }, (Vector2){ 0, -90 }, 0, 1);
+            CreateAsteroid(
+                tracker, (Vector2){ 900, 300 }, (Vector2){ 0, 90 }, 0, 1);
+            CreateAsteroid(
+                tracker, (Vector2){ 900, 500 }, (Vector2){ 0, 0 }, 0, 2);
         }
 
         if (IsKeyPressed('4')) {
 
             CreateAsteroid(
-                tracker, (Vector2){ 400, 300 }, (Vector2){ 120, 0 }, 0, 1);
+                tracker, (Vector2){ 300, 300 }, (Vector2){ 120, 120 }, 0, 1);
             CreateAsteroid(
-                tracker, (Vector2){ 600, 300 }, (Vector2){ -120, 0 }, 0, 2);
+                tracker, (Vector2){ 600, 600 }, (Vector2){ -120, -120 }, 0, 2);
         }
 
         if (IsKeyPressed('5')) {
@@ -136,12 +141,12 @@ void DebugingKeyHandler(objTracker *tracker) {
         }
 
         if (IsKeyPressed('9')) {
-            for (int i = 0; i < SOFT_MAX_ASTEROIDS - 1; i++) {
+            for (unsigned int i = 0; i < SOFT_MAX_ASTEROIDS - 1; i++) {
                 AsteroidSafeSpawn(tracker);
             }
         }
 
-#ifdef BENCHMARKING
+    #ifdef BENCHMARKING
         if (IsKeyPressed('B') && BENCH_LOG_FILE_PTR) {
             if (!BENCHRUNNING) {
                 BENCHRUNNING = true;
@@ -149,30 +154,27 @@ void DebugingKeyHandler(objTracker *tracker) {
                     AsteroidSafeSpawn(tracker);
                 }
             } else {
-                BENCHRUNNING = false;
+                BENCHRUNNING             = false;
                 unsigned long iterations = tracker->objListLen;
                 if (iterations > 1) {
                     for (unsigned long i = iterations - 1; i > 0; i--) {
-                        if (tracker->objList[i] == tracker->playerPtr)
-                            continue;
+                        if (tracker->objList[i] == tracker->playerPtr) continue;
                         tracker->objList[i]->request = DELETE;
                     }
                 }
             }
         }
-#endif // BENCHMARKING
+    #endif // BENCHMARKING
 
         if (IsKeyPressed('0')) {
             for (unsigned int i = 0; i < tracker->objListLen; i++) {
                 objWrap *current = tracker->objList[i];
-                if (!current || current == tracker->playerPtr)
-                    continue;
+                if (!current || current == tracker->playerPtr) continue;
                 current->request = DELETE;
             }
         }
 
-        if (IsKeyPressed('='))
-            AsteroidSafeSpawn(tracker);
+        if (IsKeyPressed('=')) AsteroidSafeSpawn(tracker);
 
         if (IsKeyPressed('-')) {
             if (tracker->objListLen > 1) {
@@ -188,14 +190,12 @@ void DebugingKeyHandler(objTracker *tracker) {
 
 void ShipControlls(objTracker *tracker) {
 
-    if (!tracker->playerPtr)
-        return;
+    if (!tracker->playerPtr) return;
     if (IsKeyDown('W'))
         OnPlayerAccellerate(tracker->playerPtr->objPtr, PLAYER_MOVE_SPEED);
     if (IsKeyDown('S'))
         OnPlayerAccellerate(tracker->playerPtr->objPtr, -PLAYER_MOVE_SPEED);
-    if (IsKeyDown('D'))
-        RotateObject(tracker->playerPtr, PLAYER_ROTATION_SPEED);
+    if (IsKeyDown('D')) RotateObject(tracker->playerPtr, PLAYER_ROTATION_SPEED);
     if (IsKeyDown('A'))
         RotateObject(tracker->playerPtr, -PLAYER_ROTATION_SPEED);
 
@@ -210,13 +210,13 @@ void ShipControlls(objTracker *tracker) {
 const menuParent *MenuControlls(const menuParent *menu, int *menuHighlighted) {
     if (IsKeyPressed('W')) {
         *menuHighlighted =
-            RollOverInt((*menuHighlighted - 1), 0, menu->optionListLen - 1);
+            RollOver((*menuHighlighted - 1), 0, menu->optionListLen - 1);
         LOG(DEBUG, "*menuHighlighted == %d", *menuHighlighted);
     }
 
     if (IsKeyPressed('S')) {
         *menuHighlighted =
-            RollOverInt((*menuHighlighted + 1), 0, menu->optionListLen - 1);
+            RollOver((*menuHighlighted + 1), 0, menu->optionListLen - 1);
         LOG(DEBUG, "*menuHighlighted == %d", *menuHighlighted);
     }
 
@@ -229,7 +229,7 @@ const menuParent *MenuControlls(const menuParent *menu, int *menuHighlighted) {
 
     if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)) {
         const int selected = *menuHighlighted;
-        *menuHighlighted = 0;
+        *menuHighlighted   = 0;
         return SelectCurrent(menu, selected);
     }
 
@@ -238,8 +238,7 @@ const menuParent *MenuControlls(const menuParent *menu, int *menuHighlighted) {
 
 void PlayerRuntimeControlls(objTracker *tracker) {
 
-    if (tracker->playerPtr && IsKeyPressed('C'))
-        CAMERA_FOLLOW = !CAMERA_FOLLOW;
+    if (tracker->playerPtr && IsKeyPressed('C')) CAMERA_FOLLOW = !CAMERA_FOLLOW;
 
     if (IsKeyPressed(KEY_ESCAPE)) {
         if (GAME_STATE == PAUSE) {
@@ -252,8 +251,7 @@ void PlayerRuntimeControlls(objTracker *tracker) {
     }
 
     if (IsMouseButtonDown(1)) {
-        if (CAMERA_FOLLOW)
-            CAMERA_FOLLOW = false;
+        if (CAMERA_FOLLOW) CAMERA_FOLLOW = false;
         Vector2 mouseDelta = GetMouseDelta();
         tracker->playerCamera.target.x -=
             mouseDelta.x / tracker->playerCamera.zoom;
@@ -277,14 +275,15 @@ void NewGame(objTracker *tracker) {
 }
 
 int SpawnAsteroidOnTime(objTracker *tracker) {
-    if (NEXT_ASTEROID_SPAWN >= GAME_TIME_PASSED)
-        return 0;
+    if (NEXT_ASTEROID_SPAWN >= GAME_TIME_PASSED) return 0;
     LAST_ASTEROID_SPAWN = GAME_TIME_PASSED;
     NEXT_ASTEROID_SPAWN =
         LAST_ASTEROID_SPAWN +
         ((2.f / (logf((float)tracker->playerScore / 100.f + 1.2f))) - 1);
 
-    if (!AsteroidSafeSpawn(tracker))
-        return -1;
+    if (!AsteroidSafeSpawn(tracker)) return -1;
+    LOG(TRACE,
+        "Spawned a new asteroid. Currently %d spawned already",
+        tracker->objListLen);
     return 1;
 }

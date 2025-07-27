@@ -1,5 +1,5 @@
 // system includes
-#include <raylib.h>
+#include "raylib.h"
 #include <stdlib.h>
 
 // local includes
@@ -7,10 +7,15 @@
 #include "render.h"
 #include "rlgl.h"
 #include "structs.h"
+#include "vector-math.h"
 
 #ifdef DEBUGGING
     #include "visdebugger.h"
 #endif
+
+static void DrawObject(objWrap *wrap);
+static void DrawGrid2D(int dist, Color color);
+static void UpdateScreenBorder(objTracker *restrict tracker);
 
 void DisplayText(Vector2 pos, int fontSize, Color color,
                  const char *restrict format, ...) {
@@ -41,135 +46,21 @@ void DisplayText(Vector2 pos, int fontSize, Color color,
     DrawText(messageString, (int)pos.x, (int)pos.y, fontSize, color);
 }
 
-void DrawObject(objWrap *wrap) {
-#ifdef DEBUGGING
-    if (VISUAL_DEBUG)
-        DrawRectangleLines(
-            (int)(wrap->collider.collider.x + wrap->objPtr->position.x),
-            (int)(wrap->collider.collider.y + wrap->objPtr->position.y),
-            (int)(wrap->collider.collider.width),
-            (int)(wrap->collider.collider.height),
-            RED);
-
-    DebugDisplayText(
-        (Vector2){ wrap->objPtr->position.x, wrap->objPtr->position.y + 50 },
-        18,
-        WHITE,
-        "Heading: %f\nIsCollidable: %d\nSpeed.x: %f\nSpeed.y: %f",
-        (double)wrap->objPtr->heading,
-        wrap->collider.isCollidable,
-        (double)wrap->objPtr->speed.x,
-        (double)wrap->objPtr->speed.y);
-
-    if (VISUAL_DEBUG_SHOW_POINTS) {
-        DebugDisplayText((Vector2){ wrap->objPtr->position.x,
-                                    wrap->objPtr->position.y + 118 },
-                         18,
-                         WHITE,
-                         "Points Pos:");
-        for (unsigned long i = 0; i < wrap->objPtr->shape.arrayLength; i++) {
-
-            DebugDisplayText(
-                (Vector2){ wrap->objPtr->position.x,
-                           wrap->objPtr->position.y + 136 + (float)i * 18 },
-                18,
-                WHITE,
-                "x: %f y: %f",
-                wrap->objPtr->shape.points[i].x,
-                wrap->objPtr->shape.points[i].y);
-        }
-    }
-#endif // DEBUGGING
-
-    if (wrap->objPtr->shape.arrayLength == 0) {
-        LOG(WARNING, "%s", "Attempting to draw an empty shape");
-    }
-
-    // Texturing is only supported on RL_QUADS
-    rlBegin(RL_LINES);
-    rlColor4ub(RAYWHITE.r, RAYWHITE.g, RAYWHITE.b, RAYWHITE.a);
-    bool shouldEnd = false;
-    for (unsigned int i = 1; i <= wrap->objPtr->shape.arrayLength && !shouldEnd;
-         i++) {
-        rlVertex2f(
-            wrap->objPtr->shape.points[i - 1].x + wrap->objPtr->position.x,
-            wrap->objPtr->shape.points[i - 1].y + wrap->objPtr->position.y);
-
-        if (i == wrap->objPtr->shape.arrayLength) {
-            i         = 0;
-            shouldEnd = true;
-        }
-        rlVertex2f(wrap->objPtr->shape.points[i].x + wrap->objPtr->position.x,
-                   wrap->objPtr->shape.points[i].y + wrap->objPtr->position.y);
-    }
-    rlEnd();
-}
-
-void DrawGrid2D(int dist, Color color) {
-
-    int shiftedCoord = abs(WORLD_POS_MIN_X) + abs(WORLD_POS_MAX_X);
-
-    dist = shiftedCoord % dist != 0 ? dist + (shiftedCoord % dist) : dist;
-
-    for (int current = 0; current < shiftedCoord; current += dist) {
-        DrawLine(WORLD_POS_MIN_X + current,
-                 WORLD_POS_MIN_Y,
-                 WORLD_POS_MIN_X + current,
-                 WORLD_POS_MAX_Y,
-                 color);
-        DrawLine(WORLD_POS_MIN_X,
-                 WORLD_POS_MIN_Y + current,
-                 WORLD_POS_MAX_X,
-                 WORLD_POS_MIN_Y + current,
-                 color);
-    }
-
-    DrawLine(WORLD_POS_MIN_X,
-             WORLD_POS_MIN_Y,
-             WORLD_POS_MIN_X,
-             WORLD_POS_MAX_Y,
-             WHITE);
-
-    DrawLine(WORLD_POS_MIN_X,
-             WORLD_POS_MAX_Y,
-             WORLD_POS_MAX_X,
-             WORLD_POS_MAX_Y,
-             WHITE);
-
-    DrawLine(WORLD_POS_MAX_X,
-             WORLD_POS_MAX_Y,
-             WORLD_POS_MAX_X,
-             WORLD_POS_MIN_Y,
-             WHITE);
-
-    DrawLine(WORLD_POS_MAX_X,
-             WORLD_POS_MIN_Y,
-             WORLD_POS_MIN_X,
-             WORLD_POS_MIN_Y,
-             WHITE);
-}
-
-void RunWorldRender(objTracker *tracker) {
+void RunWorldRender(objTracker *restrict tracker) {
     BeginMode2D(tracker->playerCamera);
+    UpdateScreenBorder(tracker);
+
+    Vector2 screenStart = tracker->screenBorderWrap.screenStart;
+    Vector2 screenEnd   = tracker->screenBorderWrap.screenEnd;
 
     DrawRectangle(WORLD_POS_MIN_X,
                   WORLD_POS_MIN_Y,
-                  abs(WORLD_POS_MIN_X) + abs(WORLD_POS_MAX_X),
-                  abs(WORLD_POS_MIN_Y) + abs(WORLD_POS_MAX_Y),
+                  fabsf(WORLD_POS_MIN_X) + fabsf(WORLD_POS_MAX_X),
+                  fabsf(WORLD_POS_MIN_Y) + fabsf(WORLD_POS_MAX_Y),
                   (Color){ 18, 18, 18, 255 });
     DrawGrid2D(200, (Color){ 38, 38, 38, 255 });
 
-    Vector2 screenStart = {
-        tracker->playerCamera.target.x -
-            tracker->playerCamera.offset.x / tracker->playerCamera.zoom,
-        tracker->playerCamera.target.y -
-            tracker->playerCamera.offset.y / tracker->playerCamera.zoom
-    };
-
-    Vector2 screenEnd = {
-        screenStart.x + (float)SCREEN_WIDTH / tracker->playerCamera.zoom,
-        screenStart.y + (float)SCREEN_HEIGHT / tracker->playerCamera.zoom
-    };
+    Vector2 colliderStart, colliderEnd;
     objWrap *current;
     // int DrawingObjCount = 0;
     for (unsigned int i = 0; i < tracker->objListLen; i++) {
@@ -177,22 +68,23 @@ void RunWorldRender(objTracker *tracker) {
 
         if (!current || !current->draw || current->request != UPDATE) continue;
 
-        Vector2 colliderStart = {
+        // int DrawingObjCount = 0;
+        colliderStart = (Vector2){
             current->objPtr->position.x + current->collider.collider.x,
             current->objPtr->position.y + current->collider.collider.y
         };
-        Vector2 colliderEnd = { current->objPtr->position.x +
-                                    current->collider.collider.x +
-                                    current->collider.collider.width,
-                                current->objPtr->position.y +
-                                    current->collider.collider.y +
-                                    current->collider.collider.height };
+        colliderEnd = (Vector2){ current->objPtr->position.x +
+                                     current->collider.collider.x +
+                                     current->collider.collider.width,
+                                 current->objPtr->position.y +
+                                     current->collider.collider.y +
+                                     current->collider.collider.height };
 
         if (colliderEnd.x < screenStart.x || screenEnd.x < colliderStart.x ||
             colliderEnd.y < screenStart.y || screenEnd.y < colliderStart.y)
             continue;
 
-        DrawObject(tracker->objList[i]);
+        DrawObject(current);
 
         // DrawingObjCount++;
     }
@@ -219,7 +111,124 @@ void RunWorldRender(objTracker *tracker) {
     EndMode2D();
 }
 
-void RunScreenRender(objTracker *tracker) {
+void DrawObject(objWrap *restrict wrap) {
+    if (!wrap) return;
+#ifdef DEBUGGING
+    if (VISUAL_DEBUG)
+        DrawRectangleLines(
+            (int)(wrap->collider.collider.x + wrap->objPtr->position.x),
+            (int)(wrap->collider.collider.y + wrap->objPtr->position.y),
+            (int)(wrap->collider.collider.width),
+            (int)(wrap->collider.collider.height),
+            RED);
+
+    DebugDisplayText(
+        (Vector2){ wrap->objPtr->position.x, wrap->objPtr->position.y + 50 },
+        18,
+        WHITE,
+        "Heading: %f\n"
+        "IsCollidable: %d\n"
+        "Pos.x: %f\n"
+        "Pos.y: %f\n"
+        "Speed.x: %f\n"
+        "Speed.y: %f",
+        (double)wrap->objPtr->heading,
+        wrap->collider.isCollidable,
+        (double)wrap->objPtr->position.x,
+        (double)wrap->objPtr->position.y,
+        (double)wrap->objPtr->speed.x,
+        (double)wrap->objPtr->speed.y);
+
+    if (VISUAL_DEBUG_SHOW_POINTS) {
+        DebugDisplayText((Vector2){ wrap->objPtr->position.x,
+                                    wrap->objPtr->position.y + 118 },
+                         18,
+                         WHITE,
+                         "Points Pos:");
+        for (unsigned long i = 0; i < wrap->objPtr->shape.arrayLength; i++) {
+
+            DebugDisplayText(
+                (Vector2){ wrap->objPtr->position.x,
+                           wrap->objPtr->position.y + 136 + (float)i * 18 },
+                18,
+                WHITE,
+                "x: %f y: %f",
+                wrap->objPtr->shape.points[i].x,
+                wrap->objPtr->shape.points[i].y);
+        }
+    }
+#endif // DEBUGGING
+
+    if (wrap->objPtr->shape.arrayLength == 0) {
+        LOG(WARNING, "%s", "Attempting to draw an empty shape");
+        return;
+    }
+
+    // Texturing is only supported on RL_QUADS
+    rlBegin(RL_LINES);
+    rlColor4ub(RAYWHITE.r, RAYWHITE.g, RAYWHITE.b, RAYWHITE.a);
+    int next;
+    Vector2 currentV, nextV;
+    nextV = VecAddVec(wrap->objPtr->shape.points[0], wrap->objPtr->position);
+    for (unsigned int i = 0; i < wrap->objPtr->shape.arrayLength; i++) {
+        next =
+            RollOver((int)i + 1, 0, (int)wrap->objPtr->shape.arrayLength - 1);
+        currentV = nextV;
+        nextV =
+            VecAddVec(wrap->objPtr->shape.points[next], wrap->objPtr->position);
+
+        rlVertex2f(currentV.x, currentV.y);
+        rlVertex2f(nextV.x, nextV.y);
+    }
+    rlEnd();
+}
+
+void DrawGrid2D(int dist, Color color) {
+
+    int shiftedCoord = fabsf(WORLD_POS_MIN_X) + fabsf(WORLD_POS_MAX_X);
+
+    dist = shiftedCoord % dist != 0 ? dist + (shiftedCoord % dist) : dist;
+
+    rlBegin(RL_LINES);
+    rlColor4ub(color.r, color.g, color.b, color.a);
+    for (int current = 0; current < shiftedCoord; current += dist) {
+        rlVertex2f((float)(WORLD_POS_MIN_X + current), WORLD_POS_MIN_Y);
+
+        rlVertex2f((float)(WORLD_POS_MIN_X + current), WORLD_POS_MAX_Y);
+        rlVertex2f(WORLD_POS_MIN_X, (float)(WORLD_POS_MIN_Y + current));
+        rlVertex2f(WORLD_POS_MAX_X, (float)(WORLD_POS_MIN_Y + current));
+    }
+    rlColor4ub(WHITE.r, WHITE.g, WHITE.b, WHITE.a);
+
+    rlVertex2f(WORLD_POS_MIN_X, WORLD_POS_MIN_Y);
+    rlVertex2f(WORLD_POS_MIN_X, WORLD_POS_MAX_Y);
+    rlVertex2f(WORLD_POS_MIN_X, WORLD_POS_MAX_Y);
+    rlVertex2f(WORLD_POS_MAX_X, WORLD_POS_MAX_Y);
+    rlVertex2f(WORLD_POS_MAX_X, WORLD_POS_MAX_Y);
+    rlVertex2f(WORLD_POS_MAX_X, WORLD_POS_MIN_Y);
+    rlVertex2f(WORLD_POS_MAX_X, WORLD_POS_MIN_Y);
+    rlVertex2f(WORLD_POS_MIN_X, WORLD_POS_MIN_Y);
+    rlEnd();
+}
+
+// LOG(TRACE, "Drawing %d objects", DrawingObjCount);
+
+void UpdateScreenBorder(objTracker *tracker) {
+    tracker->screenBorderWrap.screenStart = (Vector2){
+        tracker->playerCamera.target.x -
+            tracker->playerCamera.offset.x / tracker->playerCamera.zoom,
+        tracker->playerCamera.target.y -
+            tracker->playerCamera.offset.y / tracker->playerCamera.zoom
+    };
+
+    tracker->screenBorderWrap.screenEnd =
+        (Vector2){ tracker->screenBorderWrap.screenStart.x +
+                       (float)SCREEN_WIDTH / tracker->playerCamera.zoom,
+                   tracker->screenBorderWrap.screenStart.y +
+                       (float)SCREEN_HEIGHT / tracker->playerCamera.zoom };
+}
+
+void RunScreenRender(objTracker *restrict tracker) {
 
     SCREEN_WIDTH                   = GetScreenWidth();
     SCREEN_HEIGHT                  = GetScreenHeight();
@@ -274,16 +283,17 @@ void RunScreenRender(objTracker *tracker) {
                      "Length of the list: %lu",
                      tracker->objListLen);
 
-    DebugDisplayText((Vector2){ 20, 32 },
-                     18,
-                     WHITE,
-                     "Time untill next asteroid: %f",
-                     NEXT_ASTEROID_SPAWN - GAME_TIME_PASSED);
+    if (tracker->playerPtr)
+        DebugDisplayText((Vector2){ 20, 32 },
+                         18,
+                         WHITE,
+                         "Time untill next asteroid: %f",
+                         NEXT_ASTEROID_SPAWN - GAME_TIME_PASSED);
 #endif // DEBUGGING
     DrawFPS(0, 0);
 }
 
-void RunMenuRender(const menuParent *menu, int menuHighlighted,
+void RunMenuRender(const menuParent *restrict menu, int menuHighlighted,
                    int subTitleLinesNum, ...) {
     const int titleFontSize = 42;
     const int fontSize      = 32;

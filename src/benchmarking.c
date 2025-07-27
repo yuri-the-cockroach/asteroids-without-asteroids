@@ -3,10 +3,12 @@
 #include "structs.h"
 #include <errno.h>
 
+#pragma GCC diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
+
 int BenchLog(...) {
 
-    if (!BENCH_LOG_FILE_PTR) {
-        LOG(FATAL, "Benchmark log file pointer is NULL!");
+    if (!LOG_FILE_PTR) {
+        LOG(FATAL, "Log file pointer is NULL!");
         errno = EFAULT;
         err(errno, "Benchmark log file pointer is NULL!");
     }
@@ -21,8 +23,8 @@ int BenchLog(...) {
     vsnprintf(messageString, 1024, format, argptr);
     va_end(argptr);
 
-    fprintf(BENCH_LOG_FILE_PTR, messageString);
-    fprintf(stderr, messageString);
+    fprintf(LOG_FILE_PTR, "%s", messageString);
+    fprintf(stderr, "%s", messageString);
 
     return 0;
 }

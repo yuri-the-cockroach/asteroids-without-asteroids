@@ -4,14 +4,17 @@
 #include "gamelogic.h"
 #include "logger.h"
 #include "menulogic.h"
+#include "mt.h"
 #include "objecthandler.h"
+#include "objectlogic.h"
 #include "render.h"
 #include "structs.h"
+
 #ifdef BENCHMARKING
     #include "benchmarking.h"
 #endif // BENCHMARKING
 
-#include <raylib.h>
+#include "raylib.h"
 #include <stdio.h>
 #include <time.h>
 
@@ -21,9 +24,13 @@ enum game_state NEXT_STATE = NOOP;
 // Set default values for basic variables
 
 int StateMachine(void) {
+    LOG(DEBUG,
+        "<--- CURRENT CONFIG --->\n"
+        "WORLD_POS_MIN_X = %d\n"
+        "WORLD_POS_MAX_X = %d",
+        WORLD_POS_MIN_X,
+        WORLD_POS_MAX_X);
 #ifdef BENCHMARKING
-    long timerStartTotalCycle = 0;
-    // long timerStartKeys = 0;
 #endif // BENCHMARKING
 
     objTracker *tracker = NULL;
@@ -39,7 +46,9 @@ int StateMachine(void) {
 
         switch (GAME_STATE) {
         case INIT: {
+            LOG(ALL, "Entered INIT state");
             GAME_STATE = MAIN_MENU;
+            LOG(ALL, "Exiting INIT state");
             break;
         }
 
@@ -51,65 +60,56 @@ int StateMachine(void) {
 
         case TESTING: {
             tracker    = InitTracker();
+            mtDataWrap = InitMT(tracker);
+            curMenu    = &refMainMenu;
             GAME_STATE = RUNNING;
             break;
         }
+
         case START_NEW: {
-            tracker = InitTracker();
-#ifdef MT_ENABLED
+            tracker    = InitTracker();
             mtDataWrap = InitMT(tracker);
-#endif // MT_ENABLED
             NewGame(tracker);
+            curMenu    = &refMainMenu;
             GAME_STATE = RUNNING;
             break;
         }
 
         case GAME_OVER: {
             char msg[128] = "";
-            sprintf(msg, "Your score: %d", tracker->playerScore);
-            MenuControlls(curMenu, &menuHighlighted);
+            sprintf(msg, "Your score: %ud", tracker->playerScore);
+            curMenu = MenuControlls(curMenu, &menuHighlighted);
             RunMenuRender(curMenu, menuHighlighted, 1, msg);
             break;
         }
 
         case RUNNING: {
-
-            DEBUG(SPEED_PREV = tracker->playerPtr->objPtr->speed;
-                  DebugingKeyHandler(tracker);)
-
-            DEBUG(if (!DEBUG_PAUSE) {)
-
-#ifdef MT_ENABLED
-                CollectThreads(mtDataWrap);
-#endif // MT_ENABLED
-                SpawnAsteroidOnTime(tracker);
-                RunActionList(tracker);
-#ifdef MT_ENABLED
-                RunThreads(mtDataWrap);
-#endif // MT_ENABLED
-                GAME_TIME_PASSED += GetFrameTime();
-
-                DEBUG(
-            })
+            LOG(ALL, "Entered RUNNING state");
             DEBUG(if (tracker->playerPtr) SPEED_PREV =
                       tracker->playerPtr->objPtr->speed;
-                  DebugingKeyHandler(tracker);
-                  if (!DEBUG_PAUSE) {)
-                        if (tracker->playerPtr) SpawnAsteroidOnTime(tracker);
-                      RunActionList(tracker);
-                      GAME_TIME_PASSED += GetFrameTime();
-                    DEBUG(
-                  })
+                  DebugingKeyHandler(tracker);)
 
             // Controlls
             PlayerRuntimeControlls(tracker);
             ShipControlls(tracker);
+
+            SpawnAsteroidOnTime(tracker);
+            // RunActionList(tracker);
+            SortListByX(tracker);
+            DEBUG(if (!DEBUG_PAUSE)) {
+                RunThreads(mtDataWrap);
+                CollectThreads(mtDataWrap);
+                RunActionList(tracker);
+                GAME_TIME_PASSED += GetFrameTime();
+            }
 
             // Logic
             // Rendering
             RunWorldRender(tracker);
             RunScreenRender(tracker);
 
+            CleanupMemory(tracker);
+            LOG(ALL, "Exiting RUNNING state");
             break;
         }
 
@@ -125,7 +125,6 @@ int StateMachine(void) {
             MenuControlls(curMenu, &menuHighlighted);
 
             // Rendering
-            RunWorldRender(tracker);
             RunScreenRender(tracker);
 
             RunMenuRender(curMenu, menuHighlighted, 0);
@@ -136,12 +135,11 @@ int StateMachine(void) {
             CloseWindow();
             return 0;
         }
+
         case CLEANUP: {
             curMenu = &refMainMenu;
             DeleteTracker(tracker);
-#ifdef MT_ENABLED
             MTCleanupAndFree(mtDataWrap);
-#endif // MT_ENABLED
             mtDataWrap = 0;
             tracker    = 0;
             if (NEXT_STATE == NOOP) GAME_STATE = EXIT;
@@ -158,5 +156,6 @@ int StateMachine(void) {
         }
 
         EndDrawing();
+        LAST_FRAME_TIME = GetFrameTime();
     }
 }

@@ -9,13 +9,12 @@
 #include "logger.h"
 #include "objecthandler.h"
 #include "objectlogic.h"
+#include "render.h"
 #include "structs.h"
+#include "vector-math.h"
 
 // Returns a list of objects that need to be drawn
 void RunActionList(objTracker *tracker) {
-
-    SortListByX(tracker);
-
     // Run through all the tracked objects
     for (unsigned long i = 0; i < tracker->objListLen; i++) {
 
@@ -43,7 +42,7 @@ void RunActionList(objTracker *tracker) {
 
         case UPDATE: // Call the updater function of the element
         {
-            UpdateObj(tracker, i);
+            if (current->updatePosition) UpdateObjectPos(current);
             break;
         }
 
@@ -51,51 +50,43 @@ void RunActionList(objTracker *tracker) {
             break;
         }
     }
-
-    CleanupMemory(tracker);
-}
-
-void UpdateObj(objTracker *tracker, unsigned long index) {
-
-    objWrap *wrap = tracker->objList[index];
-
-#ifndef MT_ENABLED
-    if (wrap->collider.isCollidable) FastFindCollisions(tracker, index);
-#endif // MT_ENABLED
-
-    if (wrap->isRotatableByGame) {
-        RotateObject(wrap, (wrap->objPtr->rotateSpeed));
-    }
-
-    if (wrap->updatePosition) UpdateObjectPos(wrap);
 }
 
 objTracker *InitTracker(void) {
     objTracker *tracker = calloc(1, sizeof(objTracker));
-    tracker[0] =
-        (objTracker){ NULL,
-                      { .zoom = 1 },
-                      (objWrap **)calloc(MAX_OBJECT_COUNT, sizeof(objWrap *)),
-                      0,
-                      0 };
+    tracker[0]          = (objTracker){
+                 .playerPtr    = NULL,
+                 .playerCamera = { .zoom = 1 },
+                 .objList      = (objWrap **)calloc(MAX_OBJECT_COUNT, sizeof(objWrap *)),
+                 .objListLen   = 0,
+                 .playerScore  = 0,
+                 .screenBorderWrap = { (Vector2){ 0, 0 },
+                                  (Vector2){ (float)SCREEN_WIDTH,
+                                                  (float)SCREEN_HEIGHT } }
+    };
     return tracker;
 }
 
 objWrap InitWrap(void) {
-    return (objWrap){
-        NOTYPE,
-        IGNORE,
-        false,
-        false,
-        false,
-        0,
-        { false, { 0, 0, 0, 0 }, 0, NULL },
-        0
+    objWrap ret = {
+        .objectType        = NOTYPE,
+        .request           = IGNORE,
+        .updatePosition    = false,
+        .draw              = false,
+        .isRotatableByGame = false,
+        .objPtr            = NULL,
+        .collider          = { false, { 0, 0, 0, 0 }, 0, NULL },
+        .livesLeft         = 0,
+        .mutex             = PTHREAD_MUTEX_INITIALIZER
     };
+    pthread_mutexattr_t attr = { 0 };
+    pthread_mutexattr_settype(
+        &attr, PTHREAD_MUTEX_ERRORCHECK); // Enable error checking for mutexes
+    pthread_mutex_init(&ret.mutex, &attr);
+    return ret;
 }
 
 int AddWrapToList(objTracker *tracker, objWrap *wrap) {
-
     if (!wrap) {
         errno = EFAULT;
         LOG(ERROR,
@@ -154,9 +145,7 @@ void CreatePlayer(objTracker *tracker, Vector2 initPosition, float size) {
 
     object *objPtr = malloc(sizeof(object));
     objPtr[0] =
-        InitObject(InitShape(PLAYER_SHAPE_POINTS,
-                             sizeof(PLAYER_SHAPE_POINTS) / sizeof(Vector2),
-                             size),
+        InitObject(InitShape(PLAYER_SHAPE_POINTS, PLAYER_SHAPE_SIZE, size),
                    initPosition,
                    (Vector2){ 0, 0 },
                    0);
@@ -195,21 +184,17 @@ void CreateProjectile(objTracker *tracker, objWrap *parent) {
 
     object *objPtr = malloc(sizeof(object));
     objPtr[0]      = InitObject(
-        InitShape(PROJECTILE_SHAPE_POINTS,
-                  sizeof(PROJECTILE_SHAPE_POINTS) / sizeof(Vector2),
-                  PROJECTILE_SIZE),
+        InitShape(
+            PROJECTILE_SHAPE_POINTS, PROJECTILE_SHAPE_SIZE, PROJECTILE_SIZE),
 
         // I don't know why this works, but other approach
         // doesn't and at this point I don't care. Just don't
         // change it, keep it the way it is
-        (Vector2){ parent->objPtr->position.x +
-                            parent->objPtr->shape.points[0].x * 2.0f,
-                        parent->objPtr->position.y +
-                            parent->objPtr->shape.points[0].y * 2.0f },
-        (Vector2){ parent->objPtr->shape.points[0].x * PROJECTILE_SPEED +
-                            parent->objPtr->speed.x,
-                        parent->objPtr->shape.points[0].y * PROJECTILE_SPEED +
-                            parent->objPtr->speed.y },
+        VecAddVec(VecMulFloat(parent->objPtr->shape.points[0], 3.0f),
+                  parent->objPtr->position),
+        VecAddVec(
+            VecMulFloat(parent->objPtr->shape.points[0], PROJECTILE_SPEED),
+            parent->objPtr->speed),
         5);
 
     projectile[0] = InitWrap();

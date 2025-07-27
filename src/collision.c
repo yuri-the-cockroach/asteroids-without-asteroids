@@ -1,4 +1,5 @@
 // system includes
+#include "tracingtools.c"
 #include <errno.h>
 #include <immintrin.h>
 #include <pthread.h>
@@ -9,262 +10,7 @@
 #include "collision.h"
 #include "logger.h"
 #include "structs.h"
-
-// NOTE This function is WIP and is may not perform as expected, so it should
-// not be used for now
-void *EasyThreadAVX(void *arg) {
-    objWrap *current, *next;
-    __m256 first_x_st = { 0 }, first_x_en = { 0 }, second_x_en = { 0 },
-           second_x_st = { 0 }, first_y_st = { 0 }, second_y_st = { 0 },
-           first_y_en = { 0 }, second_y_en = { 0 };
-    __m256i y_ss_fe = { 0 }, y_fs_se = { 0 }, x_ss_fe = { 0 }, x_fs_se = { 0 };
-    int *i32_ptr_y_ss_fe, *i32_ptr_y_fs_se, *i32_ptr_x_ss_fe, *i32_ptr_x_fs_se;
-
-    struct mt_init_struct *init = (struct mt_init_struct *)arg;
-    init->KeepRunning           = true;
-    objTracker *tracker         = init->tracker;
-    objWrap **objList           = tracker->objList;
-
-    unsigned long size = tracker->objListLen;
-    pthread_mutex_init(&init->threadMutex, NULL);
-    pthread_cond_init(&init->threadWakeupSignal, NULL);
-    pthread_mutex_lock(&init->threadMutex);
-    float f_x_st, f_x_en, f_y_st, f_y_en, s_x_st, s_x_en, s_y_st, s_y_en;
-    pthread_cond_wait(&init->threadWakeupSignal, &init->threadMutex);
-
-    do {
-        size = tracker->objListLen;
-        for (unsigned int i = init->id; i < tracker->objListLen;
-             i += N_CPU_THREADS) {
-            current = tracker->objList[i];
-
-            f_x_st = current->objPtr->position.x + current->collider.collider.x;
-            f_x_en = f_x_st + current->collider.collider.width;
-
-            f_y_st = current->objPtr->position.y + current->collider.collider.y;
-            f_y_en = f_y_st + current->collider.collider.height;
-
-            first_x_st = (__m256){ f_x_st, f_x_st, f_x_st, f_x_st,
-                                   f_x_st, f_x_st, f_x_st, f_x_st };
-
-            first_x_en = (__m256){ f_x_en, f_x_en, f_x_en, f_x_en,
-                                   f_x_en, f_x_en, f_x_en, f_x_en };
-
-            first_y_st = (__m256){ f_y_st, f_y_st, f_y_st, f_y_st,
-                                   f_y_st, f_y_st, f_y_st, f_y_st };
-
-            first_y_en = (__m256){ f_y_en, f_y_en, f_y_en, f_y_en,
-                                   f_y_en, f_y_en, f_y_en, f_y_en };
-
-            if (i + 8 > size) {
-                for (unsigned long n = i + 8 - size; n > 0; n--) {
-                    first_x_st[8 - n] = 0;
-                    first_x_en[8 - n] = 0;
-                    first_y_st[8 - n] = 0;
-                    first_y_en[8 - n] = 0;
-                }
-            }
-
-            for (unsigned int j = i + 1; j < tracker->objListLen; j += 8) {
-
-                if (objList[j] == NULL ||
-                    first_x_en[0] <= objList[j]->objPtr->position.x +
-                                         objList[j]->collider.collider.x)
-                    break;
-
-                // LOG(INFO, "size: %d, j: %d", size, j);
-                for (unsigned long n = j; n < size && n - j < 8; n++) {
-                    if (objList[n] == NULL || objList[n]->request != UPDATE ||
-                        !objList[n]->collider.isCollidable)
-                        continue;
-                    s_x_st = objList[n]->objPtr->position.x +
-                             objList[n]->collider.collider.x;
-                    s_x_en = s_x_st + objList[n]->collider.collider.width;
-
-                    s_y_st = objList[n]->objPtr->position.y +
-                             objList[n]->collider.collider.y;
-                    s_y_en = s_y_st + objList[n]->collider.collider.height;
-
-                    second_x_st[n - j] = s_x_st;
-                    second_x_en[n - j] = s_x_en;
-                    second_y_st[n - j] = s_y_st;
-                    second_y_en[n - j] = s_y_en;
-                }
-
-                if (i + 8 > size) {
-                    for (unsigned long n = j + 8 - size; n > 0; n--) {
-                        first_x_st[8 - n]  = 0;
-                        first_x_en[8 - n]  = 0;
-                        first_y_st[8 - n]  = 0;
-                        first_y_en[8 - n]  = 0;
-                        second_x_st[8 - n] = 0;
-                        second_x_en[8 - n] = 0;
-                        second_y_st[8 - n] = 0;
-                        second_y_en[8 - n] = 0;
-                    }
-                }
-
-                x_fs_se = _mm256_and_si256(
-                    _mm256_srlv_epi32(
-                        (__m256i)_mm256_sub_ps(first_x_st, second_x_en),
-                        shiftByVec),
-                    bitMaskVec); // second x - first x to make sure that there's
-                                 // actually a collision
-
-                x_ss_fe = _mm256_and_si256(
-                    _mm256_srlv_epi32(
-                        (__m256i)_mm256_sub_ps(second_x_st, first_x_en),
-                        shiftByVec),
-                    bitMaskVec); // second x - first x to make sure that there's
-                                 // actually a collision
-                y_fs_se = _mm256_and_si256(
-                    _mm256_srlv_epi32(
-                        (__m256i)_mm256_sub_ps(first_y_st, second_y_en),
-                        shiftByVec),
-                    bitMaskVec); // first start - second end
-
-                y_ss_fe = _mm256_and_si256(
-                    _mm256_srlv_epi32(
-                        (__m256i)_mm256_sub_ps(second_y_st, first_y_en),
-                        shiftByVec),
-                    bitMaskVec); // second start - first end
-
-                i32_ptr_x_ss_fe = (int *)(void *)&x_ss_fe;
-                i32_ptr_x_fs_se = (int *)(void *)&x_fs_se;
-                i32_ptr_y_ss_fe = (int *)(void *)&y_ss_fe;
-                i32_ptr_y_fs_se = (int *)(void *)&y_fs_se;
-
-                for (unsigned int n = 0; n < 8 && j + n < size; n++) {
-                    next = objList[j + n];
-
-                    if (current->objectType == next->objectType &&
-                        current->objectType == PROJECTILE)
-                        continue;
-
-                    if (!(i32_ptr_x_fs_se[n] & i32_ptr_x_ss_fe[n] &
-                          i32_ptr_y_fs_se[n] & i32_ptr_y_ss_fe[n]))
-                        continue;
-
-                    if (current->objectType > next->objectType) {
-                        current->collider.ActionOnCollision(
-                            tracker, current, next);
-                        continue;
-                    }
-                    next->collider.ActionOnCollision(tracker, next, current);
-                }
-            }
-        }
-        pthread_cond_wait(&init->threadWakeupSignal, &init->threadMutex);
-    } while (init->KeepRunning);
-    return NULL;
-}
-
-void *EasyThread(void *arg) {
-    objWrap *current, *next;
-
-    struct mt_init_struct *init = (struct mt_init_struct *)arg;
-    init->KeepRunning           = true;
-    objTracker *tracker         = init->tracker;
-
-    pthread_mutex_init(&init->threadMutex, NULL);
-    pthread_cond_init(&init->threadWakeupSignal, NULL);
-    pthread_mutex_lock(&init->threadMutex);
-
-    pthread_cond_wait(&init->threadWakeupSignal, &init->threadMutex);
-    do {
-        for (unsigned int i = init->id; i < tracker->objListLen;
-             i += N_CPU_THREADS) {
-            current = tracker->objList[i];
-            for (unsigned int j = i + 1; j < tracker->objListLen; j++) {
-                next = tracker->objList[j];
-
-                if (tracker->objList[j] == NULL || current == next ||
-                    next->request != UPDATE || !next->collider.isCollidable)
-                    continue;
-
-                if (current->objectType == next->objectType &&
-                    current->objectType == PROJECTILE)
-                    continue;
-
-                if (current->collider.collider.x +
-                        current->collider.collider.width <=
-                    next->collider.collider.x)
-                    break;
-
-                if (!CheckIfCollide(current, next)) continue;
-
-                if (current->objectType > next->objectType) {
-                    current->collider.ActionOnCollision(tracker, current, next);
-                    continue;
-                }
-
-                next->collider.ActionOnCollision(tracker, next, current);
-            }
-        }
-        pthread_cond_wait(&init->threadWakeupSignal, &init->threadMutex);
-    } while (init->KeepRunning);
-    return NULL;
-}
-
-int CollectThreads(struct mt_data_wrap *dataWrap) {
-    for (unsigned int i = 0; i < N_CPU_THREADS; i++) {
-        pthread_mutex_lock(&dataWrap->initStructList[i].threadMutex);
-        pthread_mutex_unlock(&dataWrap->initStructList[i].threadMutex);
-    }
-    return 0;
-}
-
-int MTCleanupAndFree(struct mt_data_wrap *dataWrap) {
-    if (!dataWrap) {
-        LOG(DEBUG, "%", "Null pointer was passed to be freed");
-        return 0;
-    }
-
-    for (unsigned int i = 0; i < N_CPU_THREADS; i++) {
-        dataWrap->initStructList[i].KeepRunning = false;
-        pthread_cond_signal(&dataWrap->initStructList[i].threadWakeupSignal);
-    }
-
-    for (unsigned int i = 0; i < N_CPU_THREADS; i++) {
-        pthread_join(dataWrap->threads[i], NULL);
-    }
-
-    free(dataWrap->initStructList);
-    free(dataWrap->threads);
-    free(dataWrap);
-    return 0;
-}
-
-int RunThreads(struct mt_data_wrap *dataWrap) {
-    for (unsigned int i = 0; i < N_CPU_THREADS; i++) {
-        pthread_mutex_unlock(&dataWrap->initStructList[i].threadMutex);
-        int ret = pthread_cond_signal(
-            &dataWrap->initStructList[i].threadWakeupSignal);
-        errno = ret ? ret : errno;
-    }
-    return errno;
-}
-
-struct mt_data_wrap *InitMT(objTracker *tracker) {
-
-    struct mt_data_wrap *dataWrap = calloc(1, sizeof(struct mt_data_wrap));
-    *dataWrap                     = (struct mt_data_wrap){
-                            .threads = calloc((unsigned long)N_CPU_THREADS, sizeof(pthread_t)),
-                            .initStructList =
-            calloc((unsigned long)N_CPU_THREADS, sizeof(struct mt_init_struct)),
-    };
-
-    for (unsigned int i = 0; i < N_CPU_THREADS; i++) {
-        dataWrap->initStructList[i] =
-            (struct mt_init_struct){ .id = i, .tracker = tracker };
-        pthread_create(&dataWrap->threads[i],
-                       NULL,
-                       EasyThread,
-                       &dataWrap->initStructList[i]);
-    }
-
-    return dataWrap;
-}
+#include "vector-math.h"
 
 bool FindAnyCollision(objTracker *tracker, objWrap *first) {
     if (tracker->objListLen < 2) return false;
@@ -278,6 +24,11 @@ bool FindAnyCollision(objTracker *tracker, objWrap *first) {
         if (first == second) continue;
 
         if (!second->collider.isCollidable) continue;
+
+        if (first->objPtr->position.x + first->collider.collider.x +
+                first->collider.collider.width <
+            second->objPtr->position.x + MAX_COLL_OFFSET)
+            break;
 
         if (CheckIfCollide(first, second)) return true;
     }
@@ -315,9 +66,18 @@ void SortListByX(objTracker *tracker) {
     unsigned long i        = 1;
     unsigned long gotToPos = 0;
     while (i < tracker->objListLen) {
-
         objWrap *prev    = tracker->objList[i - 1];
         objWrap *current = tracker->objList[i];
+        if (!prev || !current) {
+            fatal(EINVAL, 0, "Got a null while sorting");
+            break;
+        }
+
+        if (!prev->objPtr || !current->objPtr) {
+            fatal(EINVAL, 0, "Got a null objPtr while sorting");
+            break;
+        }
+
         if (current->objPtr->position.x >= prev->objPtr->position.x) {
             if (i > gotToPos) {
                 gotToPos = i;
@@ -328,7 +88,6 @@ void SortListByX(objTracker *tracker) {
         }
         tracker->objList[i]     = prev;
         tracker->objList[i - 1] = current;
-
         if (i > 1) i--;
     }
 }
@@ -342,33 +101,29 @@ void ApplyMassBasedRandRotation(objWrap *wrap) {
 }
 
 void Bounce(objTracker *tracker, objWrap *first, objWrap *second) {
-
     UNUSED(tracker);
 
-    objWrap *left, *right;
-    objWrap *above, *below;
+    Vector2 pos_delta =
+        VecSubVec(second->objPtr->position, first->objPtr->position);
+    Vector2 speed_delta =
+        VecSubVec(second->objPtr->speed, first->objPtr->speed);
 
-    float frameTime = GetFrameTime();
+    // If the signs match, that means that they're not going towards eachother,
+    // thus no point to bounce them
+    if (fGetSign(pos_delta.x) == fGetSign(speed_delta.x) &&
+        fGetSign(pos_delta.y) == fGetSign(speed_delta.y))
+        return;
 
-    // If A.x < B.x then A is left of B
-    left  = first->objPtr->position.x < second->objPtr->position.x
-                ? first
-                : second;                   // Find the left one
-    right = left == first ? second : first; // Set right to the other one
-
-    // If A.y < B.y then A is above of B
-    above = first->objPtr->position.y < second->objPtr->position.y
-                ? first
-                : second;                    // Find the above one
-    below = above == first ? second : first; // Set below to the other one
     {
 
         // I wasted 24 fucking hours trying to make this work
         float Sa = first->objPtr->speed.x;
         float Sb = second->objPtr->speed.x;
 
-        float ma = ClampFloat(first->collider.mass, 1, 1024);
-        float mb = ClampFloat(second->collider.mass, 1, 1024);
+        float ma =
+            ClampFloat(first->collider.mass, 1, 1024) * BOUNCE_BACK_FACTOR;
+        float mb =
+            ClampFloat(second->collider.mass, 1, 1024) * BOUNCE_BACK_FACTOR;
 
         first->objPtr->speed.x  = Sa + (Sb - Sa) / ma;
         second->objPtr->speed.x = Sb + (Sa - Sb) / mb;
@@ -379,17 +134,16 @@ void Bounce(objTracker *tracker, objWrap *first, objWrap *second) {
             "SPEEDS AFTER:\n First == %f\n Second == %f",
             first->objPtr->speed.x,
             second->objPtr->speed.x);
-
-        left->objPtr->position.x -= BOUCE_CONSTANT * frameTime;
-        right->objPtr->position.x += BOUCE_CONSTANT * frameTime;
     }
 
     {
         float Sa = first->objPtr->speed.y;
         float Sb = second->objPtr->speed.y;
 
-        float ma = ClampFloat(first->collider.mass, 1, 1024);
-        float mb = ClampFloat(second->collider.mass, 1, 1024);
+        float ma =
+            ClampFloat(first->collider.mass, 1, 1024) * BOUNCE_BACK_FACTOR;
+        float mb =
+            ClampFloat(second->collider.mass, 1, 1024) * BOUNCE_BACK_FACTOR;
 
         first->objPtr->speed.y  = Sa + (Sb - Sa) / ma;
         second->objPtr->speed.y = Sb + (Sa - Sb) / mb;
@@ -400,15 +154,37 @@ void Bounce(objTracker *tracker, objWrap *first, objWrap *second) {
             "SPEEDS AFTER:\n First == %f\n Second == %f",
             first->objPtr->speed.y,
             second->objPtr->speed.y);
-
-        above->objPtr->position.y -= BOUCE_CONSTANT * frameTime;
-        below->objPtr->position.y += BOUCE_CONSTANT * frameTime;
     }
-    return;
+    FixClipping(first, second);
+}
+
+void FixClipping(objWrap *first, objWrap *second) {
+    Vector2 pos_delta =
+        VecSubVec(second->objPtr->position, first->objPtr->position);
+
+    if (fabsf(fCutOff(pos_delta.x, 0)) >= fabsf(fCutOff(pos_delta.y, 0))) {
+        const objWrap *left =
+            first->objPtr->position.x < second->objPtr->position.x ? first
+                                                                   : second;
+        const objWrap *right = left == first ? second : first;
+
+        left->objPtr->speed.x -= 1;
+        right->objPtr->speed.x += 1;
+    }
+    if (fabsf(fCutOff(pos_delta.x, 0)) <= fabsf(fCutOff(pos_delta.y, 0))) {
+        const objWrap *above =
+            first->objPtr->position.y < second->objPtr->position.y ? first
+                                                                   : second;
+        const objWrap *below = above == first ? second : first;
+
+        above->objPtr->speed.y -= 5;
+        below->objPtr->speed.y += 5;
+    }
 }
 
 bool CheckIfCollide(objWrap *first, objWrap *second) {
     // This abomination will make the logic actually readable
+    // TODO: Rewrite this with vector-math lib
     Vector2 firstStart = {
         first->objPtr->position.x +     // leftmost point of the collider
             first->collider.collider.x, // in the abs coord system
@@ -436,6 +212,16 @@ bool CheckIfCollide(objWrap *first, objWrap *second) {
     // Assume x == 0 is the leftmost point of the system
     // And y == 0 is the topmost point of the system
     //
+    //  +--------+ <- first object
+    //  |   +----|---+ <- second object
+    //  |   |    |   |
+    //  |   |    |   |
+    //  +---|----+   |
+    //      |        |
+    //      +--------+
+    // In that example  second object overlaps the first one from the
+    // bottom-right
+    //
     // firstStart.x -- Leftmost point of the first object
     // firstEnd.x -- Rightmost point of the first object
     // secondStart.x -- Leftmost point of the second object
@@ -460,9 +246,14 @@ bool CheckIfCollide(objWrap *first, objWrap *second) {
     //
     // If they overlap in both axis, then they collide
     // Actuall logic
-    if ((firstStart.x < secondEnd.x && secondStart.x < firstEnd.x) &&
-        (firstStart.y < secondEnd.y && secondStart.y < firstEnd.y))
-        return true;
+    bool collide_x =
+        (firstStart.x <= secondEnd.x && secondStart.x <= firstEnd.x) ||
+        (firstStart.x >= secondEnd.x && secondStart.x >= firstEnd.x);
+    bool collide_y =
+        (firstStart.y <= secondEnd.y && secondStart.y <= firstEnd.y) ||
+        (firstStart.y >= secondEnd.y && secondStart.y >= firstEnd.y);
+
+    if (collide_x && collide_y) return true;
 
     return false;
 }
@@ -482,36 +273,42 @@ void GetShot(objTracker *tracker, objWrap *projectile, objWrap *victim) {
 void FastFindCollisions(objTracker *tracker, unsigned long index) {
     objWrap *current = tracker->objList[index];
     if (tracker->objListLen < 2) return;
-
-    if (!current) return;
-
-    if (current->request == DELETE) return;
+    if (!current || !current->objPtr || current->request == DELETE) return;
 
     objWrap *next;
-
     for (unsigned long j = index + 1; j < tracker->objListLen; j++) {
         next = tracker->objList[j];
 
-        if (tracker->objList[j] == NULL || current == next ||
-            next->request != UPDATE || !next->collider.isCollidable)
+        if (next == NULL || current == next || next->request != UPDATE ||
+            !next->collider.isCollidable)
             continue;
 
+        pthread_mutex_lock(&next->mutex);
         if (current->objPtr->position.x + current->collider.collider.x +
-                current->collider.collider.width <=
-            next->objPtr->position.x + next->collider.collider.x)
+                current->collider.collider.width <
+            next->objPtr->position.x + MAX_COLL_OFFSET) {
+            pthread_mutex_unlock(&next->mutex);
             break;
+        }
 
-        if (!CheckIfCollide(current, next)) continue;
+        if (!CheckIfCollide(current, next)) {
+            pthread_mutex_unlock(&next->mutex);
+            continue;
+        }
 
         if (current->objectType == next->objectType &&
-            current->objectType == PROJECTILE)
+            current->objectType == PROJECTILE) {
+            pthread_mutex_unlock(&next->mutex);
             continue;
+        }
 
         if (current->objectType > next->objectType) {
             current->collider.ActionOnCollision(tracker, current, next);
+            pthread_mutex_unlock(&next->mutex);
             continue;
         }
         next->collider.ActionOnCollision(tracker, next, current);
+        pthread_mutex_unlock(&next->mutex);
     }
     return;
 }

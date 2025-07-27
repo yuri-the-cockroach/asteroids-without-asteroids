@@ -11,50 +11,6 @@
 #include "autils.h"
 #include "structs.h"
 
-int fGetSign(float f) {
-    int *ptr = (int *)(void *)&f;
-    return *ptr >> 31 | 1;
-}
-
-int GetSign(int i) { return i >> 31 | 1; }
-
-float GetRandomFloat(float min, float max) {
-    return (float)(GetRandomValue((int)(min * 1000), (int)(max * 1000))) / 1000;
-}
-
-float RollOverFloat(float d, float min, float max) {
-    const float t = d < min ? max : d;
-    return t > max ? min : t;
-}
-
-float fCutOff(float f, int n) {
-    if (n == 0) return (float)(int)f;
-    float mult = powf(10.f, (float)n);
-    int temp   = (int)(f * mult);
-    return (float)temp / mult;
-}
-
-int RollOverInt(int d, int min, int max) {
-    const int t = d < min ? max : d;
-    return t > max ? min : t;
-}
-
-float ClampFloat(float d, float min, float max) {
-    const float t = d < min ? min : d;
-    return t > max ? max : t;
-}
-
-int ClampInt(int d, int min, int max) {
-    const int t = d < min ? min : d;
-    return t > max ? max : t;
-}
-
-long GetTimeMicS(void) {
-    struct timeval tv = { 0, 0 };
-    gettimeofday(&tv, 0);
-    return tv.tv_sec * (long)1e6 + tv.tv_usec;
-}
-
 void CleanupMemory(objTracker *tracker) {
     unsigned long i           = 0;
     unsigned long firstNull   = MAX_OBJECT_COUNT;
@@ -79,7 +35,7 @@ void CleanupMemory(objTracker *tracker) {
     tracker->objListLen -= nullCounter;
 }
 
-int CreateLogFile(void) {
+FILE *CreateLogFile(char *restrict file_name_ptr) {
     time_t t           = time(NULL);
     struct tm timedate = *localtime(&t);
 
@@ -89,6 +45,7 @@ int CreateLogFile(void) {
     // If logs exists, but is not a directory
     // remove it and set errno to ENOENT
     // So the next condition gets triggered and creates a directory
+
     if (statThingi.st_mode / 010000 == 010) {
         remove("logs");
         errno = ENOENT;
@@ -99,19 +56,20 @@ int CreateLogFile(void) {
         errno = 0;
     }
 
-    sprintf(LOG_FILE_NAME,
-            "logs/asteroids-%d-%02d-%02d_%02d-%02d-%02d.log",
-            timedate.tm_year + 1900,
-            timedate.tm_mon + 1,
-            timedate.tm_mday,
-            timedate.tm_hour,
-            timedate.tm_min,
-            timedate.tm_sec);
+    snprintf(file_name_ptr,
+             LOG_FILE_NAME_SIZE,
+             "logs/asteroids-%d-%02d-%02d_%02d-%02d-%02d.log",
+             timedate.tm_year + 1900,
+             timedate.tm_mon + 1,
+             timedate.tm_mday,
+             timedate.tm_hour,
+             timedate.tm_min,
+             timedate.tm_sec);
 
-    LOG_FILE_PTR = fopen(LOG_FILE_NAME, "a");
-    errno        = 0;
+    FILE *file_ptr = fopen(file_name_ptr, "a");
+    errno          = 0;
 
-    return 0;
+    return file_ptr;
 }
 
 int GetStartUpArguments(int argc, char **argv) {
@@ -121,7 +79,8 @@ int GetStartUpArguments(int argc, char **argv) {
                 !strcmp(argv[i], "--loglevelconsole")) {
                 i++;
 
-                int newLogLevel = ClampInt(atoi(argv[i]), 0, 8);
+                int newLogLevel =
+                    ClampInt(atoi(argv[i]), 0, sizeof(loglvlToStringNoColor));
                 if (newLogLevel) {
                     CURRENT_LOG_LEVEL_CONSOLE = (enum loglevel)newLogLevel;
                     continue;
@@ -136,7 +95,8 @@ int GetStartUpArguments(int argc, char **argv) {
             if (!strcmp(argv[i], "-lf") || !strcmp(argv[i], "--loglevelfile")) {
                 i++;
 
-                int newLogLevel = ClampInt(atoi(argv[i]), 0, 8);
+                int newLogLevel =
+                    ClampInt(atoi(argv[i]), 0, sizeof(loglvlToStringNoColor));
                 if (newLogLevel) {
                     CURRENT_LOG_LEVEL_FILE = (enum loglevel)newLogLevel;
                     continue;
@@ -149,6 +109,9 @@ int GetStartUpArguments(int argc, char **argv) {
             }
         }
     }
+    printf("Current log level set to %d for shell and %d for file\n",
+           CURRENT_LOG_LEVEL_CONSOLE,
+           CURRENT_LOG_LEVEL_FILE);
     return 0;
 }
 
@@ -156,33 +119,23 @@ void RunConfig(void) {
     SetTraceLogLevel(LOG_ERROR);
     setlocale(LC_NUMERIC, "en_US.UTF-8");
 
-#ifdef MT_ENABLED
     N_CPU_THREADS = sysconf(_SC_NPROCESSORS_ONLN);
-#endif // MT_ENABLED
+    LOG_FILE_PTR  = CreateLogFile(LOG_FILE_NAME);
+}
 
-#ifdef BENCHMARKING
-    BENCH_LOG_FILE_PTR = fopen(BENCH_LOG_FILE_NAME, "w");
-    LOG(DEBUG,
-        "%s",
-        "Compiled with benchmarking support.\nBenchmarking is enabled");
-#endif
+void InitRaylib(void) {
 
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    // SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "asteroids without asteroids");
 
-    SetWindowPosition(1, 1);
+    // SetWindowPosition(1, 1);
     SetWindowMinSize(640, 480);
     SetWindowMaxSize(8192, 8192);
 
     SetTargetFPS(FPS_TARGET);
-    CreateLogFile();
 }
 
 void RunCleanup(void) {
     CloseWindow();
     fclose(LOG_FILE_PTR);
-
-#ifdef BENCHMARKING
-    if (BENCH_LOG_FILE_PTR) fclose(BENCH_LOG_FILE_PTR);
-#endif
 }

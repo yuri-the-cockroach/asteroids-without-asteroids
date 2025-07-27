@@ -7,7 +7,7 @@
                           // it's not an issue
 
 #define LOG(logLevel, ...) \
-    Logger(__FILE__, __FUNCTION__, __LINE__, logLevel, __VA_ARGS__)
+    Logger(__FILE__, __PRETTY_FUNCTION__, __LINE__, logLevel, __VA_ARGS__)
 
 void Logger(const char *restrict inFile, const char *restrict inFunc,
             const int onLine, const enum loglevel loglevel, ...);

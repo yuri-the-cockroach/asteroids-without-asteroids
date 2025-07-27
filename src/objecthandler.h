@@ -6,9 +6,6 @@
 // Go through the list of tracked objects and call UpdateObj function on them
 void RunActionList(objTracker *tracker);
 
-// Called on a single objWrap* and goes through the update checklist
-void UpdateObj(objTracker *tracker, unsigned long index);
-
 // Takes care of safely deleting the object and cleaning up after it
 void DeleteObjWrap(objWrap *wrap);
 

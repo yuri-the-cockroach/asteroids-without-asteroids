@@ -1,9 +1,9 @@
 #ifndef STRUCTS_H_
 #define STRUCTS_H_
 
-#include <raylib.h>
-#include <raymath.h>
-#include <rcamera.h>
+#include "raylib.h"
+#include "raymath.h"
+#include "rcamera.h"
 
 // Sys stuff
 #include <sys/time.h>
@@ -59,22 +59,35 @@ enum difficulty {
 
 enum menuOptionType { DUMMY = -1, SUBMENU = 1, FUNCTION = 2 };
 
-static const char *loglvlToString[12] = { "NOLOG",
-                                          "\033[1;31mFATAL\033[0;37m",
-                                          "\033[0;31mERROR\033[0;37m",
-                                          "\033[1;33mWARNING\033[0;37m",
-                                          "\033[0;32mINFO\033[0;37m",
-                                          "\033[1;31mTEST FAIL\033[0;37m",
-                                          "\033[0;32mTEST PASS\033[0;37m",
-                                          "\033[0;34mFIXME\033[0;37m",
-                                          "\033[1;35mDEBUG\033[0;37m",
-                                          "\033[0;35mTRACE\033[0;37m",
-                                          "ALL" };
+#define TERM_GRAY       "30"
+#define TERM_RED        "31"
+#define TERM_GREEN      "32"
+#define TERM_YELLOW     "33"
+#define TERM_BLUE       "34"
+#define TERM_PURPLE     "35"
+#define TERM_CYAN       "36"
+#define TERM_WHITE      "37"
 
-static const char *loglvlToStringNoColor[12] = {
-    "NOLOG",     "FATAL", "ERROR", "WARNING", "INFO", "TEST FAIL",
-    "TEST PASS", "FIXME", "DEBUG", "TRACE",   "ALL"
-};
+#define TERM_NORMAL     "0"
+#define TERM_BOLD       "1"
+#define TERM_LIGHT      "2"
+#define TERM_UNDERLINED "4"
+#define TERM_BLINKING   "5"
+#define TERM_REVERSE    "7"
+
+#define TERM_TEXT_MOD(mod, color, text) \
+    "\033[" mod ";" color "m" text "\033[0;37m"
+
+extern const char *loglvlToString[12];
+
+// "\e[1;33mWARNING\e[0m",
+// "\e[0;32mINFO\e[0m",
+// "\e[1;31mTEST FAIL\e[0m",
+// "\e[0;32mTEST PASS\e[0m",
+// "\e[0;34mFIXME\e[0m",
+// "\e[1;35mDEBUG\e[0m",
+// "\e[0;35mTRACE\e[0m",
+extern const char *loglvlToStringNoColor[12];
 
 enum request { IGNORE = 0, UPDATE = 1, SEPARATE = 2, CREATE = 3, DELETE = -1 };
 
@@ -94,40 +107,41 @@ typedef struct menu_option_struct menuOption;
 // -------------------- CONSTANTS --------------------
 // -------------------- Physics constants --------------------
 
-#define MT_ENABLED
+#define LOG_FILE_NAME_SIZE 64
 
-static const float ELASTICITY_FACTOR =
-    0.5; // How much energy object recives back on bouce
+extern const float WORLD_POS_MIN_X;
+extern const float WORLD_POS_MAX_X;
 
-static const int WORLD_POS_MIN_X = 0;
-static const int WORLD_POS_MAX_X = 10000;
+extern const float WORLD_POS_MIN_Y;
+extern const float WORLD_POS_MAX_Y;
+extern const unsigned int ASTEROID_POINT_HIGHT;
+extern const float MAX_ASTEROID_SIZE;
 
-static const int WORLD_POS_MIN_Y = 0;
-static const int WORLD_POS_MAX_Y = 10000;
-
-static const int SOFT_MAX_ASTEROIDS = 1000;
-static const int MAX_OBJECT_COUNT   = 1024;
+extern const unsigned int MAX_OBJECT_COUNT;
+extern const unsigned int SOFT_MAX_ASTEROIDS;
 
 // player related
-static const int RATE_OF_FIRE          = 5;
-static const int PROJECTILE_SPEED      = 20;
-static const float PROJECTILE_SIZE     = 0.1f;
-static const int PLAYER_ROTATION_SPEED = 5;
-static const int PLAYER_MOVE_SPEED     = 20;
-static const int BASE_ROTATE           = 5;
+extern const int RATE_OF_FIRE;
+extern const float PROJECTILE_SPEED;
+extern const float PROJECTILE_SIZE;
+extern const int PLAYER_ROTATION_SPEED;
+extern const int PLAYER_MOVE_SPEED;
+extern const int BASE_ROTATE;
+extern const float BOUNCE_BACK_FACTOR;
 
-static const enum loglevel DEFAULT_LOG_LEVEL = WARNING;
+extern const enum loglevel DEFAULT_LOG_LEVEL;
 
-static const int MAX_MENU_STACK_SIZE = 32;
-
-static const long ASTEROID_SPAWN_DELAY            = 10;
-static const unsigned long ASTEROID_CORNERS_COUNT = 20;
-static const float ASTEROID_HEIGHT_VARIATION      = 15;
+extern const long ASTEROID_SPAWN_DELAY;
+extern const unsigned long ASTEROID_CORNERS_COUNT;
+extern const float ASTEROID_HEIGHT_VARIATION;
 
 // Externally defined dynamic global variables
 
+extern float LAST_FRAME_TIME;
+
 // Debugging vars
 #ifdef DEBUGGING
+extern int COLLISION_COUNT;
 extern objWrap *lastDragged;
 extern Vector2 SPEED_PREV;
 extern bool DEBUG_PAUSE;
@@ -143,7 +157,7 @@ extern enum loglevel CURRENT_LOG_LEVEL_CONSOLE;
 extern enum loglevel CURRENT_LOG_LEVEL_FILE;
 
 extern enum difficulty CUR_DIFFICULTY;
-extern char LOG_FILE_NAME[64];
+extern char LOG_FILE_NAME[LOG_FILE_NAME_SIZE];
 extern FILE *LOG_FILE_PTR;
 
 // Benchmarking
@@ -152,8 +166,6 @@ extern bool BENCHRUNNING;
 extern long BENCH_COLLIDER_TIME;
 extern FILE *BENCH_LOG_FILE_PTR;
 
-static const char *restrict BENCH_LOG_FILE_NAME = "logs/asteroids-benchlog.log";
-static const int SAMPLES                        = 1024;
 #endif // BENCHMARKING
 
 // Game flow related
@@ -168,28 +180,12 @@ extern int SCREEN_HEIGHT;
 extern int FPS_TARGET;
 extern bool CAMERA_FOLLOW;
 
-static const Vector2 PLAYER_SHAPE_POINTS[] = {
-    (Vector2){ 0,   -50 }, // Is always treated as the fronts-most point, used to
-                         // get the heading
-    (Vector2){ 50,  50  },
-    (Vector2){ 0,   20  },
-    (Vector2){ -50, 50  }
-};
+extern const int PLAYER_SHAPE_SIZE;
+extern const Vector2 PLAYER_SHAPE_POINTS[];
+extern const int PROJECTILE_SHAPE_SIZE;
+extern const Vector2 PROJECTILE_SHAPE_POINTS[];
 
-static const Vector2 ASTEROID_SHAPE_POINTS[] = {
-    (Vector2){ -50, 50  },
-    (Vector2){ 50,  50  },
-    (Vector2){ 50,  -50 },
-    (Vector2){ -50, -50 }
-};
-
-static const Vector2 PROJECTILE_SHAPE_POINTS[] = {
-    (Vector2){ 0,   -50 },
-    (Vector2){ -30, 40  },
-    (Vector2){ 45,  -15 },
-    (Vector2){ -45, -15 },
-    (Vector2){ 30,  40  }
-};
+extern const float MAX_COLL_OFFSET;
 
 // -------------------- structs --------------------
 
@@ -240,6 +236,7 @@ struct object_wrap_struct {
 
     collider collider;
     int livesLeft;
+    pthread_mutex_t mutex;
 };
 
 struct obj_tracker_struct {
@@ -248,6 +245,9 @@ struct obj_tracker_struct {
     objWrap **objList;
     unsigned long objListLen;
     unsigned int playerScore;
+    struct {
+        Vector2 screenStart, screenEnd;
+    } screenBorderWrap;
 };
 
 struct menu_function_wrap_struct {
