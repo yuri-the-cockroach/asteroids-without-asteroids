@@ -1,4 +1,5 @@
 // system includes
+#include "tracingtools.c"
 #include <errno.h>
 #include <immintrin.h>
 #include <pthread.h>
@@ -59,9 +60,18 @@ void SortListByX(objTracker *tracker) {
     unsigned long i        = 1;
     unsigned long gotToPos = 0;
     while (i < tracker->objListLen) {
-
         objWrap *prev    = tracker->objList[i - 1];
         objWrap *current = tracker->objList[i];
+        if (!prev || !current) {
+            fatal(EINVAL, 0, "Got a null while sorting");
+            break;
+        }
+
+        if (!prev->objPtr || !current->objPtr) {
+            fatal(EINVAL, 0, "Got a null objPtr while sorting");
+            break;
+        }
+
         if (current->objPtr->position.x >= prev->objPtr->position.x) {
             if (i > gotToPos) {
                 gotToPos = i;
@@ -72,7 +82,6 @@ void SortListByX(objTracker *tracker) {
         }
         tracker->objList[i]     = prev;
         tracker->objList[i - 1] = current;
-
         if (i > 1) i--;
     }
 }
