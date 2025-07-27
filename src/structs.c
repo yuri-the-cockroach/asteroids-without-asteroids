@@ -40,13 +40,13 @@ FILE *LOG_FILE_PTR;
 
 long N_CPU_THREADS = 1;
 
+const float MAX_ASTEROID_SIZE = 4;
+
 #ifdef BENCHMARKING
 const float WORLD_POS_MIN_X = 0.f;
 const float WORLD_POS_MAX_X = 100000.f;
 const float WORLD_POS_MIN_Y = 0.f;
 const float WORLD_POS_MAX_Y = 100000.f;
-
-const float MAX_ASTEROID_SIZE = 4;
 
 const unsigned int MAX_OBJECT_COUNT   = 32768;
 const unsigned int SOFT_MAX_ASTEROIDS = MAX_OBJECT_COUNT;
@@ -56,8 +56,6 @@ const float WORLD_POS_MIN_X = 0;
 const float WORLD_POS_MAX_X = 20000;
 const float WORLD_POS_MIN_Y = 0;
 const float WORLD_POS_MAX_Y = 20000;
-
-const float MAX_ASTEROID_SIZE = 4;
 
 const unsigned int SOFT_MAX_ASTEROIDS = 2000u;
 const unsigned int MAX_OBJECT_COUNT   = 2048u;
