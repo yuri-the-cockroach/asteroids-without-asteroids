@@ -24,12 +24,13 @@ void OnPlayerAccellerate(object *object, float speed) {
     }
 
     object->speed.x +=
-        (speed / mult_x) * GetFrameTime() * object->shape.points[0].x;
+        (speed / mult_x) * LAST_FRAME_TIME * object->shape.points[0].x;
     object->speed.y +=
-        (speed / mult_y) * GetFrameTime() * object->shape.points[0].y;
+        (speed / mult_y) * LAST_FRAME_TIME * object->shape.points[0].y;
 
-    // object->speed.x +=  object->shape.points[0].x * (speed * GetFrameTime());
-    // object->speed.y += object->shape.points[0].y * (speed * GetFrameTime());
+    // object->speed.x +=  object->shape.points[0].x * (speed *
+    // LAST_FRAME_TIME); object->speed.y += object->shape.points[0].y * (speed *
+    // LAST_FRAME_TIME);
 }
 
 #ifdef DEBUGGING
@@ -58,8 +59,8 @@ void DebugingKeyHandler(objTracker *tracker) {
 
     if (lastDragged && !IsMouseButtonDown(0)) {
         lastDragged->objPtr->speed =
-            (Vector2){ GetMouseDelta().x / GetFrameTime(),
-                       GetMouseDelta().y / GetFrameTime() };
+            (Vector2){ GetMouseDelta().x / LAST_FRAME_TIME,
+                       GetMouseDelta().y / LAST_FRAME_TIME };
 
         lastDragged = NULL;
     } // End of dragging
