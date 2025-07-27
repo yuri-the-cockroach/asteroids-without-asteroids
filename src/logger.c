@@ -40,20 +40,25 @@ void Logger(const char *restrict inFile, const char *restrict inFunc,
     // Actually print to stderr
     if (CURRENT_LOG_LEVEL_CONSOLE >= loglevel)
         fprintf(stderr,
-                "[%s] %s %s->%s:%d %s\n",
-                loglvlToString[loglevel],
-                formatedTime,
+                "%s:%d:0: %s in " TERM_TEXT_MOD(
+                    TERM_LIGHT,
+                    TERM_WHITE,
+                    "%s") " at " TERM_TEXT_MOD(TERM_NORMAL,
+                                               TERM_WHITE,
+                                               "%s") ": %s\n",
                 inFile,
-                inFunc,
                 onLine,
+                loglvlToString[loglevel],
+                inFunc,
+                formatedTime,
                 messageString);
 
     fprintf(LOG_FILE_PTR,
-            "[%s] %s %s->%s:%d %s\n",
-            loglvlToStringNoColor[loglevel],
-            formatedTime,
+            "%s:%d:0 %s in %s at %s: %s\n",
             inFile,
-            inFunc,
             onLine,
+            loglvlToString[loglevel],
+            inFunc,
+            formatedTime,
             messageString);
 }
