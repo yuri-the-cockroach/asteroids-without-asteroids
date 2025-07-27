@@ -121,8 +121,10 @@ void Bounce(objTracker *tracker, objWrap *first, objWrap *second) {
         float Sa = first->objPtr->speed.x;
         float Sb = second->objPtr->speed.x;
 
-        float ma = ClampFloat(first->collider.mass, 1, 1024);
-        float mb = ClampFloat(second->collider.mass, 1, 1024);
+        float ma =
+            ClampFloat(first->collider.mass, 1, 1024) * BOUNCE_BACK_FACTOR;
+        float mb =
+            ClampFloat(second->collider.mass, 1, 1024) * BOUNCE_BACK_FACTOR;
 
         first->objPtr->speed.x  = Sa + (Sb - Sa) / ma;
         second->objPtr->speed.x = Sb + (Sa - Sb) / mb;
@@ -139,8 +141,10 @@ void Bounce(objTracker *tracker, objWrap *first, objWrap *second) {
         float Sa = first->objPtr->speed.y;
         float Sb = second->objPtr->speed.y;
 
-        float ma = ClampFloat(first->collider.mass, 1, 1024);
-        float mb = ClampFloat(second->collider.mass, 1, 1024);
+        float ma =
+            ClampFloat(first->collider.mass, 1, 1024) * BOUNCE_BACK_FACTOR;
+        float mb =
+            ClampFloat(second->collider.mass, 1, 1024) * BOUNCE_BACK_FACTOR;
 
         first->objPtr->speed.y  = Sa + (Sb - Sa) / ma;
         second->objPtr->speed.y = Sb + (Sa - Sb) / mb;
