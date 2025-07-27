@@ -167,5 +167,6 @@ int StateMachine(void) {
         }
 
         EndDrawing();
+        LAST_FRAME_TIME = GetFrameTime();
     }
 }
