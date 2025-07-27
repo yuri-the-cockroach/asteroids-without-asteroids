@@ -144,7 +144,7 @@ extern enum loglevel CURRENT_LOG_LEVEL_CONSOLE;
 extern enum loglevel CURRENT_LOG_LEVEL_FILE;
 
 extern enum difficulty CUR_DIFFICULTY;
-extern char LOG_FILE_NAME[64];
+extern char LOG_FILE_NAME[LOG_FILE_NAME_SIZE];
 extern FILE *LOG_FILE_PTR;
 
 // Benchmarking
