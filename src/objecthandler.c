@@ -11,6 +11,7 @@
 #include "objectlogic.h"
 #include "render.h"
 #include "structs.h"
+#include "vector-math.h"
 
 // Returns a list of objects that need to be drawn
 void RunActionList(objTracker *tracker) {
