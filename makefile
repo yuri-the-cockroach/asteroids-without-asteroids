@@ -158,4 +158,8 @@ valgrind:
 debug:
 	gdb -i=mi main
 
+rebuild:
+	$(MAKE) clean
+	$(MAKE) all
+
 # end
