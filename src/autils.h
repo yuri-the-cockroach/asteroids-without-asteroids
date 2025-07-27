@@ -42,7 +42,10 @@ int ClampInt(int d, int min, int max);
 
 // Gets you a random float between min and max
 // Wrapper for raylib GetRandomValue
-float GetRandomFloat(float min, float max);
+float GetRandomf(float min, float max);
+
+// Rollover float, if it gets over max or under min
+float fRollOver(float d, float min, float max);
 
 // Get current time in milliseconds
 long GetTimeMicS(void);
