@@ -88,6 +88,8 @@ const int PLAYER_MOVE_SPEED     = 20;
 const int BASE_ROTATE           = 5;
 const float BOUNCE_BACK_FACTOR  = 1;
 
+// How far the point is from the center of the asteroid as a base
+const unsigned int ASTEROID_POINT_HIGHT    = 50;
 const long ASTEROID_SPAWN_DELAY            = 10;
 const unsigned long ASTEROID_CORNERS_COUNT = 20;
 const float ASTEROID_HEIGHT_VARIATION      = 15;
