@@ -168,28 +168,11 @@ extern int SCREEN_HEIGHT;
 extern int FPS_TARGET;
 extern bool CAMERA_FOLLOW;
 
-static const Vector2 PLAYER_SHAPE_POINTS[] = {
-    (Vector2){ 0,   -50 }, // Is always treated as the fronts-most point, used to
-                         // get the heading
-    (Vector2){ 50,  50  },
-    (Vector2){ 0,   20  },
-    (Vector2){ -50, 50  }
-};
+extern const int PLAYER_SHAPE_SIZE;
+extern const Vector2 PLAYER_SHAPE_POINTS[];
+extern const int PROJECTILE_SHAPE_SIZE;
+extern const Vector2 PROJECTILE_SHAPE_POINTS[];
 
-static const Vector2 ASTEROID_SHAPE_POINTS[] = {
-    (Vector2){ -50, 50  },
-    (Vector2){ 50,  50  },
-    (Vector2){ 50,  -50 },
-    (Vector2){ -50, -50 }
-};
-
-static const Vector2 PROJECTILE_SHAPE_POINTS[] = {
-    (Vector2){ 0,   -50 },
-    (Vector2){ -30, 40  },
-    (Vector2){ 45,  -15 },
-    (Vector2){ -45, -15 },
-    (Vector2){ 30,  40  }
-};
 
 // -------------------- structs --------------------
 
