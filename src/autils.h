@@ -63,10 +63,12 @@ void CleanupMemory(objTracker *tracker);
 // Rollover int, if it gets over max or under min
 int RollOver(int d, int min, int max);
 
-// Rollover float, if it gets over max or under min
-float RollOverFloat(float d, float min, float max);
 
 int CreateLogFile(void);
+float fRollOver(float d, float min, float max) {
+    const float t = d < min ? max : d;
+    return t > max ? min : t;
+}
 
 int GetStartUpArguments(int argc, char **argv);
 
