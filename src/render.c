@@ -293,7 +293,7 @@ void RunScreenRender(objTracker *restrict tracker) {
     DrawFPS(0, 0);
 }
 
-void RunMenuRender(const menuParent *menu, int menuHighlighted,
+void RunMenuRender(const menuParent *restrict menu, int menuHighlighted,
                    int subTitleLinesNum, ...) {
     const int titleFontSize = 42;
     const int fontSize      = 32;
