@@ -26,6 +26,8 @@ void ApplyMassBasedRandRotation(objWrap *wrap);
 // Check if two objects collide
 bool CheckIfCollide(objWrap *first, objWrap *second);
 
+void FixClipping(objWrap *first, objWrap *second);
+
 // Collision response function
 void Bounce(objTracker *tracker, objWrap *first, objWrap *second);
 
