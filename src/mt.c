@@ -166,7 +166,7 @@
 // * Ask all the threads to stop
 // * Wait for them all join
 // * Cleanup all the allocations made for MT
-MTCleanupAndFree(struct mt_data_wrap *dataWrap) {
+int MTCleanupAndFree(struct mt_data_wrap *dataWrap) {
     if (!dataWrap) {
         LOG(DEBUG, "%", "Null pointer was passed to be freed");
         return 0;
