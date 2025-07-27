@@ -63,6 +63,7 @@ int StateMachine(void) {
         case TESTING: {
             tracker    = InitTracker();
             mtDataWrap = InitMT(tracker);
+            curMenu    = &refMainMenu;
             GAME_STATE = RUNNING;
             break;
         }
@@ -70,14 +71,15 @@ int StateMachine(void) {
             tracker = InitTracker();
             mtDataWrap = InitMT(tracker);
             NewGame(tracker);
+            curMenu    = &refMainMenu;
             GAME_STATE = RUNNING;
             break;
         }
 
         case GAME_OVER: {
             char msg[128] = "";
-            sprintf(msg, "Your score: %d", tracker->playerScore);
-            MenuControlls(curMenu, &menuHighlighted);
+            sprintf(msg, "Your score: %ud", tracker->playerScore);
+            curMenu = MenuControlls(curMenu, &menuHighlighted);
             RunMenuRender(curMenu, menuHighlighted, 1, msg);
             break;
         }
