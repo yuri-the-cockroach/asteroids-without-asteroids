@@ -12,6 +12,10 @@
     #include "visdebugger.h"
 #endif
 
+static void DrawObject(objWrap *wrap);
+static void DrawGrid2D(int dist, Color color);
+static void UpdateScreenBorder(objTracker *restrict tracker);
+
 void DisplayText(Vector2 pos, int fontSize, Color color,
                  const char *restrict format, ...) {
     char messageString[1024] = "";
