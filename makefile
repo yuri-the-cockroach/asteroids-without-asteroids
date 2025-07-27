@@ -150,6 +150,9 @@ clean:
 link-raylib:
 	ln -s ~/git/raylib/src/*.so* shared/
 
+valgrind:
+	valgrind --leak-check=full --suppressions=nonproj.supp --show-leak-kinds=all --track-origins=yes --verbose ./main
+
 debug:
 	gdb -i=mi main
 
