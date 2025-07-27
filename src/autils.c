@@ -119,16 +119,10 @@ void RunConfig(void) {
     SetTraceLogLevel(LOG_ERROR);
     setlocale(LC_NUMERIC, "en_US.UTF-8");
 
-#ifdef MT_ENABLED
     N_CPU_THREADS = sysconf(_SC_NPROCESSORS_ONLN);
-#endif // MT_ENABLED
+    LOG_FILE_PTR  = CreateLogFile(LOG_FILE_NAME);
+}
 
-#ifdef BENCHMARKING
-    BENCH_LOG_FILE_PTR = fopen(BENCH_LOG_FILE_NAME, "w");
-    LOG(DEBUG,
-        "%s",
-        "Compiled with benchmarking support.\nBenchmarking is enabled");
-#endif
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "asteroids without asteroids");
