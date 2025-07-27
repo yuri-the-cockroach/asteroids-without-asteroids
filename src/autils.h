@@ -50,6 +50,12 @@ float fRollOver(float d, float min, float max);
 // Get current time in milliseconds
 long GetTimeMicS(void);
 
+long GetTimeMicS(void) {
+    struct timeval tv = { 0, 0 };
+    gettimeofday(&tv, 0);
+    return tv.tv_sec * (long)1e6 + tv.tv_usec;
+}
+
 // Cleanup memory find all NULLs in memory
 // remove them and rearenge memory
 void CleanupMemory(objTracker *tracker);
