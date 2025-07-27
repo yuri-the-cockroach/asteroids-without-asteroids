@@ -184,6 +184,7 @@ void FixClipping(objWrap *first, objWrap *second) {
 
 bool CheckIfCollide(objWrap *first, objWrap *second) {
     // This abomination will make the logic actually readable
+    // TODO: Rewrite this with vector-math lib
     Vector2 firstStart = {
         first->objPtr->position.x +     // leftmost point of the collider
             first->collider.collider.x, // in the abs coord system
@@ -210,6 +211,16 @@ bool CheckIfCollide(objWrap *first, objWrap *second) {
     // Explanation:
     // Assume x == 0 is the leftmost point of the system
     // And y == 0 is the topmost point of the system
+    //
+    //  +--------+ <- first object
+    //  |   +----|---+ <- second object
+    //  |   |    |   |
+    //  |   |    |   |
+    //  +---|----+   |
+    //      |        |
+    //      +--------+
+    // In that example  second object overlaps the first one from the
+    // bottom-right
     //
     // firstStart.x -- Leftmost point of the first object
     // firstEnd.x -- Rightmost point of the first object
