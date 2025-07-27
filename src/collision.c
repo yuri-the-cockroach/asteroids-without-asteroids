@@ -25,6 +25,11 @@ bool FindAnyCollision(objTracker *tracker, objWrap *first) {
 
         if (!second->collider.isCollidable) continue;
 
+        if (first->objPtr->position.x + first->collider.collider.x +
+                first->collider.collider.width <
+            second->objPtr->position.x + MAX_COLL_OFFSET)
+            break;
+
         if (CheckIfCollide(first, second)) return true;
     }
     return false;
