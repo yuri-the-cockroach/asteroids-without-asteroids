@@ -3,6 +3,7 @@
 
 #include "logger.h"
 #include "structs.h"
+#include "tracingtools.c"
 #include <assert.h>
 #include <sys/stat.h>
 
@@ -15,15 +16,6 @@
     #pragma GCC diagnostic ignored "-Wmacro-redefined"
     #define DEBUG(a) a
 #endif // DEBUGGING
-
-#define ASSERT(pass_condition, format, ...)      \
-    ({                                           \
-        if (!pass_condition) {                   \
-            LOG(TEST_FAIL, format, __VA_ARGS__); \
-            assert(pass_condition);              \
-        }                                        \
-        LOG(TEST_PASS, format, __VA_ARGS__);     \
-    })
 
 // Cutoff decimal digits after `n` from a float,
 // Where `n` is a power of 10,
