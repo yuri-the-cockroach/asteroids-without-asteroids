@@ -20,7 +20,7 @@ void Logger(const char *restrict inFile, const char *restrict inFunc,
 
     // Pass all the arguments to the vsprinf, which will fill it into the
     // message string. If argptr is 0, then it will just be ignored (hopefully)
-    va_start(argptr);
+    va_start(argptr, 0);
 
     const char *restrict format = va_arg(argptr, const char *restrict);
     vsnprintf(messageString, 1024, format, argptr);
