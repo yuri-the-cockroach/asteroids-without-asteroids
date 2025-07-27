@@ -13,6 +13,7 @@ bool FindAnyCollision(objTracker *tracker, objWrap *first);
 // Sort the list by X coordinate
 void SortListByX(objTracker *tracker);
 
+void MaybeFindCollisions(objTracker *tracker, unsigned long index);
 // An algorithm that shoud in theory be a lot faster
 void FastFindCollisions(objTracker *tracker, unsigned long index);
 
