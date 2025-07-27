@@ -74,18 +74,8 @@ export CFLAGS=-D_GNU_SOURCE -mavx2 -std=gnu23 -rdynamic -fblocks
 ifdef BENCH
 export BENCHMARKING = -DBENCHMARKING
 endif # BENCHMARKING
-
-define buildLib
-    clang $(CFLAGS) $(WARN) $(NOWARN) $(OPTIMIZE) $(SANITIZE) $(DEBUGGING) $(BENCHMARKING) -std=c23 -fPIC -ferror-limit=0 -o object/$1.o -c src/$1.c
-    clang $(CFLAGS) $(WARN) $(NOWARN) $(OPTIMIZE) $(SANITIZE) $(DEBUGGING) $(BENCHMARKING) -std=c23 -fPIC -ferror-limit=0 -shared -o shared/lib$1.so object/$1.o
-endef
-
-endif #DEFINES
-
-all:
-	if [[ ! -e object ]]; then mkdir object; fi
-	if [[ ! -e shared ]]; then mkdir shared; fi
-	mold -run make -j $(nproc) \
+TARGETS=shared \
+		object \
 		shared/liblogger.so \
 		shared/libautils.so \
 		shared/libobjecthandler.so \
@@ -97,53 +87,35 @@ all:
 		shared/libstatemachine.so \
 		shared/libmenulogic.so \
 		shared/libasteroid.so \
-	mold -run make benchmark main unit-tests
-
-shared/libmenulogic.so: makefile src/menulogic.h src/menulogic.c src/structs.h
-	$(call buildLib,menulogic)
-
-shared/libcollision.so: makefile src/collision.h src/collision.c src/structs.h
-	$(call buildLib,collision)
-
-shared/librender.so: makefile src/render.h src/render.c src/structs.h
-	$(call buildLib,render)
-
-shared/liblogger.so: makefile src/logger.h src/logger.c src/structs.h
-	$(call buildLib,logger)
 		shared/libmt.so
 
-shared/libautils.so: makefile src/autils.h src/autils.c src/structs.h
-	$(call buildLib,autils)
+ifdef DEBUG
+	TARGETS+= shared/libvisdebugger.so
+endif
+ifdef BENCH
+	TARGETS+= shared/libbenchmarking.so
+endif
 
-shared/libobjectlogic.so: makefile src/objectlogic.h src/objectlogic.c src/structs.h
-	$(call buildLib,objectlogic)
+endif #DEFINES
 
-shared/libgamelogic.so: makefile src/gamelogic.h src/gamelogic.c src/structs.h
-	$(call buildLib,gamelogic)
+.PHONY: all clean
 
-shared/libsyslogic.so: makefile src/syslogic.h src/syslogic.c src/structs.h
-	$(call buildLib,syslogic)
+.DEFAULT: all main
 
-shared/libobjecthandler.so: makefile src/objecthandler.h src/objecthandler.c src/structs.h
-	$(call buildLib,objecthandler)
+all: $(TARGETS)
 
-shared/libcollider.so: makefile src/collider.h src/collider.c src/structs.h
-	$(call buildLib,collider)
+object:
+	mkdir object
 
-shared/libvisdebugger.so: makefile src/visdebugger.h src/visdebugger.c src/structs.h
-	$(call buildLib,visdebugger)
+shared:
+	mkdir shared
 
-shared/libstatemachine.so: makefile src/statemachine.h src/statemachine.c src/structs.h
-	$(call buildLib,statemachine)
 
-shared/libasteroid.so: makefile src/asteroid.h src/asteroid.c src/structs.h
-	$(call buildLib,asteroid)
+shared/lib%.so: src/%.c src/%.h makefile src/structs.h
+	clang $(CFLAGS) $(WARN) $(NOWARN) $(OPTIMIZE) $(SANITIZE) $(DEBUGGING) $(BENCHMARKING) -fPIC -ferror-limit=0 -shared -o $@ $<
 
-shared/libbenchmarking.so: makefile src/benchmarking.h src/benchmarking.c src/structs.h
-	$(call buildLib,benchmarking)
-
-unit-tests: run-unit-tests.c makefile src/unit-tests.c src/unit-tests.h src/structs.h
-	bear -- clang $(CFLAGS) $(WARN) $(NOWARN) -std=c23 -ferror-limit=0 -rpath shared $(OPTIMIZE) $(SANITIZE) $(DEBUGGING) $(BENCHMARKING) -o unit-tests run-unit-tests.c src/unit-tests.c -Isrc -Lshared $(LIBS)
+unit-tests: run-unit-tests.c makefile src/unit-tests.c src/structs.h
+	bear -- clang $(CFLAGS) $(WARN) $(NOWARN) -ferror-limit=0 -rpath shared $(OPTIMIZE) $(SANITIZE) $(DEBUGGING) -o unit-tests $(STATIC) run-unit-tests.c -Isrc -Lshared $(LIBS)
 
 main: makefile main.c src/structs.h
 	bear -- clang $(CFLAGS) $(WARN) $(NOWARN) -std=c23 -ferror-limit=0 -rpath shared $(OPTIMIZE) $(SANITIZE) $(DEBUGGING) $(BENCHMARKING) -o main main.c -Isrc -Lshared $(LIBS)
