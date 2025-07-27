@@ -35,7 +35,7 @@ void CleanupMemory(objTracker *tracker) {
     tracker->objListLen -= nullCounter;
 }
 
-int CreateLogFile(void) {
+FILE *CreateLogFile(char *restrict file_name_ptr) {
     time_t t           = time(NULL);
     struct tm timedate = *localtime(&t);
 
@@ -45,6 +45,7 @@ int CreateLogFile(void) {
     // If logs exists, but is not a directory
     // remove it and set errno to ENOENT
     // So the next condition gets triggered and creates a directory
+
     if (statThingi.st_mode / 010000 == 010) {
         remove("logs");
         errno = ENOENT;
