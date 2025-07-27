@@ -63,17 +63,52 @@ void CleanupMemory(objTracker *tracker);
 // Rollover int, if it gets over max or under min
 int RollOver(int d, int min, int max);
 
+int fGetSign(float f) {
+    int *ptr = (int *)(void *)&f;
+    return *ptr >> 31 | 1;
+}
 
-int CreateLogFile(void);
+int GetSign(int i) { return i >> 31 | 1; }
+
+float GetRandomf(float min, float max) {
+    return (float)(GetRandomValue((int)(min * 1000), (int)(max * 1000))) / 1000;
+}
+
 float fRollOver(float d, float min, float max) {
     const float t = d < min ? max : d;
     return t > max ? min : t;
 }
 
+float fCutOff(float f, int n) {
+    if (n == 0) return (float)(int)f;
+    const float mult = powf(10.f, (float)n);
+    const int temp   = (int)(f * mult);
+    return (float)temp / mult;
+}
+
+int RollOver(int d, int min, int max) {
+    const int t = d < min ? max : d;
+    return t > max ? min : t;
+}
+
+float ClampFloat(float d, float min, float max) {
+    const float t = d < min ? min : d;
+    return t > max ? max : t;
+}
+
+int ClampInt(int d, int min, int max) {
+    const int t = d < min ? min : d;
+    return t > max ? max : t;
+}
+
+FILE *CreateLogFile(char *restrict file_name_ptr);
+
 int GetStartUpArguments(int argc, char **argv);
 
 // Initializes needed config
 void RunConfig(void);
+
+void InitRaylib(void);
 
 // Cleansup everthing created with `RunConfig()`
 void RunCleanup(void);
