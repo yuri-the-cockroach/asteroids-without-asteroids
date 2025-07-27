@@ -6,7 +6,6 @@
 #include "src/autils.h"
 #include "src/statemachine.h"
 #include "src/structs.c"
-#include "src/structs.h"
 #include "src/syslogic.h"
 
 int main(int argc, char **argv) {
