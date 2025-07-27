@@ -87,16 +87,22 @@ void DebugingKeyHandler(objTracker *tracker) {
     if (GAME_STATE == RUNNING) {
         if (IsKeyPressed('P')) DEBUG_PAUSE = !DEBUG_PAUSE;
         if (IsKeyPressed('1')) {
+            CreateAsteroid(
+                tracker, (Vector2){ 300, 600 }, (Vector2){ 0, 0 }, 0, 1);
+            CreateAsteroid(
+                tracker, (Vector2){ 500, 600 }, (Vector2){ -90, 0 }, 0, 1);
 
             CreateAsteroid(
-                tracker, (Vector2){ 200, 0 }, (Vector2){ 0, 0 }, 1, 1);
+                tracker, (Vector2){ 300, 900 }, (Vector2){ 90, 0 }, 0, 1);
+            CreateAsteroid(
+                tracker, (Vector2){ 500, 900 }, (Vector2){ 0, 0 }, 0, 1);
         }
 
         if (IsKeyPressed('2')) {
             CreateAsteroid(
-                tracker, (Vector2){ 300, 600 }, (Vector2){ 0, 0 }, 0, 2);
+                tracker, (Vector2){ 300, 600 }, (Vector2){ 0, 0 }, 0, 1);
             CreateAsteroid(
-                tracker, (Vector2){ 500, 600 }, (Vector2){ -90, 0 }, 0, 1);
+                tracker, (Vector2){ 500, 600 }, (Vector2){ -90, 0 }, 0, 2);
 
             CreateAsteroid(
                 tracker, (Vector2){ 300, 900 }, (Vector2){ 90, 0 }, 0, 1);
@@ -105,19 +111,22 @@ void DebugingKeyHandler(objTracker *tracker) {
         }
 
         if (IsKeyPressed('3')) {
-
             CreateAsteroid(
-                tracker, (Vector2){ 300, 900 }, (Vector2){ -30, 0 }, 0, 4);
+                tracker, (Vector2){ 600, 300 }, (Vector2){ 0, 0 }, 0, 2);
             CreateAsteroid(
-                tracker, (Vector2){ 600, 900 }, (Vector2){ -90, 0 }, 0, 1);
+                tracker, (Vector2){ 600, 500 }, (Vector2){ 0, -90 }, 0, 1);
+            CreateAsteroid(
+                tracker, (Vector2){ 900, 300 }, (Vector2){ 0, 90 }, 0, 1);
+            CreateAsteroid(
+                tracker, (Vector2){ 900, 500 }, (Vector2){ 0, 0 }, 0, 2);
         }
 
         if (IsKeyPressed('4')) {
 
             CreateAsteroid(
-                tracker, (Vector2){ 400, 300 }, (Vector2){ 120, 0 }, 0, 1);
+                tracker, (Vector2){ 300, 300 }, (Vector2){ 120, 120 }, 0, 1);
             CreateAsteroid(
-                tracker, (Vector2){ 600, 300 }, (Vector2){ -120, 0 }, 0, 2);
+                tracker, (Vector2){ 600, 600 }, (Vector2){ -120, -120 }, 0, 2);
         }
 
         if (IsKeyPressed('5')) {
@@ -132,7 +141,7 @@ void DebugingKeyHandler(objTracker *tracker) {
         }
 
         if (IsKeyPressed('9')) {
-            for (int i = 0; i < SOFT_MAX_ASTEROIDS - 1; i++) {
+            for (unsigned int i = 0; i < SOFT_MAX_ASTEROIDS - 1; i++) {
                 AsteroidSafeSpawn(tracker);
             }
         }
