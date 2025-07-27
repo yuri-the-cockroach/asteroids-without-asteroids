@@ -45,6 +45,71 @@ void DisplayText(Vector2 pos, int fontSize, Color color,
     DrawText(messageString, (int)pos.x, (int)pos.y, fontSize, color);
 }
 
+void RunWorldRender(objTracker *restrict tracker) {
+    BeginMode2D(tracker->playerCamera);
+    UpdateScreenBorder(tracker);
+
+    Vector2 screenStart = tracker->screenBorderWrap.screenStart;
+    Vector2 screenEnd   = tracker->screenBorderWrap.screenEnd;
+
+    DrawRectangle(WORLD_POS_MIN_X,
+                  WORLD_POS_MIN_Y,
+                  fabsf(WORLD_POS_MIN_X) + fabsf(WORLD_POS_MAX_X),
+                  fabsf(WORLD_POS_MIN_Y) + fabsf(WORLD_POS_MAX_Y),
+                  (Color){ 18, 18, 18, 255 });
+    DrawGrid2D(200, (Color){ 38, 38, 38, 255 });
+
+    Vector2 colliderStart, colliderEnd;
+    objWrap *current;
+    // int DrawingObjCount = 0;
+    for (unsigned int i = 0; i < tracker->objListLen; i++) {
+        current = tracker->objList[i];
+
+        if (!current || !current->draw || current->request != UPDATE) continue;
+
+        // int DrawingObjCount = 0;
+        colliderStart = (Vector2){
+            current->objPtr->position.x + current->collider.collider.x,
+            current->objPtr->position.y + current->collider.collider.y
+        };
+        colliderEnd = (Vector2){ current->objPtr->position.x +
+                                     current->collider.collider.x +
+                                     current->collider.collider.width,
+                                 current->objPtr->position.y +
+                                     current->collider.collider.y +
+                                     current->collider.collider.height };
+
+        if (colliderEnd.x < screenStart.x || screenEnd.x < colliderStart.x ||
+            colliderEnd.y < screenStart.y || screenEnd.y < colliderStart.y)
+            continue;
+
+        DrawObject(current);
+
+        // DrawingObjCount++;
+    }
+    // LOG(TRACE, "Drawing %d objects", DrawingObjCount);
+
+// Highlight cursor position
+#ifdef DEBUGGING
+    if (VISUAL_DEBUG) {
+        Vector2 cursorPos =
+            (Vector2){ (GetMousePosition().x - tracker->playerCamera.offset.x) /
+                               tracker->playerCamera.zoom +
+                           tracker->playerCamera.target.x,
+                       (GetMousePosition().y - tracker->playerCamera.offset.y) /
+                               tracker->playerCamera.zoom +
+                           tracker->playerCamera.target.y };
+        int rectSize = 20;
+        DrawRectangle((int)cursorPos.x - rectSize / 2,
+                      (int)cursorPos.y - rectSize / 2,
+                      rectSize,
+                      rectSize,
+                      RED);
+    }
+#endif
+    EndMode2D();
+}
+
 #ifdef DEBUGGING
     if (VISUAL_DEBUG)
         DrawRectangleLines(
